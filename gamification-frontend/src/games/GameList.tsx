@@ -1,0 +1,172 @@
+import {
+    List as RaList,
+    SimpleListLoading,
+    useListContext, TopToolbar,
+    CreateButton,
+    Pagination,
+    BulkActionsToolbar,
+    BulkDeleteButton,
+    RecordContextProvider,
+    useStore,
+    useRemoveFromStore,
+    SearchInput,    
+    useDataProvider,
+    useNotify
+} from 'react-admin';
+import { useRedirect } from 'react-admin';
+import {
+    List,
+    ListItem,
+    ListItemText,
+    Button
+} from '@mui/material';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { Game } from '../types';
+import { useEffect } from 'react';
+
+const GameListContent = () => {
+    const {
+        data: Games,
+        isLoading,
+        onToggleItem,
+        selectedIds,
+    } = useListContext<Game>();
+    if (isLoading) {
+        return <SimpleListLoading hasLeftAvatarOrIcon hasSecondaryText />;
+    }
+    const now = Date.now();
+
+    return (
+        <>
+            <BulkActionsToolbar>
+                <BulkDeleteButton />
+            </BulkActionsToolbar>
+            <List>
+                {Games.map(Game => (
+                    <RecordContextProvider key={Game.id} value={Game}>
+                        <ListItem>
+                            <ListItemText primary={`${Game.name}`} secondary={`${Game.id}`}></ListItemText>
+                            {/* <SettingButton selectedId={Game.id} /> */}
+                            <ManageButton selectedId={Game.id} selectedName={Game.name}></ManageButton>
+                        </ListItem>
+                    </RecordContextProvider>
+                ))}
+            </List>
+        </>
+    );
+};
+
+const GameListActions = () => (
+    <TopToolbar>
+        <ExportGameButton />
+        <CreateButton
+            variant="contained"
+            label="New Game"
+            sx={{ marginLeft: 2 }}
+        />
+    </TopToolbar>
+);
+
+export const GameList = () => {    
+    const remove = useRemoveFromStore();
+    useEffect(() => {
+        remove('game.selected');
+        remove('game.name');
+      }, []);
+    return (
+        <RaList
+            actions={<GameListActions />}
+            perPage={25}
+            pagination={<Pagination rowsPerPageOptions={[10, 25, 50, 100]} />}
+            sort={{ field: 'last_seen', order: 'DESC' }}
+            filters={GameFilters}
+        >
+            <GameListContent />
+        </RaList>
+    )
+};
+
+const ManageButton = (params: any) => {
+    const redirect = useRedirect();
+    const [gameId, setGameId] = useStore('game.selected');
+    const [gameName, setGameName] = useStore('game.name');
+    return (
+        <>
+            <Button endIcon={<CheckCircleOutlinedIcon />} onClick={() => {
+                setGameId(params.selectedId);
+                setGameName(params.selectedName);
+                redirect('/game/' + params.selectedId + '/show');
+            }}>
+                Manage
+            </Button>
+        </>
+    );
+
+};
+
+const SettingButton = (params: any) => {
+    const redirect = useRedirect();
+    const [gameId, getGameId] = useStore('game.selected');
+    return (
+        <>
+            <Button disabled={params.selectedId != gameId} endIcon={<SettingsIcon />} onClick={() => {
+                redirect('/game/' + params.selectedId + '/edit');
+            }}>
+                Edit Settings
+            </Button>
+        </>
+    );
+}
+
+const GameFilters = [
+    <SearchInput placeholder='Search by game name' source="q" alwaysOn />
+];
+
+const ExportGameButton = (params: any) => {
+    const dataProvider = useDataProvider();
+    const notify = useNotify();
+    const exportGames = function () {
+        const req = {
+            path: 'downloadJsonDB', //exportJsonDB
+            // options: { responseType: 'arraybuffer' }
+            // body: JSON.stringify(data),
+        };
+        dataProvider
+            .invoke(req)
+            .then(function (response: any) {
+                var json = JSON.stringify(response);
+                var blob = new Blob([json], { type: 'application/json' });
+                let url = window.URL.createObjectURL(blob);
+                let link = document.createElement('a');
+                link.href = url;
+                link.download = 'data.json';
+                link.click();
+            }).catch(function (error: any) {
+                notify(error.toString())
+            })
+    }
+
+    return (
+        <>
+            <Button
+                sx={{
+                    color: 'white',
+                    backgroundColor: '#1976d2',
+                    boxShadow: '0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%)',
+                    marginLeft: '16px',
+                    lineHeight: '1.5',
+                    fontWeight: '500',
+                    fontSize: '0.8125rem',
+                    minWidth: '64px',
+                    padding: '4px 10px',
+                    borderRadius: '4px'
+                }}
+                endIcon={<FileDownloadIcon />} onClick={exportGames}
+            >
+                Export Games
+            </Button>
+        </>
+    );
+};
