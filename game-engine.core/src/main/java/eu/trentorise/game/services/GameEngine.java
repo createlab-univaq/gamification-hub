@@ -22,6 +22,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import eu.trentorise.game.model.PlayerState;
+import eu.trentorise.game.model.simulation.SimulationResult;
 
 @Service
 public interface GameEngine {
@@ -29,15 +30,19 @@ public interface GameEngine {
 	public PlayerState execute(String gameId, PlayerState state, String action, Map<String, Object> data,
 			String executionId, long executionMoment, List<Object> factObjects);
 
+	public SimulationResult simulate(String gameId, PlayerState state, String action,
+			Map<String, Object> data, String executionId, long executionMoment,
+			List<Object> factObjects, boolean showDetailedChanges);
+
 	/**
 	 * Rule syntax validation
-	 * 
+	 *
 	 * @param gameId
 	 *            gameId
 	 * @param content
 	 *            the rule content
-	 * 
-	 * 
+	 *
+	 *
 	 * @return the list of syntax errors, or an empty list if validation gone
 	 *         fine
 	 */

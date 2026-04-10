@@ -1,19 +1,21 @@
 package eu.trentorise.game.managers;
 
-import static eu.trentorise.game.test_utils.Utils.date;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
+import eu.trentorise.game.config.AppConfig;
+import eu.trentorise.game.config.MongoConfig;
+import eu.trentorise.game.config.RabbitConf;
+import eu.trentorise.game.core.Clock;
+import eu.trentorise.game.model.ChallengeConcept.ChallengeState;
+import eu.trentorise.game.model.*;
+import eu.trentorise.game.model.ChallengeInvitation.Player;
+import eu.trentorise.game.model.GroupChallenge.Attendee;
+import eu.trentorise.game.model.GroupChallenge.Attendee.Role;
+import eu.trentorise.game.model.GroupChallenge.PointConceptRef;
+import eu.trentorise.game.model.core.ChallengeAssignment;
+import eu.trentorise.game.repo.ChallengeConceptRepo;
+import eu.trentorise.game.repo.ChallengeModelRepo;
+import eu.trentorise.game.repo.GroupChallengeRepo;
+import eu.trentorise.game.services.GameService;
+import eu.trentorise.game.services.PlayerService;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 import org.junit.Assert;
@@ -28,36 +30,22 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.sleuth.autoconfig.brave.BraveAutoConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import eu.trentorise.game.config.AppConfig;
-import eu.trentorise.game.config.MongoConfig;
-import eu.trentorise.game.config.RabbitConf;
-import eu.trentorise.game.core.Clock;
-import eu.trentorise.game.model.ChallengeConcept.ChallengeState;
-import eu.trentorise.game.model.ChallengeInvitation;
-import eu.trentorise.game.model.ChallengeInvitation.Player;
-import eu.trentorise.game.model.ChallengeModel;
-import eu.trentorise.game.model.Game;
-import eu.trentorise.game.model.GroupChallenge;
-import eu.trentorise.game.model.GroupChallenge.Attendee;
-import eu.trentorise.game.model.GroupChallenge.Attendee.Role;
-import eu.trentorise.game.model.GroupChallenge.PointConceptRef;
-import eu.trentorise.game.model.PlayerState;
-import eu.trentorise.game.model.PointConcept;
-import eu.trentorise.game.model.core.ChallengeAssignment;
-import eu.trentorise.game.repo.ChallengeConceptRepo;
-import eu.trentorise.game.repo.ChallengeModelRepo;
-import eu.trentorise.game.repo.GroupChallengeRepo;
-import eu.trentorise.game.services.GameService;
-import eu.trentorise.game.services.PlayerService;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
+import static eu.trentorise.game.test_utils.Utils.date;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, BraveAutoConfiguration.class, RabbitConf.class},
+@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class},
         loader = AnnotationConfigContextLoader.class)
 public class ChallengeManagerTest {
 
@@ -67,9 +55,9 @@ public class ChallengeManagerTest {
 
     @Autowired
     private GroupChallengeRepo groupChallengeRepo;
-    
+
     @Autowired
-	private ChallengeConceptRepo challengeConceptRepo;
+    private ChallengeConceptRepo challengeConceptRepo;
 
     @InjectMocks
     @Autowired
@@ -234,7 +222,8 @@ public class ChallengeManagerTest {
         challengeManager.save(assign);
 
         GroupChallenge assign1 = new GroupChallenge();
-        assign1.setChallengeModel(GroupChallenge.MODEL_NAME_COMPETITIVE_PERFORMANCE);;
+        assign1.setChallengeModel(GroupChallenge.MODEL_NAME_COMPETITIVE_PERFORMANCE);
+        ;
         assign1.setGameId(game.getId());
         assign1.setEnd(date("2018-09-29T09:00:00"));
         attendee = new Attendee();
@@ -269,7 +258,8 @@ public class ChallengeManagerTest {
         GroupChallenge challenge2 = new GroupChallenge();
         challenge2.setGameId(game.getId());
         challenge2.setEnd(date("2018-09-30T09:00:00"));
-        challenge2.setChallengeModel(GroupChallenge.MODEL_NAME_COMPETITIVE_PERFORMANCE);;
+        challenge2.setChallengeModel(GroupChallenge.MODEL_NAME_COMPETITIVE_PERFORMANCE);
+        ;
         attendee = new Attendee();
         attendee.setPlayerId("player");
         attendee.setRole(Role.GUEST);
@@ -280,7 +270,8 @@ public class ChallengeManagerTest {
         GroupChallenge challenge3 = new GroupChallenge();
         challenge3.setGameId(otherGame.getId());
         challenge3.setEnd(date("2018-09-17T09:00:00"));
-        challenge3.setChallengeModel(GroupChallenge.MODEL_NAME_COMPETITIVE_PERFORMANCE);;
+        challenge3.setChallengeModel(GroupChallenge.MODEL_NAME_COMPETITIVE_PERFORMANCE);
+        ;
         attendee = new Attendee();
         attendee.setPlayerId("player");
         attendee.setRole(Role.GUEST);
@@ -291,7 +282,8 @@ public class ChallengeManagerTest {
         GroupChallenge challenge4 = new GroupChallenge();
         challenge4.setGameId(game.getId());
         challenge4.setEnd(date("2018-09-17T09:00:00"));
-        challenge4.setChallengeModel(GroupChallenge.MODEL_NAME_COMPETITIVE_PERFORMANCE);;
+        challenge4.setChallengeModel(GroupChallenge.MODEL_NAME_COMPETITIVE_PERFORMANCE);
+        ;
         attendee = new Attendee();
         attendee.setPlayerId("player");
         attendee.setRole(Role.GUEST);
@@ -302,7 +294,8 @@ public class ChallengeManagerTest {
         GroupChallenge challenge5 = new GroupChallenge();
         challenge5.setGameId(game.getId());
         challenge5.setEnd(date("2018-09-29T08:00:00"));
-        challenge5.setChallengeModel(GroupChallenge.MODEL_NAME_COMPETITIVE_PERFORMANCE);;
+        challenge5.setChallengeModel(GroupChallenge.MODEL_NAME_COMPETITIVE_PERFORMANCE);
+        ;
         attendee = new Attendee();
         attendee.setPlayerId("player");
         attendee.setRole(Role.GUEST);
@@ -404,7 +397,7 @@ public class ChallengeManagerTest {
     @Test
     public void wasp_accept_invitation_having_other_proposed_challenges() {
         gameSrv.saveGameDefinition(defineGame());
-        BDDMockito.given(challengeModelRepo.findByGameIdAndName("GAME","model_1")).will(new Answer<ChallengeModel>() {
+        BDDMockito.given(challengeModelRepo.findByGameIdAndName("GAME", "model_1")).will(new Answer<ChallengeModel>() {
 
             @Override
             public ChallengeModel answer(InvocationOnMock arg0) throws Throwable {
@@ -412,7 +405,7 @@ public class ChallengeManagerTest {
                 model.setName("model_1");
                 return model;
             }
-                });
+        });
 
         ChallengeAssignment assignment = new ChallengeAssignment("model_1", "instance_name",
                 new HashMap<>(), "PROPOSED", null, null);

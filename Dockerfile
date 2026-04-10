@@ -7,10 +7,9 @@ RUN apt update && apt install -y nodejs npm git && rm -rf /var/lib/apt/lists/*
 RUN npm install -g bower
 WORKDIR /tmp/game-engine.core
 RUN cd /tmp/game-engine.web/src/main/resources/consoleweb-assets && bower --allow-root install
-RUN --mount=type=cache,target=/root/.m2,source=/.m2,from=smartcommunitylab/gamification-engine:cache mvn install -DskipTests
+RUN mvn install -DskipTests
 WORKDIR /tmp/game-engine.web
-RUN --mount=type=cache,target=/root/.m2,source=/.m2,from=smartcommunitylab/gamification-engine:cache mvn install -DskipTests
-
+RUN mvn install -DskipTests
 FROM eclipse-temurin:17-alpine
 ARG VER=3.0.0
 ARG USER=gamification

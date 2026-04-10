@@ -129,6 +129,9 @@ public class GameManager implements GameService {
     private PlayerService playerSrv;
 
     @Autowired
+    private RuleImpactAnalyzer ruleImpactAnalyzer;
+
+    @Autowired
     private ChallengeManager challengeSrv;
 
     @Autowired
@@ -345,6 +348,7 @@ public class GameManager implements GameService {
                     game.getRules().add(ruleUrl);
                     saveGameDefinition(game);
                     kieContainerFactory.purgeContainer(rule.getGameId());
+                    ruleImpactAnalyzer.purge(rule.getGameId());
                 } else {
                     throw new IllegalArgumentException(
                             "the rule already exist for game " + rule.getGameId());
@@ -514,6 +518,7 @@ public class GameManager implements GameService {
             res = g.getRules().remove(url);
             saveGameDefinition(g);
             kieContainerFactory.purgeContainer(gameId);
+            ruleImpactAnalyzer.purge(gameId);
         }
 
         return res;
@@ -536,6 +541,7 @@ public class GameManager implements GameService {
             }	
             gameRepo.deleteById(gameId);
             kieContainerFactory.purgeContainer(gameId);
+            ruleImpactAnalyzer.purge(gameId);
             res = true;
         }
         return res;

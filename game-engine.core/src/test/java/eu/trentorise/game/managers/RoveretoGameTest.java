@@ -1,11 +1,11 @@
 /**
  * Copyright 2015 Fondazione Bruno Kessler - Trento RISE
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -13,24 +13,6 @@
  */
 
 package eu.trentorise.game.managers;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.sleuth.autoconfig.brave.BraveAutoConfiguration;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import eu.trentorise.game.config.AppConfig;
 import eu.trentorise.game.config.MongoConfig;
@@ -51,9 +33,21 @@ import eu.trentorise.game.repo.NotificationPersistence;
 import eu.trentorise.game.repo.StatePersistence;
 import eu.trentorise.game.services.PlayerService;
 import eu.trentorise.game.task.GeneralClassificationTask;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
+
+import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, TestCoreConfiguration.class, BraveAutoConfiguration.class},
+@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, TestCoreConfiguration.class},
         loader = AnnotationConfigContextLoader.class)
 public class RoveretoGameTest {
 
@@ -136,13 +130,13 @@ public class RoveretoGameTest {
 
         /**
          * result after game execution
-         * 
+         *
          * player-1 Silver-green Bronze-pr
-         * 
+         *
          * player-2 Bronze-green Silver-health Gold-pr
-         * 
+         *
          * player-11 Gold-green Gold-health
-         * 
+         *
          * player-122 Bronze-health Silver-pr
          */
 
@@ -178,19 +172,19 @@ public class RoveretoGameTest {
 
         /**
          * result after game execution
-         * 
+         *
          * player-1 Bronze-green Gold-health
-         * 
+         *
          * player-2 Gold-green Gold-pr
-         * 
+         *
          * player-11 Gold-green
-         * 
+         *
          * player-12 Bronze-green Gold-health Silver-pr
-         * 
+         *
          * player-2442 Bronze-green Gold-health Silver-pr
-         * 
+         *
          * player-242 Gold-health Silver-pr
-         * 
+         *
          * player-244 Gold-health Silver-pr
          */
 
@@ -224,70 +218,68 @@ public class RoveretoGameTest {
 
         /**
          * result after game execution
-         * 
+         *
          * player-1 Gold-health Bronze-pr
-         * 
+         *
          * player-2 Gold-green Bronze-health Gold-pr
-         * 
+         *
          * player-11 Gold-green
-         * 
+         *
          * player-12 Bronze-green Gold-health Silver-pr
          */
     }
 
-    public void analyzeSameResultLastResult()
-
-    {
+    public void analyzeSameResultLastResult() {
 
         // player 1
-        check(new String[] {"10-point-green", "bronze-medal-green"}, "1", "green leaves");
-        check(new String[] {"10-point-health", "25-point-health", "50-point-health",
+        check(new String[]{"10-point-green", "bronze-medal-green"}, "1", "green leaves");
+        check(new String[]{"10-point-health", "25-point-health", "50-point-health",
                 "king-week-health", "gold-medal-health"}, "1", "health");
-        check(new String[] {}, "1", "p+r");
-        check(new String[] {}, "1", "special");
+        check(new String[]{}, "1", "p+r");
+        check(new String[]{}, "1", "special");
 
         // player 2
-        check(new String[] {"10-point-green", "50-point-green", "100-point-green",
+        check(new String[]{"10-point-green", "50-point-green", "100-point-green",
                 "gold-medal-green", "king-week-green"}, "2", "green leaves");
-        check(new String[] {"10-point-health", "25-point-health", "50-point-health"}, "2",
+        check(new String[]{"10-point-health", "25-point-health", "50-point-health"}, "2",
                 "health");
-        check(new String[] {"10-point-pr", "king-week-pr", "gold-medal-pr"}, "2", "p+r");
-        check(new String[] {}, "2", "special");
+        check(new String[]{"10-point-pr", "king-week-pr", "gold-medal-pr"}, "2", "p+r");
+        check(new String[]{}, "2", "special");
 
         // player 11
-        check(new String[] {"10-point-green", "50-point-green", "100-point-green",
+        check(new String[]{"10-point-green", "50-point-green", "100-point-green",
                 "gold-medal-green", "king-week-green"}, "11", "green leaves");
-        check(new String[] {}, "11", "health");
-        check(new String[] {}, "11", "p+r");
-        check(new String[] {}, "11", "special");
+        check(new String[]{}, "11", "health");
+        check(new String[]{}, "11", "p+r");
+        check(new String[]{}, "11", "special");
 
         // player 12
-        check(new String[] {"10-point-green", "bronze-medal-green"}, "12", "green leaves");
-        check(new String[] {"10-point-health", "25-point-health", "50-point-health",
+        check(new String[]{"10-point-green", "bronze-medal-green"}, "12", "green leaves");
+        check(new String[]{"10-point-health", "25-point-health", "50-point-health",
                 "king-week-health", "gold-medal-health"}, "12", "health");
-        check(new String[] {"10-point-pr", "silver-medal-pr"}, "12", "p+r");
-        check(new String[] {}, "12", "special");
+        check(new String[]{"10-point-pr", "silver-medal-pr"}, "12", "p+r");
+        check(new String[]{}, "12", "special");
 
         // player 2442
-        check(new String[] {"10-point-green", "bronze-medal-green"}, "2442", "green leaves");
-        check(new String[] {"10-point-health", "25-point-health", "50-point-health",
+        check(new String[]{"10-point-green", "bronze-medal-green"}, "2442", "green leaves");
+        check(new String[]{"10-point-health", "25-point-health", "50-point-health",
                 "king-week-health", "gold-medal-health"}, "2442", "health");
-        check(new String[] {"10-point-pr", "silver-medal-pr"}, "2442", "p+r");
-        check(new String[] {}, "2442", "special");
+        check(new String[]{"10-point-pr", "silver-medal-pr"}, "2442", "p+r");
+        check(new String[]{}, "2442", "special");
 
         // player 242
-        check(new String[] {"bronze-medal-green"}, "242", "green leaves");
-        check(new String[] {"10-point-health", "25-point-health", "50-point-health",
+        check(new String[]{"bronze-medal-green"}, "242", "green leaves");
+        check(new String[]{"10-point-health", "25-point-health", "50-point-health",
                 "king-week-health", "gold-medal-health"}, "242", "health");
-        check(new String[] {"10-point-pr", "silver-medal-pr"}, "242", "p+r");
-        check(new String[] {}, "242", "special");
+        check(new String[]{"10-point-pr", "silver-medal-pr"}, "242", "p+r");
+        check(new String[]{}, "242", "special");
 
         // player 244
-        check(new String[] {}, "244", "green leaves");
-        check(new String[] {"king-week-health", "10-point-health", "25-point-health",
+        check(new String[]{}, "244", "green leaves");
+        check(new String[]{"king-week-health", "10-point-health", "25-point-health",
                 "50-point-health", "gold-medal-health"}, "244", "health");
-        check(new String[] {"10-point-pr", "silver-medal-pr"}, "244", "p+r");
-        check(new String[] {}, "244", "special");
+        check(new String[]{"10-point-pr", "silver-medal-pr"}, "244", "p+r");
+        check(new String[]{}, "244", "special");
     }
 
     private void launchTaskExecution() {
@@ -317,31 +309,31 @@ public class RoveretoGameTest {
     public void analyzeSimple() {
 
         // player 1
-        check(new String[] {"silver-medal-green", "10-point-green"}, "1", "green leaves");
-        check(new String[] {"bronze-medal-pr"}, "1", "p+r");
-        check(new String[] {}, "1", "health");
-        check(new String[] {}, "1", "special");
+        check(new String[]{"silver-medal-green", "10-point-green"}, "1", "green leaves");
+        check(new String[]{"bronze-medal-pr"}, "1", "p+r");
+        check(new String[]{}, "1", "health");
+        check(new String[]{}, "1", "special");
 
         // player 2
-        check(new String[] {"bronze-medal-green", "10-point-green"}, "2", "green leaves");
-        check(new String[] {"10-point-pr", "king-week-pr", "gold-medal-pr"}, "2", "p+r");
-        check(new String[] {"10-point-health", "25-point-health", "50-point-health",
+        check(new String[]{"bronze-medal-green", "10-point-green"}, "2", "green leaves");
+        check(new String[]{"10-point-pr", "king-week-pr", "gold-medal-pr"}, "2", "p+r");
+        check(new String[]{"10-point-health", "25-point-health", "50-point-health",
                 "silver-medal-health"}, "2", "health");
-        check(new String[] {}, "2", "special");
+        check(new String[]{}, "2", "special");
 
         // player 11
-        check(new String[] {"gold-medal-green", "10-point-green", "50-point-green",
+        check(new String[]{"gold-medal-green", "10-point-green", "50-point-green",
                 "100-point-green", "king-week-green"}, "11", "green leaves");
-        check(new String[] {}, "11", "p+r");
-        check(new String[] {"10-point-health", "25-point-health", "50-point-health",
+        check(new String[]{}, "11", "p+r");
+        check(new String[]{"10-point-health", "25-point-health", "50-point-health",
                 "king-week-health", "gold-medal-health"}, "11", "health");
-        check(new String[] {}, "11", "special");
+        check(new String[]{}, "11", "special");
 
         // player 122
-        check(new String[] {}, "122", "green leaves");
-        check(new String[] {"10-point-pr", "silver-medal-pr"}, "122", "p+r");
-        check(new String[] {"bronze-medal-health", "10-point-health"}, "122", "health");
-        check(new String[] {}, "122", "special");
+        check(new String[]{}, "122", "green leaves");
+        check(new String[]{"10-point-pr", "silver-medal-pr"}, "122", "p+r");
+        check(new String[]{"bronze-medal-health", "10-point-health"}, "122", "health");
+        check(new String[]{}, "122", "special");
 
     }
 
@@ -356,33 +348,33 @@ public class RoveretoGameTest {
     public void analyzeSameResult() {
 
         // player 1
-        check(new String[] {}, "1", "green leaves");
-        check(new String[] {"king-week-health", "10-point-health", "25-point-health",
+        check(new String[]{}, "1", "green leaves");
+        check(new String[]{"king-week-health", "10-point-health", "25-point-health",
                 "50-point-health", "gold-medal-health"}, "1", "health");
-        check(new String[] {"bronze-medal-pr"}, "1", "p+r");
-        check(new String[] {}, "1", "special");
+        check(new String[]{"bronze-medal-pr"}, "1", "p+r");
+        check(new String[]{}, "1", "special");
 
         // player 12
-        check(new String[] {"bronze-medal-green"}, "12", "green leaves");
-        check(new String[] {"10-point-health", "25-point-health", "50-point-health",
+        check(new String[]{"bronze-medal-green"}, "12", "green leaves");
+        check(new String[]{"10-point-health", "25-point-health", "50-point-health",
                 "king-week-health", "gold-medal-health"}, "12", "health");
-        check(new String[] {"10-point-pr", "silver-medal-pr"}, "12", "p+r");
-        check(new String[] {}, "12", "special");
+        check(new String[]{"10-point-pr", "silver-medal-pr"}, "12", "p+r");
+        check(new String[]{}, "12", "special");
 
         // player 11
-        check(new String[] {"10-point-green", "gold-medal-green", "king-week-green"}, "11",
+        check(new String[]{"10-point-green", "gold-medal-green", "king-week-green"}, "11",
                 "green leaves");
-        check(new String[] {}, "11", "health");
-        check(new String[] {}, "11", "p+r");
-        check(new String[] {}, "11", "special");
+        check(new String[]{}, "11", "health");
+        check(new String[]{}, "11", "p+r");
+        check(new String[]{}, "11", "special");
 
         // player 2
-        check(new String[] {"10-point-green", "gold-medal-green", "king-week-green"}, "2",
+        check(new String[]{"10-point-green", "gold-medal-green", "king-week-green"}, "2",
                 "green leaves");
-        check(new String[] {"10-point-health", "25-point-health", "50-point-health",
+        check(new String[]{"10-point-health", "25-point-health", "50-point-health",
                 "bronze-medal-health"}, "2", "health");
-        check(new String[] {"10-point-pr", "king-week-pr", "gold-medal-pr"}, "2", "p+r");
-        check(new String[] {}, "2", "special");
+        check(new String[]{"10-point-pr", "king-week-pr", "gold-medal-pr"}, "2", "p+r");
+        check(new String[]{}, "2", "special");
 
     }
 
@@ -426,7 +418,7 @@ public class RoveretoGameTest {
     }
 
     private StatePersistence definePlayerState(String playerId, Double greenPoint,
-            Double healthPoint, Double prPoint) {
+                                               Double healthPoint, Double prPoint) {
         PlayerState player = new PlayerState(GAME, playerId);
         Set<GameConcept> myState = new HashSet<GameConcept>();
         PointConcept pc = new PointConcept("green leaves");

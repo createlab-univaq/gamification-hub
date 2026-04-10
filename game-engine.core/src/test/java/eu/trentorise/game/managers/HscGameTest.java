@@ -1,11 +1,11 @@
 /**
  * Copyright 2015 Fondazione Bruno Kessler - Trento RISE
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -14,39 +14,12 @@
 
 package eu.trentorise.game.managers;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.sleuth.autoconfig.brave.BraveAutoConfiguration;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-
 import eu.trentorise.game.config.AppConfig;
 import eu.trentorise.game.config.MongoConfig;
 import eu.trentorise.game.config.RabbitConf;
 import eu.trentorise.game.core.AppContextProvider;
 import eu.trentorise.game.core.config.TestCoreConfiguration;
-import eu.trentorise.game.model.BadgeCollectionConcept;
-import eu.trentorise.game.model.ChallengeModel;
-import eu.trentorise.game.model.Game;
-import eu.trentorise.game.model.PlayerState;
-import eu.trentorise.game.model.PointConcept;
-import eu.trentorise.game.model.TeamState;
+import eu.trentorise.game.model.*;
 import eu.trentorise.game.model.core.ChallengeAssignment;
 import eu.trentorise.game.model.core.ClasspathRule;
 import eu.trentorise.game.model.core.GameConcept;
@@ -55,9 +28,22 @@ import eu.trentorise.game.repo.NotificationPersistence;
 import eu.trentorise.game.repo.StatePersistence;
 import eu.trentorise.game.services.GameEngine;
 import eu.trentorise.game.services.PlayerService;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
+
+import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, TestCoreConfiguration.class, BraveAutoConfiguration.class},
+@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, TestCoreConfiguration.class},
         loader = AnnotationConfigContextLoader.class)
 public class HscGameTest {
 
@@ -71,27 +57,27 @@ public class HscGameTest {
 
     private static final String[] TEAM2_PLAYERS = {"batman", "superman"};
 
-    private static final String POINT_NAME =  "green leaves";
-    private static final String POINT_NAME_TEAM =  "green leaves";
+    private static final String POINT_NAME = "green leaves";
+    private static final String POINT_NAME_TEAM = "green leaves";
 
-    private static final String PART_NAME =  "participation";
+    private static final String PART_NAME = "participation";
 
-    private static final String BONUS =  "bonus";
+    private static final String BONUS = "bonus";
 
-    private static final String ACTIVITY =  "activity";
+    private static final String ACTIVITY = "activity";
 
-    private static final String WALK_KM =  "Walk_Km";
+    private static final String WALK_KM = "Walk_Km";
 
-    private static final String BIKE_KM =  "Bike_Km";
+    private static final String BIKE_KM = "Bike_Km";
 
-    private static final String BUS_KM =  "Bus_Km";
+    private static final String BUS_KM = "Bus_Km";
 
-    private static final String TRAIN_KM =  "Train_Km";
+    private static final String TRAIN_KM = "Train_Km";
 
-    private static final String FLAG_COLLECTION =  "flags";
+    private static final String FLAG_COLLECTION = "flags";
 
     private static final String[] POINT_CONCEPTS = new String[]
-            {BONUS, ACTIVITY, POINT_NAME, PART_NAME, WALK_KM, BIKE_KM, BUS_KM, TRAIN_KM, "Walk_Trips", "Bike_Trips", "Bus_Trips", "Train_Trips", "BikeSharing_Km", "BikeSharing_Trips", "Carpooling_Km" , "Carpooling_Trips", "Bonus_Partecipation"};
+            {BONUS, ACTIVITY, POINT_NAME, PART_NAME, WALK_KM, BIKE_KM, BUS_KM, TRAIN_KM, "Walk_Trips", "Bike_Trips", "Bus_Trips", "Train_Trips", "BikeSharing_Km", "BikeSharing_Trips", "Carpooling_Km", "Carpooling_Trips", "Bonus_Partecipation"};
 
     @Autowired
     private GameManager gameManager;
@@ -123,7 +109,6 @@ public class HscGameTest {
     }
 
 
-
     public void prepare() throws Exception {
         // randomize game id
         GAME = BASEGAME + '_' + UUID.randomUUID();
@@ -140,7 +125,7 @@ public class HscGameTest {
         game.setActions(actions);
 
         HashSet<GameConcept> gc = new HashSet<>();
-        for (String s: POINT_CONCEPTS) {
+        for (String s : POINT_CONCEPTS) {
             PointConcept pt = new PointConcept(s);
             pt.addPeriod("daily", new Date(), 60000);
             gc.add(pt);
@@ -154,7 +139,7 @@ public class HscGameTest {
         /*ClasspathRule rule = new ClasspathRule(GAME, "rules/" + BASEGAME + "/constants");
         rule.setName("constants");
         gameManager.addRule(rule);*/
-        for (String s: new String[] {"constants", "itinery.drl",  "mode-counters.drl", "challenge.drl"}) { // , "challenge.drl"
+        for (String s : new String[]{"constants", "itinery.drl", "mode-counters.drl", "challenge.drl"}) { // , "challenge.drl"
             String url = "rules/" + BASEGAME + "/" + s;
             // check if url exists
             if (Thread.currentThread().getContextClassLoader().getResource(url) == null) {
@@ -210,7 +195,7 @@ public class HscGameTest {
         team.setName(playerId);
 
         Set<GameConcept> myState = new HashSet<>();
-        for (String s: POINT_CONCEPTS) {
+        for (String s : POINT_CONCEPTS) {
             PointConcept pc;
             pc = new PointConcept(s);
             pc.setScore(0d);
@@ -235,7 +220,7 @@ public class HscGameTest {
 
         PlayerState player = new PlayerState(GAME, playerId);
         Set<GameConcept> myState = new HashSet<>();
-        for (String s: POINT_CONCEPTS) {
+        for (String s : POINT_CONCEPTS) {
             PointConcept pc;
             pc = new PointConcept(s);
             pc.setScore(0d);
@@ -268,56 +253,56 @@ public class HscGameTest {
                 DateTime.now().getMillis(), null);
         p = playerSrv.saveState(p);
 
-       check(TEAM1_PLAYERS[0], POINT_NAME, 300.0 );
-       check("disney", POINT_NAME, 1967.0 );
+        check(TEAM1_PLAYERS[0], POINT_NAME, 300.0);
+        check("disney", POINT_NAME, 1967.0);
 
         check("disney", BONUS, 1667.0);
 
         check(TEAM1_PLAYERS[0], WALK_KM, 6.0);
-        check("disney", WALK_KM, 6.0 );
+        check("disney", WALK_KM, 6.0);
 
         check(TEAM1_PLAYERS[0], "Walk_Trips", 1.0);
-        check("disney", "Walk_Trips", 1.0 );
+        check("disney", "Walk_Trips", 1.0);
 
         check(TEAM1_PLAYERS[0], ACTIVITY, 1.0);
         check("disney", ACTIVITY, 1.0);
-        
+
         p = playerSrv.loadState(GAME, TEAM1_PLAYERS[0], false, false);
         p = engine.execute(GAME, p, ACTION, data, UUID.randomUUID().toString(),
                 DateTime.now().getMillis(), null);
         p = playerSrv.saveState(p);
 
-         check(TEAM1_PLAYERS[0], POINT_NAME, 319.0 );
-         check("disney", POINT_NAME, 1986.0);
+        check(TEAM1_PLAYERS[0], POINT_NAME, 319.0);
+        check("disney", POINT_NAME, 1986.0);
 
         check("disney", BONUS, 1667.0);
-        
+
         check(TEAM1_PLAYERS[0], WALK_KM, 12.0);
-        check("disney", WALK_KM, 12.0 );
+        check("disney", WALK_KM, 12.0);
 
         check(TEAM1_PLAYERS[0], "Walk_Trips", 2.0);
-        check("disney", "Walk_Trips", 2.0 );
+        check("disney", "Walk_Trips", 2.0);
 
         check(TEAM1_PLAYERS[0], ACTIVITY, 1.0);
-        check("disney", ACTIVITY, 1.0);        
+        check("disney", ACTIVITY, 1.0);
 
         print("ehilà222");
-        
+
         p = playerSrv.loadState(GAME, TEAM1_PLAYERS[0], false, false);
         p = engine.execute(GAME, p, ACTION, data, UUID.randomUUID().toString(),
                 DateTime.now().getMillis(), null);
         p = playerSrv.saveState(p);
 
-        check(TEAM1_PLAYERS[0], POINT_NAME, 320.0 );
+        check(TEAM1_PLAYERS[0], POINT_NAME, 320.0);
         check("disney", POINT_NAME, 1987.0);
 
         check("disney", BONUS, 1667.0);
 
         check(TEAM1_PLAYERS[0], WALK_KM, 18.0);
-        check("disney", WALK_KM, 18.0 );
+        check("disney", WALK_KM, 18.0);
 
         check(TEAM1_PLAYERS[0], "Walk_Trips", 3.0);
-        check("disney", "Walk_Trips", 3.0 );
+        check("disney", "Walk_Trips", 3.0);
 
         check(TEAM1_PLAYERS[0], ACTIVITY, 1.0);
         check("disney", ACTIVITY, 1.0);
@@ -336,16 +321,16 @@ public class HscGameTest {
                 DateTime.now().getMillis(), null);
         p = playerSrv.saveState(p);
 
-        check(TEAM1_PLAYERS[0], POINT_NAME, 448.0 );
-        check("disney", POINT_NAME, 2115.0 );
+        check(TEAM1_PLAYERS[0], POINT_NAME, 448.0);
+        check("disney", POINT_NAME, 2115.0);
 
         check("disney", BONUS, 1667.0);
 
         check(TEAM1_PLAYERS[0], BIKE_KM, 4.0);
-        check("disney", BIKE_KM, 4.0 );
+        check("disney", BIKE_KM, 4.0);
 
         check(TEAM1_PLAYERS[0], "Bike_Trips", 1.0);
-        check("disney", "Bike_Trips", 1.0 );
+        check("disney", "Bike_Trips", 1.0);
 
         check(TEAM1_PLAYERS[0], ACTIVITY, 1.0);
         check("disney", ACTIVITY, 1.0);
@@ -355,16 +340,16 @@ public class HscGameTest {
                 DateTime.now().getMillis(), null);
         p = playerSrv.saveState(p);
 
-        check(TEAM1_PLAYERS[0], POINT_NAME, 528.0 );
+        check(TEAM1_PLAYERS[0], POINT_NAME, 528.0);
         check("disney", POINT_NAME, 2195.0);
 
         check("disney", BONUS, 1667.0);
 
         check(TEAM1_PLAYERS[0], BIKE_KM, 8.0);
-        check("disney", BIKE_KM, 8.0 );
+        check("disney", BIKE_KM, 8.0);
 
         check(TEAM1_PLAYERS[0], "Bike_Trips", 2.0);
-        check("disney", "Bike_Trips", 2.0 );
+        check("disney", "Bike_Trips", 2.0);
 
         check(TEAM1_PLAYERS[0], ACTIVITY, 1.0);
         check("disney", ACTIVITY, 1.0);
@@ -376,20 +361,20 @@ public class HscGameTest {
                 DateTime.now().getMillis(), null);
         p = playerSrv.saveState(p);
 
-        check(TEAM1_PLAYERS[0], POINT_NAME, 576.0 );
+        check(TEAM1_PLAYERS[0], POINT_NAME, 576.0);
         check("disney", POINT_NAME, 2243.0);
 
         check("disney", BONUS, 1667.0);
 
         check(TEAM1_PLAYERS[0], BIKE_KM, 12.0);
-        check("disney", BIKE_KM, 12.0 );
+        check("disney", BIKE_KM, 12.0);
 
         check(TEAM1_PLAYERS[0], "Bike_Trips", 3.0);
-        check("disney", "Bike_Trips", 3.0 );
+        check("disney", "Bike_Trips", 3.0);
 
         check(TEAM1_PLAYERS[0], ACTIVITY, 1.0);
         check("disney", ACTIVITY, 1.0);
-        
+
     }
 
     private void testBussing() throws Exception {
@@ -403,16 +388,16 @@ public class HscGameTest {
                 DateTime.now().getMillis(), null);
         p = playerSrv.saveState(p);
 
-        check(TEAM1_PLAYERS[0], POINT_NAME, 656.0 );
-        check("disney", POINT_NAME, 2323.0 );
+        check(TEAM1_PLAYERS[0], POINT_NAME, 656.0);
+        check("disney", POINT_NAME, 2323.0);
 
         check("disney", BONUS, 1667.0);
 
         check(TEAM1_PLAYERS[0], BUS_KM, 10.0);
-        check("disney", BUS_KM, 10.0 );
+        check("disney", BUS_KM, 10.0);
 
         check(TEAM1_PLAYERS[0], "Bus_Trips", 1.0);
-        check("disney", "Bus_Trips", 1.0 );
+        check("disney", "Bus_Trips", 1.0);
 
         check(TEAM1_PLAYERS[0], ACTIVITY, 1.0);
         check("disney", ACTIVITY, 1.0);
@@ -422,16 +407,16 @@ public class HscGameTest {
                 DateTime.now().getMillis(), null);
         p = playerSrv.saveState(p);
 
-        check(TEAM1_PLAYERS[0], POINT_NAME, 736.0 );
+        check(TEAM1_PLAYERS[0], POINT_NAME, 736.0);
         check("disney", POINT_NAME, 2403.0);
 
         check("disney", BONUS, 1667.0);
 
         check(TEAM1_PLAYERS[0], BUS_KM, 20.0);
-        check("disney", BUS_KM, 20.0 );
+        check("disney", BUS_KM, 20.0);
 
         check(TEAM1_PLAYERS[0], "Bus_Trips", 2.0);
-        check("disney", "Bus_Trips", 2.0 );
+        check("disney", "Bus_Trips", 2.0);
 
         check(TEAM1_PLAYERS[0], ACTIVITY, 1.0);
         check("disney", ACTIVITY, 1.0);
@@ -443,16 +428,16 @@ public class HscGameTest {
                 DateTime.now().getMillis(), null);
         p = playerSrv.saveState(p);
 
-        check(TEAM1_PLAYERS[0], POINT_NAME, 776.0 );
+        check(TEAM1_PLAYERS[0], POINT_NAME, 776.0);
         check("disney", POINT_NAME, 2443.0);
 
         check("disney", BONUS, 1667.0);
 
         check(TEAM1_PLAYERS[0], BUS_KM, 30.0);
-        check("disney", BUS_KM, 30.0 );
+        check("disney", BUS_KM, 30.0);
 
         check(TEAM1_PLAYERS[0], "Bus_Trips", 3.0);
-        check("disney", "Bus_Trips", 3.0 );
+        check("disney", "Bus_Trips", 3.0);
 
         check(TEAM1_PLAYERS[0], ACTIVITY, 1.0);
         check("disney", ACTIVITY, 1.0);
@@ -470,16 +455,16 @@ public class HscGameTest {
                 DateTime.now().getMillis(), null);
         p = playerSrv.saveState(p);
 
-        check(TEAM1_PLAYERS[0], POINT_NAME, 1016.0 );
-        check("disney", POINT_NAME, 2683.0 );
+        check(TEAM1_PLAYERS[0], POINT_NAME, 1016.0);
+        check("disney", POINT_NAME, 2683.0);
 
         check("disney", BONUS, 1667.0);
 
         check(TEAM1_PLAYERS[0], TRAIN_KM, 20.0);
-        check("disney", TRAIN_KM, 20.0 );
+        check("disney", TRAIN_KM, 20.0);
 
         check(TEAM1_PLAYERS[0], "Train_Trips", 1.0);
-        check("disney", "Train_Trips", 1.0 );
+        check("disney", "Train_Trips", 1.0);
 
         check(TEAM1_PLAYERS[0], ACTIVITY, 1.0);
         check("disney", ACTIVITY, 1.0);
@@ -489,16 +474,16 @@ public class HscGameTest {
                 DateTime.now().getMillis(), null);
         p = playerSrv.saveState(p);
 
-        check(TEAM1_PLAYERS[0], POINT_NAME, 1076.0 );
+        check(TEAM1_PLAYERS[0], POINT_NAME, 1076.0);
         check("disney", POINT_NAME, 2743.0);
 
         check("disney", BONUS, 1667.0);
 
         check(TEAM1_PLAYERS[0], TRAIN_KM, 40.0);
-        check("disney", TRAIN_KM, 40.0 );
+        check("disney", TRAIN_KM, 40.0);
 
         check(TEAM1_PLAYERS[0], "Train_Trips", 2.0);
-        check("disney", "Train_Trips", 2.0 );
+        check("disney", "Train_Trips", 2.0);
 
         check(TEAM1_PLAYERS[0], ACTIVITY, 1.0);
         check("disney", ACTIVITY, 1.0);
@@ -510,16 +495,16 @@ public class HscGameTest {
                 DateTime.now().getMillis(), null);
         p = playerSrv.saveState(p);
 
-        check(TEAM1_PLAYERS[0], POINT_NAME, 1091.0 );
+        check(TEAM1_PLAYERS[0], POINT_NAME, 1091.0);
         check("disney", POINT_NAME, 2758.0);
 
         check("disney", BONUS, 1667.0);
 
         check(TEAM1_PLAYERS[0], TRAIN_KM, 60.0);
-        check("disney", TRAIN_KM, 60.0 );
+        check("disney", TRAIN_KM, 60.0);
 
         check(TEAM1_PLAYERS[0], "Train_Trips", 3.0);
-        check("disney", "Train_Trips", 3.0 );
+        check("disney", "Train_Trips", 3.0);
 
         check(TEAM1_PLAYERS[0], ACTIVITY, 1.0);
         check("disney", ACTIVITY, 1.0);
@@ -593,7 +578,7 @@ public class HscGameTest {
             }
         }
 
-       throw new Exception("GameConcept not found: " + name);
+        throw new Exception("GameConcept not found: " + name);
     }
 
     private void print(String text) {
@@ -838,7 +823,7 @@ public class HscGameTest {
         double limit = 1.5;
         double score = 0.0;
         int index = 0;
-        while(index < 10) {
+        while (index < 10) {
             score += Math.min(distance, limit) * point;
             System.out.printf("score: %.2f\n", score);
             distance -= limit;

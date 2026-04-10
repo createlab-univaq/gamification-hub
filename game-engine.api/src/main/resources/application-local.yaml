@@ -1,0 +1,7 @@
+custom:
+  cors:
+    allow-origin: "*"
+    allow-headers: "*"
+  jwt:
+    secret-key: ePzhPkV0RM/iszU9WijGvT5jhjegEK/m7YSH+sHEzgKiATs71IhdKvkq8NEqgCcFGDpKTOwDRs1CHMQdJTeQQw==
+    expiration: 86400

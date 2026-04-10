@@ -17,15 +17,23 @@ package eu.trentorise.game.managers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.trentorise.game.model.*;
+import eu.trentorise.game.model.simulation.ConceptChange;
+import eu.trentorise.game.model.simulation.FiredRuleResult;
+import eu.trentorise.game.model.simulation.SimulationResult;
 import org.apache.commons.collections4.CollectionUtils;
+import org.kie.api.event.rule.AfterMatchFiredEvent;
+import org.kie.api.event.rule.DefaultAgendaEventListener;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -76,6 +84,10 @@ import eu.trentorise.game.services.Workflow;
 public class DroolsEngine implements GameEngine {
 
     private final Logger logger = LoggerFactory.getLogger(DroolsEngine.class);
+
+    // ObjectMapper is thread-safe once configured — reuse a single instance instead of
+    // allocating a new one on every simulate() call
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
     private NotificationManager notificationSrv;
@@ -320,6 +332,255 @@ public class DroolsEngine implements GameEngine {
         return state;
     }
 
+
+    @Override
+    public SimulationResult simulate(String gameId, PlayerState state, String action,
+            Map<String, Object> data, String executionId, long executionMoment,
+            List<Object> factObjects, boolean showDetailedChanges) {
+
+        // Load challenges from DB (same as execute)
+        List<ChallengeConceptPersistence> listCcs =
+                challengeConceptRepo.findByGameIdAndPlayerId(gameId, state.getPlayerId());
+        state.loadChallengeConcepts(listCcs);
+
+        Game game = gameSrv.loadGameDefinitionById(gameId);
+        if (game != null && game.isTerminated()) {
+            throw new IllegalArgumentException(String.format("game %s is expired", gameId));
+        }
+
+        // Snapshot before execution
+        PlayerState beforeState = state.clone();
+
+        // Deep-copy challenges separately since clone() excludes them
+        List<ChallengeConcept> challengesBefore = new ArrayList<>();
+        for (ChallengeConcept c : state.challenges()) {
+            try {
+                String json = OBJECT_MAPPER.writeValueAsString(c);
+                challengesBefore.add(OBJECT_MAPPER.readValue(json, ChallengeConcept.class));
+            } catch (Exception e) {
+                logger.warn("Could not deep-copy challenge {} for simulation snapshot", c.getName());
+            }
+        }
+
+        ConceptHelper conceptHelper = new ConceptHelper();
+        KieContainer kieContainer = kieContainerFactory.getContainer(gameId);
+        StatelessKieSession kSession = kieContainer.newStatelessKieSession();
+
+        KieCommands commands = KieServices.get().getCommands();
+        List<Command> cmds = new ArrayList<>();
+
+        if (data == null) {
+            data = new HashMap<>();
+        }
+        cmds.add(commands.newInsert(new InputData(data)));
+
+        if (!StringUtils.isBlank(action)) {
+            cmds.add(commands.newInsert(new Action(action)));
+        }
+
+        if (factObjects != null) {
+            cmds.add(commands.newInsertElements(factObjects));
+        }
+
+        cmds.add(commands.newInsert(new Game(gameId)));
+
+        Player player = new Player(state);
+        cmds.add(commands.newInsert(player));
+
+        // Push team state (read-only — no propagation in simulation)
+        List<TeamState> playerTeams = playerSrv.readTeams(gameId, state.getPlayerId());
+        for (TeamState ts : playerTeams) {
+            cmds.add(commands.newInsert(new Player(ts)));
+            cmds.add(commands.newInsert(ts.getCustomData()));
+        }
+
+        Set<GameConcept> concepts = new HashSet<>(state.getState());
+        concepts = conceptHelper.injectExecutionMoment(concepts, executionMoment);
+        concepts = conceptHelper.activateConcepts(concepts);
+
+        Set<GameConcept> activeConcepts = conceptHelper.findActiveConcepts(concepts);
+        Set<GameConcept> inactiveConcepts =
+                new HashSet<>(CollectionUtils.subtract(concepts, activeConcepts));
+
+        cmds.add(commands.newInsertElements(activeConcepts));
+        cmds.add(commands.newInsert(state.getCustomData()));
+        cmds.add(commands.newFireAllRules());
+        cmds.add(commands.newQuery("retrieveState", "getGameConcepts"));
+
+        List<FiredRuleResult> firedRules = new ArrayList<>();
+
+        if (showDetailedChanges) {
+            // Full listener: snapshots state before each rule fires and diffs after,
+            // tracking per-rule concept changes and which rule caused each activation.
+            // Has O(active_concepts × rules_fired) overhead — use only for debugging.
+            kSession.addEventListener(new DefaultAgendaEventListener() {
+
+                private final Map<String, Double>       scoresBefore         = new HashMap<>();
+                private final Map<String, List<String>> badgesBefore         = new HashMap<>();
+                private final Map<String, String>       challengeStateBefore = new HashMap<>();
+                // tracks the last rule that modified each concept — used to determine cause
+                private final Map<String, String>       lastModifier         = new HashMap<>();
+
+                private void snapshot() {
+                    for (GameConcept gc : activeConcepts) {
+                        if (gc instanceof PointConcept) {
+                            scoresBefore.put(gc.getName(), ((PointConcept) gc).getScore());
+                        } else if (gc instanceof BadgeCollectionConcept) {
+                            badgesBefore.put(gc.getName(),
+                                    new ArrayList<>(((BadgeCollectionConcept) gc).getBadgeEarned()));
+                        } else if (gc instanceof ChallengeConcept) {
+                            ChallengeConcept cc = (ChallengeConcept) gc;
+                            challengeStateBefore.put(gc.getName(),
+                                    cc.getState() != null ? cc.getState().toString() : null);
+                        }
+                    }
+                }
+
+                @Override
+                public void beforeMatchFired(org.kie.api.event.rule.BeforeMatchFiredEvent event) {
+                    snapshot();
+                }
+
+                @Override
+                public void afterMatchFired(AfterMatchFiredEvent event) {
+                    String ruleName = event.getMatch().getRule().getName();
+
+                    // Determine cause: find the last rule that modified any matched concept
+                    String cause = null;
+                    for (Object obj : event.getMatch().getObjects()) {
+                        if (obj instanceof GameConcept) {
+                            String modifier = lastModifier.get(((GameConcept) obj).getName());
+                            if (modifier != null) {
+                                cause = modifier;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Compute per-rule changes
+                    List<ConceptChange> ruleChanges = new ArrayList<>();
+                    for (GameConcept gc : activeConcepts) {
+                        if (gc instanceof PointConcept) {
+                            PointConcept pc = (PointConcept) gc;
+                            double before = scoresBefore.getOrDefault(gc.getName(), 0d);
+                            if (Double.compare(before, pc.getScore()) != 0) {
+                                ruleChanges.add(new ConceptChange("PointConcept", gc.getName(),
+                                        "score", before, pc.getScore()));
+                            }
+                        } else if (gc instanceof BadgeCollectionConcept) {
+                            BadgeCollectionConcept bcc = (BadgeCollectionConcept) gc;
+                            List<String> before = badgesBefore.getOrDefault(
+                                    gc.getName(), Collections.<String>emptyList());
+                            List<String> newBadges = new ArrayList<>(bcc.getBadgeEarned());
+                            newBadges.removeAll(before);
+                            for (String badge : newBadges) {
+                                ruleChanges.add(new ConceptChange("BadgeCollectionConcept",
+                                        gc.getName(), "badgeEarned", null, badge));
+                            }
+                        } else if (gc instanceof ChallengeConcept) {
+                            ChallengeConcept cc = (ChallengeConcept) gc;
+                            String before = challengeStateBefore.get(gc.getName());
+                            String after = cc.getState() != null ? cc.getState().toString() : null;
+                            if (!java.util.Objects.equals(before, after)) {
+                                ruleChanges.add(new ConceptChange("ChallengeConcept",
+                                        gc.getName(), "state", before, after));
+                            }
+                        }
+                    }
+
+                    // Update lastModifier for each concept changed by this rule
+                    for (ConceptChange change : ruleChanges) {
+                        lastModifier.put(change.getConceptName(), ruleName);
+                    }
+
+                    firedRules.add(new FiredRuleResult(ruleName, cause,
+                            Collections.emptyList(), Collections.emptyList(), ruleChanges));
+                }
+            });
+        } else {
+            // Lightweight listener: only tracks which rules fired and in what order
+            kSession.addEventListener(new DefaultAgendaEventListener() {
+                @Override
+                public void afterMatchFired(AfterMatchFiredEvent event) {
+                    firedRules.add(new FiredRuleResult(event.getMatch().getRule().getName(), null,
+                            Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
+                }
+            });
+        }
+
+        kSession.setGlobal("utils", new Utility(gameId));
+        kSession = loadGameConstants(kSession, gameId);
+
+        ExecutionResults results = kSession.execute(commands.newBatchExecution(cmds));
+
+        // Build final state from query results — no persistence, no notifications
+        Set<GameConcept> newState = new HashSet<>(inactiveConcepts);
+        Iterator<QueryResultsRow> iter =
+                ((QueryResults) results.getValue("retrieveState")).iterator();
+        while (iter.hasNext()) {
+            newState.add((GameConcept) iter.next().get("$result"));
+        }
+
+        PlayerState finalState = new PlayerState(gameId, state.getPlayerId());
+        finalState.setState(newState);
+
+        List<ConceptChange> changes = computeDiff(beforeState, challengesBefore, finalState);
+
+        return new SimulationResult(beforeState, finalState, firedRules, changes);
+    }
+
+    private List<ConceptChange> computeDiff(PlayerState before,
+            List<ChallengeConcept> challengesBefore, PlayerState after) {
+
+        List<ConceptChange> changes = new ArrayList<>();
+
+        for (GameConcept afterConcept : after.getState()) {
+
+            if (afterConcept instanceof PointConcept) {
+                PointConcept afterPc = (PointConcept) afterConcept;
+                double beforeScore = before.getState().stream()
+                        .filter(c -> c instanceof PointConcept && c.getName().equals(afterPc.getName()))
+                        .map(c -> ((PointConcept) c).getScore())
+                        .findFirst().orElse(0d);
+                if (Double.compare(afterPc.getScore(), beforeScore) != 0) {
+                    changes.add(new ConceptChange("PointConcept", afterPc.getName(),
+                            "score", beforeScore, afterPc.getScore()));
+                }
+            }
+
+            if (afterConcept instanceof BadgeCollectionConcept) {
+                BadgeCollectionConcept afterBcc = (BadgeCollectionConcept) afterConcept;
+                List<String> beforeBadges = before.getState().stream()
+                        .filter(c -> c instanceof BadgeCollectionConcept
+                                && c.getName().equals(afterBcc.getName()))
+                        .map(c -> ((BadgeCollectionConcept) c).getBadgeEarned())
+                        .findFirst().orElse(Collections.<String>emptyList());
+                List<String> newBadges = new ArrayList<>(afterBcc.getBadgeEarned());
+                newBadges.removeAll(beforeBadges);
+                for (String badge : newBadges) {
+                    changes.add(new ConceptChange("BadgeCollectionConcept", afterBcc.getName(),
+                            "badgeEarned", null, badge));
+                }
+            }
+
+            if (afterConcept instanceof ChallengeConcept) {
+                ChallengeConcept afterCc = (ChallengeConcept) afterConcept;
+                challengesBefore.stream()
+                        .filter(c -> c.getName().equals(afterCc.getName()))
+                        .findFirst()
+                        .ifPresent(beforeCc -> {
+                            if (afterCc.getState() != beforeCc.getState()) {
+                                changes.add(new ConceptChange("ChallengeConcept", afterCc.getName(),
+                                        "state",
+                                        beforeCc.getState() != null ? beforeCc.getState().toString() : null,
+                                        afterCc.getState() != null ? afterCc.getState().toString() : null));
+                            }
+                        });
+            }
+        }
+
+        return changes;
+    }
 
     private void sendLevelNotifications(String domain, String gameId, String playerId,
             String executionId, long executionTime, long timestamp,

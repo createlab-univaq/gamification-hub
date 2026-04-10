@@ -14,7 +14,8 @@
 
 package eu.trentorise.game.managers;
 
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -34,6 +35,7 @@ import eu.trentorise.game.model.Game;
 import eu.trentorise.game.model.GroupChallenge;
 import eu.trentorise.game.model.PlayerState;
 import eu.trentorise.game.model.PointConcept;
+import eu.trentorise.game.model.simulation.SimulationResult;
 import eu.trentorise.game.notification.GameNotification;
 import eu.trentorise.game.services.GameEngine;
 import eu.trentorise.game.services.GameService;
@@ -68,14 +70,16 @@ public class GameWorkflow implements Workflow {
     @Autowired
     private Environment env;
     
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    // DateTimeFormatter is immutable and thread-safe, unlike SimpleDateFormat
+    private static final DateTimeFormatter DATE_FORMAT =
+            DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
 
     protected void workflowExec(String gameId, String actionId, String userId, String executionId,
             long executionMoment, Map<String, Object> data, List<Object> factObjects) {
         final Date executionDate = new Date(executionMoment);
         LogHub.info(gameId, logger,
                 "gameId:{}, actionId: {}, playerId: {}, executionMoment: {}, data: {}, factObjs: {}",
-                gameId, actionId, userId, dateFormat.format(executionDate), data,
+                gameId, actionId, userId, DATE_FORMAT.format(executionDate.toInstant()), data,
                 factObjects);
         Game g = gameSrv.loadGameDefinitionById(gameId);
         if (g == null || g.getActions() == null
@@ -219,6 +223,31 @@ public class GameWorkflow implements Workflow {
             Map<String, Object> data, List<Object> factObjects) {
         String executionId = generateExecutionId();
         workflowExec(gameId, actionId, playerId, executionId, executionMoment, data, factObjects);
+    }
+
+    @Override
+    public SimulationResult simulate(String gameId, String actionId, String playerId,
+            long executionMoment, Map<String, Object> data, PlayerState syntheticState,
+            boolean showDetailedChanges) {
+
+        Game g = gameSrv.loadGameDefinitionById(gameId);
+        if (g == null || g.getActions() == null
+                || (!actionId.startsWith(GameManager.INTERNAL_ACTION_PREFIX)
+                        && !g.getActions().contains(actionId))) {
+            throw new IllegalArgumentException(String
+                    .format("game %s not exist or action %s not belong to it", gameId, actionId));
+        }
+
+        PlayerState state;
+        if (syntheticState != null) {
+            state = syntheticState;
+        } else {
+            state = playerSrv.loadState(gameId, playerId, true, false);
+        }
+
+        String executionId = generateExecutionId();
+        return gameEngine.simulate(gameId, state, actionId, data, executionId, executionMoment,
+                null, showDetailedChanges);
     }
 
     private String generateExecutionId() {

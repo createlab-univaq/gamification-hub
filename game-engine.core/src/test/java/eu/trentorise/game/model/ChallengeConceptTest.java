@@ -1,32 +1,8 @@
 package eu.trentorise.game.model;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-
-import org.joda.time.LocalDateTime;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.BDDMockito;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.sleuth.autoconfig.brave.BraveAutoConfiguration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.trentorise.game.config.AppConfig;
 import eu.trentorise.game.config.MongoConfig;
 import eu.trentorise.game.config.RabbitConf;
@@ -36,9 +12,28 @@ import eu.trentorise.game.model.ChallengeConcept.ChallengeState;
 import eu.trentorise.game.repo.ChallengeConceptPersistence;
 import eu.trentorise.game.repo.ChallengeConceptRepo;
 import eu.trentorise.game.services.PlayerService;
+import org.joda.time.LocalDateTime;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.BDDMockito;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, BraveAutoConfiguration.class},
+@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class},
         loader = AnnotationConfigContextLoader.class)
 public class ChallengeConceptTest {
 
@@ -47,9 +42,9 @@ public class ChallengeConceptTest {
 
     @Autowired
     private PlayerService playerSrv;
-    
+
     @Autowired
-  	private ChallengeConceptRepo challengeConceptRepo;
+    private ChallengeConceptRepo challengeConceptRepo;
 
     @Before
     public void setup() {
@@ -175,7 +170,6 @@ public class ChallengeConceptTest {
     }
 
 
-
     @Test
     public void persist_and_load_challenge() {
         Date activateDate = date("2018-07-25T14:22");
@@ -183,12 +177,12 @@ public class ChallengeConceptTest {
         ChallengeConcept challenge = new ChallengeConcept(clock);
         challenge.setName("ch1");
         challenge.updateState(ChallengeState.ACTIVE);
-        
+
         PlayerState player = new PlayerState("my_game", "my_player");
         player.getState().add(challenge);
 
         PlayerState saved = playerSrv.saveState(player);
-        List<ChallengeConceptPersistence> listCcs = challengeConceptRepo.findByGameIdAndPlayerId("my_game", "my_player"); 
+        List<ChallengeConceptPersistence> listCcs = challengeConceptRepo.findByGameIdAndPlayerId("my_game", "my_player");
         saved.loadChallengeConcepts(listCcs);
         assertThat(saved.getState(), hasSize(1));
         ChallengeConcept loaded = (ChallengeConcept) saved.getState().stream().findFirst().orElse(null);
@@ -249,8 +243,6 @@ public class ChallengeConceptTest {
         challenge.getVisibility().setDisclosureDate(disclosureDate);
         assertThat(challenge.isHidden(), is(true));
     }
-
-
 
 
 }

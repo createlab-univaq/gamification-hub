@@ -1,18 +1,20 @@
 package eu.trentorise.game.managers;
 
 
-import static eu.trentorise.game.test_utils.Utils.date;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-
+import eu.trentorise.game.config.AppConfig;
+import eu.trentorise.game.config.MongoConfig;
+import eu.trentorise.game.config.RabbitConf;
+import eu.trentorise.game.core.Clock;
+import eu.trentorise.game.model.ChallengeConcept.ChallengeState;
+import eu.trentorise.game.model.*;
+import eu.trentorise.game.model.GroupChallenge.Attendee;
+import eu.trentorise.game.model.GroupChallenge.Attendee.Role;
+import eu.trentorise.game.model.GroupChallenge.PointConceptRef;
+import eu.trentorise.game.model.Level.Threshold;
+import eu.trentorise.game.model.core.TimeInterval;
+import eu.trentorise.game.model.core.TimeUnit;
+import eu.trentorise.game.services.GameService;
+import eu.trentorise.game.services.PlayerService;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,36 +26,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.sleuth.autoconfig.brave.BraveAutoConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import eu.trentorise.game.config.AppConfig;
-import eu.trentorise.game.config.MongoConfig;
-import eu.trentorise.game.config.RabbitConf;
-import eu.trentorise.game.core.Clock;
-import eu.trentorise.game.model.ChallengeConcept.ChallengeState;
-import eu.trentorise.game.model.Game;
-import eu.trentorise.game.model.GameStatistics;
-import eu.trentorise.game.model.GroupChallenge;
-import eu.trentorise.game.model.GroupChallenge.Attendee;
-import eu.trentorise.game.model.GroupChallenge.Attendee.Role;
-import eu.trentorise.game.model.GroupChallenge.PointConceptRef;
-import eu.trentorise.game.model.Level;
-import eu.trentorise.game.model.Level.Threshold;
-import eu.trentorise.game.model.PlayerLevel;
-import eu.trentorise.game.model.PlayerState;
-import eu.trentorise.game.model.PointConcept;
-import eu.trentorise.game.model.Settings;
-import eu.trentorise.game.model.core.TimeInterval;
-import eu.trentorise.game.model.core.TimeUnit;
-import eu.trentorise.game.services.GameService;
-import eu.trentorise.game.services.PlayerService;
+import java.util.*;
+
+import static eu.trentorise.game.test_utils.Utils.date;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, BraveAutoConfiguration.class},
+@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class},
         loader = AnnotationConfigContextLoader.class)
 public class GameManagerTest {
 
@@ -125,7 +110,7 @@ public class GameManagerTest {
         Level level = new Level("miner", "green leaves");
         g.getLevels().add(level);
         gameSrv.saveGameDefinition(g);
-        
+
         level.getThresholds().add(new Threshold("first", 50d));
         level.getThresholds().add(new Threshold("second", 100d));
 
@@ -227,7 +212,6 @@ public class GameManagerTest {
 
         gameSrv.addLevelThreshold(gameId, levelName, new Threshold(name, 400d));
     }
-
 
 
     @Test
@@ -413,7 +397,7 @@ public class GameManagerTest {
         g.getLevels().add(explorerLevel);
 
         g = gameSrv.saveGameDefinition(g);
-        
+
         PlayerState playerState = new PlayerState(gameId, "player");
         PointConcept greenScore = new PointConcept("green");
         greenScore.setScore(56d);
@@ -603,80 +587,80 @@ public class GameManagerTest {
         gameSrv.taskCheckPerformanceGroupChallenges();
 
     }
-    
-	@Test
-	public void generate_game_statistics() {
-		// create game with settings.
-		final String gameId = "STATS_GAME";
-		final String POINT_CONCEPT = "green leaves";
-		final String PERIOD_NAME = "weekly";
 
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DAY_OF_WEEK, -(cal.get(Calendar.DAY_OF_WEEK)));
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
-		
-		Game g = new Game(gameId);
-		g.setConcepts(new HashSet<>());
-		PointConcept green = new PointConcept(POINT_CONCEPT);
-		green.addPeriod(PERIOD_NAME, cal.getTime(), 7 * 24 * 60 * 60000);
-		Settings settings = new Settings();
-		settings.getStatisticsConfig().put(POINT_CONCEPT, PERIOD_NAME);
-		g.setSettings(settings);
+    @Test
+    public void generate_game_statistics() {
+        // create game with settings.
+        final String gameId = "STATS_GAME";
+        final String POINT_CONCEPT = "green leaves";
+        final String PERIOD_NAME = "weekly";
 
-		g.getConcepts().add(green);
-		gameSrv.saveGameDefinition(g);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_WEEK, -(cal.get(Calendar.DAY_OF_WEEK)));
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
 
-		// create 10 players with 'weekly' and 'green leaves'.
-		for (int p = 1; p <= 10; p++) {
-			PointConcept testGreen = new PointConcept(POINT_CONCEPT);
-			testGreen.addPeriod(PERIOD_NAME, cal.getTime(), 7 * 24 * 60 * 60000);
-			if (p % 2 == 0) {
-				testGreen.setScore(2d);
-			} else {
-				testGreen.setScore(1d);
-			}
+        Game g = new Game(gameId);
+        g.setConcepts(new HashSet<>());
+        PointConcept green = new PointConcept(POINT_CONCEPT);
+        green.addPeriod(PERIOD_NAME, cal.getTime(), 7 * 24 * 60 * 60000);
+        Settings settings = new Settings();
+        settings.getStatisticsConfig().put(POINT_CONCEPT, PERIOD_NAME);
+        g.setSettings(settings);
 
-			PlayerState player = new PlayerState(gameId, "player-" + p);
-			player.getState().add(testGreen);
-			playerSrv.saveState(player);
-		}
+        g.getConcepts().add(green);
+        gameSrv.saveGameDefinition(g);
 
-		// generate and verify statistics (average, variance etc).
-		gameSrv.taskGameStats();
+        // create 10 players with 'weekly' and 'green leaves'.
+        for (int p = 1; p <= 10; p++) {
+            PointConcept testGreen = new PointConcept(POINT_CONCEPT);
+            testGreen.addPeriod(PERIOD_NAME, cal.getTime(), 7 * 24 * 60 * 60000);
+            if (p % 2 == 0) {
+                testGreen.setScore(2d);
+            } else {
+                testGreen.setScore(1d);
+            }
 
-		// verify result.
-		List<GameStatistics> gameStats = gameSrv.loadGameStats(gameId, POINT_CONCEPT, PERIOD_NAME,
-				cal.getTimeInMillis(), null, null);
+            PlayerState player = new PlayerState(gameId, "player-" + p);
+            player.getState().add(testGreen);
+            playerSrv.saveState(player);
+        }
 
-		Assert.assertEquals(1, gameStats.size());
-		Assert.assertTrue(gameStats.get(0).getAverage() == 1.5);
-		Assert.assertTrue(gameStats.get(0).getVariance() == 0.25);
-		Assert.assertTrue(gameStats.get(0).getQuantiles().get(9) == 2.0);
-		
-		// upsert test
-		for (int p = 11; p <= 20; p++) {
-			PointConcept testGreen = new PointConcept(POINT_CONCEPT);
-			testGreen.addPeriod(PERIOD_NAME, cal.getTime(), 7 * 24 * 60 * 60000);
-			testGreen.setScore(1d);
+        // generate and verify statistics (average, variance etc).
+        gameSrv.taskGameStats();
 
-			PlayerState player = new PlayerState(gameId, "player-" + p);
-			player.getState().add(testGreen);
-			playerSrv.saveState(player);
-		}
+        // verify result.
+        List<GameStatistics> gameStats = gameSrv.loadGameStats(gameId, POINT_CONCEPT, PERIOD_NAME,
+                cal.getTimeInMillis(), null, null);
 
-		gameSrv.taskGameStats();
+        Assert.assertEquals(1, gameStats.size());
+        Assert.assertTrue(gameStats.get(0).getAverage() == 1.5);
+        Assert.assertTrue(gameStats.get(0).getVariance() == 0.25);
+        Assert.assertTrue(gameStats.get(0).getQuantiles().get(9) == 2.0);
 
-		gameStats = gameSrv.loadGameStats(gameId, POINT_CONCEPT, PERIOD_NAME, cal.getTimeInMillis(), null, null);
+        // upsert test
+        for (int p = 11; p <= 20; p++) {
+            PointConcept testGreen = new PointConcept(POINT_CONCEPT);
+            testGreen.addPeriod(PERIOD_NAME, cal.getTime(), 7 * 24 * 60 * 60000);
+            testGreen.setScore(1d);
 
-		Assert.assertEquals(1, gameStats.size());
-		Assert.assertTrue(gameStats.get(0).getAverage() == 1.25);
-		Assert.assertTrue(gameStats.get(0).getVariance() == 0.1875);
-		Assert.assertTrue(gameStats.get(0).getQuantiles().get(9) == 2.0);
-	}
-    
+            PlayerState player = new PlayerState(gameId, "player-" + p);
+            player.getState().add(testGreen);
+            playerSrv.saveState(player);
+        }
+
+        gameSrv.taskGameStats();
+
+        gameStats = gameSrv.loadGameStats(gameId, POINT_CONCEPT, PERIOD_NAME, cal.getTimeInMillis(), null, null);
+
+        Assert.assertEquals(1, gameStats.size());
+        Assert.assertTrue(gameStats.get(0).getAverage() == 1.25);
+        Assert.assertTrue(gameStats.get(0).getVariance() == 0.1875);
+        Assert.assertTrue(gameStats.get(0).getQuantiles().get(9) == 2.0);
+    }
+
     @Test
     public void challengeDisclosureNotSetted() {
         Game game = new Game();

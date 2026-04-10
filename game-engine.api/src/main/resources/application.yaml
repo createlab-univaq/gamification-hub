@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: Gamification-API
+  profiles:
+    active: local
+  mongodb:
+    port: ${MONGODB_PORT:50000}
+    database: ${MONGODB_NAME:gamification-api-db}
+    username: ${MONGODB_USER:username}
+    password: ${MONGODB_PASSWORD:password}
+    authentication-database: admin
+
+  main:
+    allow-circular-references: true

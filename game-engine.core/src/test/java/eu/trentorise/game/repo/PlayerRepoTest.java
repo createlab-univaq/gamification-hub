@@ -1,28 +1,5 @@
 package eu.trentorise.game.repo;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import org.bson.Document;
-import org.joda.time.LocalDate;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.sleuth.autoconfig.brave.BraveAutoConfiguration;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-
 import eu.trentorise.game.config.AppConfig;
 import eu.trentorise.game.config.MongoConfig;
 import eu.trentorise.game.config.RabbitConf;
@@ -40,9 +17,24 @@ import eu.trentorise.game.model.core.RawSearchQuery.SortItem;
 import eu.trentorise.game.model.core.RawSearchQuery.SortItem.Direction;
 import eu.trentorise.game.model.core.StringSearchQuery;
 import eu.trentorise.game.services.GameService;
+import org.bson.Document;
+import org.joda.time.LocalDate;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
+
+import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, BraveAutoConfiguration.class},
+@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class},
         loader = AnnotationConfigContextLoader.class)
 public class PlayerRepoTest {
 
@@ -56,10 +48,9 @@ public class PlayerRepoTest {
 
     @Autowired
     private GameService gameSrv;
-    
-    private PageRequest defaultPageable = PageRequest.of(0,20);
-    
-    
+
+    private PageRequest defaultPageable = PageRequest.of(0, 20);
+
 
     @Before
     public void cleanDB() {

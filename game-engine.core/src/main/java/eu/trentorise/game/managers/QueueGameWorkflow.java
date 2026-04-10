@@ -1,24 +1,13 @@
-/**
- * Copyright 2015 Fondazione Bruno Kessler - Trento RISE
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
- */
-
 package eu.trentorise.game.managers;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
@@ -26,24 +15,28 @@ import org.springframework.stereotype.Component;
 import eu.trentorise.game.core.LogHub;
 
 /**
- * A game workflow that manage sequential execution queue of gameEngine to fix issue
- * https://github.com/smartcampuslab/smartcampus.gamification/issues/1
- * 
- * @author mirko perillo
- * 
+ * A game workflow that manages a sequential execution queue per game.
+ * Each game has its own single-thread executor, preserving intra-game action ordering
+ * while allowing full concurrency across different games.
  */
 @Component
 public class QueueGameWorkflow extends GameWorkflow {
-	
+
     private final Logger logger = org.slf4j.LoggerFactory.getLogger(QueueGameWorkflow.class);
 
-    private static ExecutorService executor = Executors.newSingleThreadExecutor();
+    // One single-thread executor per game: preserves ordering within a game,
+    // allows different games to execute concurrently without blocking each other
+    private final ConcurrentHashMap<String, ExecutorService> executors = new ConcurrentHashMap<>();
+
+    private ExecutorService getExecutor(String gameId) {
+        return executors.computeIfAbsent(gameId, id -> Executors.newSingleThreadExecutor());
+    }
 
     @Override
     public void apply(String gameId, String actionId, String userId, Map<String, Object> data,
             List<Object> factObjects) {
-    	long executionMoment = System.currentTimeMillis();
-    	apply(gameId, actionId, userId, executionMoment, data, factObjects);
+        long executionMoment = System.currentTimeMillis();
+        apply(gameId, actionId, userId, executionMoment, data, factObjects);
     }
 
     @Override
@@ -51,24 +44,31 @@ public class QueueGameWorkflow extends GameWorkflow {
             Map<String, Object> data, List<Object> factObjects) {
         try {
             String executionId = UUID.randomUUID().toString();
-        	Execution execution = new Execution(gameId, actionId, userId, executionId, executionMoment,
-                    data, factObjects);
-            executor.execute(execution);
+            Execution execution = new Execution(gameId, actionId, userId, executionId,
+                    executionMoment, data, factObjects);
+            getExecutor(gameId).execute(execution);
         } catch (Exception e) {
-            LogHub.error(gameId, logger, "Exception in game queue execution", e);
+            LogHub.error(gameId, logger, "Exception submitting to game execution queue", e);
         }
     }
 
-    
+    // Gracefully shut down all per-game executors on application stop to avoid thread leaks
+    @PreDestroy
+    public void shutdown() {
+        logger.info("Shutting down {} game execution queues", executors.size());
+        executors.values().forEach(ExecutorService::shutdown);
+        executors.clear();
+    }
+
     class Execution implements Runnable {
 
-        private String gameId;
-        private String actionId;
-        private String userId;
-        private String executionId;
-        private long executionMoment;
-        private Map<String, Object> data;
-        private List<Object> factObjects;
+        private final String gameId;
+        private final String actionId;
+        private final String userId;
+        private final String executionId;
+        private final long executionMoment;
+        private final Map<String, Object> data;
+        private final List<Object> factObjects;
 
         public Execution(String gameId, String actionId, String userId, String executionId,
                 long executionMoment, Map<String, Object> data, List<Object> factObjects) {
@@ -79,12 +79,10 @@ public class QueueGameWorkflow extends GameWorkflow {
             this.executionMoment = executionMoment;
             this.data = data;
             this.factObjects = factObjects;
-
         }
 
         public void run() {
             workflowExec(gameId, actionId, userId, executionId, executionMoment, data, factObjects);
         }
-
     }
 }

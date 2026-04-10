@@ -1,0 +1,55 @@
+package it.smartcommunitylab.gamification.gameengineapi.controller;
+
+import it.smartcommunitylab.gamification.gameengineapi.exception.RequestException;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.ExceptionResponse;
+import jakarta.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@ControllerAdvice
+@Slf4j
+public class ExceptionController {
+
+    private ResponseEntity<ExceptionResponse> buildResponseObject(String title, String content, Map<String, Object> details, HttpStatus status) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(title, content, details);
+        return ResponseEntity.status(status).body(exceptionResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ExceptionResponse> handleValidationException(MethodArgumentNotValidException e) {
+        log.error("Validation error!\n{}", e.getMessage());
+        Map<String, Object> details = new HashMap<>();
+        e.getFieldErrors().forEach(fieldError -> {
+            details.put(fieldError.getField(), fieldError.getDefaultMessage());
+        });
+        return buildResponseObject("Validation Error!", "One or more values are not correct.", details, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ExceptionResponse> handleBadCredentialsException(BadCredentialsException ex) {
+        log.error("User authentication failed. Bad Credentials");
+        return buildResponseObject("Authentication failed", "Username or password incorrect", null, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(RequestException.class)
+    public ResponseEntity<ExceptionResponse> handleResponseException(RequestException e) {
+        log.error("Response Error!\n{}", e.toString());
+        return buildResponseObject(e.getTitle(), e.getMessage(), null, e.getStatus());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionResponse> handleGenericException(Exception e) {
+        log.error("Generic Error!\n{}", e.getLocalizedMessage());
+        return buildResponseObject("Generic Error", "Something went truly wrong...", null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+}

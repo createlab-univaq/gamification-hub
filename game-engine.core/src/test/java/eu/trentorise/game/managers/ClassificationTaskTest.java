@@ -1,29 +1,5 @@
 package eu.trentorise.game.managers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.UUID;
-
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.sleuth.autoconfig.brave.BraveAutoConfiguration;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-
 import eu.trentorise.game.config.AppConfig;
 import eu.trentorise.game.config.MongoConfig;
 import eu.trentorise.game.config.RabbitConf;
@@ -34,20 +10,30 @@ import eu.trentorise.game.model.BadgeCollectionConcept;
 import eu.trentorise.game.model.Game;
 import eu.trentorise.game.model.PlayerState;
 import eu.trentorise.game.model.PointConcept;
-import eu.trentorise.game.model.core.ClasspathRule;
-import eu.trentorise.game.model.core.GameConcept;
-import eu.trentorise.game.model.core.GameTask;
-import eu.trentorise.game.model.core.TimeInterval;
-import eu.trentorise.game.model.core.TimeUnit;
+import eu.trentorise.game.model.core.*;
 import eu.trentorise.game.services.GameEngine;
 import eu.trentorise.game.services.GameService;
 import eu.trentorise.game.services.PlayerService;
 import eu.trentorise.game.services.TaskService;
 import eu.trentorise.game.task.IncrementalClassificationTask;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
+
+import java.util.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, TestCoreConfiguration.class, BraveAutoConfiguration.class},
+@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, TestCoreConfiguration.class},
         loader = AnnotationConfigContextLoader.class)
 public class ClassificationTaskTest {
 
@@ -196,7 +182,7 @@ public class ClassificationTaskTest {
             }
             if (gc instanceof BadgeCollectionConcept && gc.getName().equals("green leaves")) {
                 found = found && true;
-                Assert.assertArrayEquals(new String[] {"10-point-green", "50-point-green"},
+                Assert.assertArrayEquals(new String[]{"10-point-green", "50-point-green"},
                         ((BadgeCollectionConcept) gc).getBadgeEarned().toArray(new String[1]));
             }
 
@@ -313,21 +299,21 @@ public class ClassificationTaskTest {
         p1 = playerSrv.loadState(GAME, PLAYER_1, false, false);
         for (GameConcept gc : p1.getState()) {
             if (gc instanceof BadgeCollectionConcept && gc.getName().equals("green leaves")) {
-                Assert.assertArrayEquals(new String[] {"bronze-medal-green"},
+                Assert.assertArrayEquals(new String[]{"bronze-medal-green"},
                         ((BadgeCollectionConcept) gc).getBadgeEarned().toArray(new String[1]));
                 break;
             }
         }
 
         p2 = playerSrv.loadState(GAME, PLAYER_2, false, false);
-		for (GameConcept gc : p2.getState()) {
-			if (gc instanceof BadgeCollectionConcept && gc.getName().equals("green leaves")) {
+        for (GameConcept gc : p2.getState()) {
+            if (gc instanceof BadgeCollectionConcept && gc.getName().equals("green leaves")) {
 //				Assert.assertArrayEquals(new String[] { "silver-medal-green", "10-point-green" },
 //						((BadgeCollectionConcept) gc).getBadgeEarned().toArray(new String[1]));
-				assertThat(((BadgeCollectionConcept) gc).getBadgeEarned(), containsInAnyOrder("silver-medal-green", "10-point-green"));
-				break;
-			}
-		}
+                assertThat(((BadgeCollectionConcept) gc).getBadgeEarned(), containsInAnyOrder("silver-medal-green", "10-point-green"));
+                break;
+            }
+        }
 
         p3 = playerSrv.loadState(GAME, PLAYER_3, false, false);
         for (GameConcept gc : p3.getState()) {
@@ -375,6 +361,6 @@ public class ClassificationTaskTest {
         PointConcept score = new PointConcept("green");
         IncrementalClassificationTask task =
                 new IncrementalClassificationTask(score, "my-period", "classification");
-        
+
     }
 }

@@ -1,23 +1,5 @@
 package eu.trentorise.game.model;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.cloud.sleuth.autoconfig.brave.BraveAutoConfiguration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-
 import eu.trentorise.game.config.AppConfig;
 import eu.trentorise.game.config.MongoConfig;
 import eu.trentorise.game.config.RabbitConf;
@@ -26,9 +8,23 @@ import eu.trentorise.game.model.Inventory.ItemChoice;
 import eu.trentorise.game.model.Inventory.ItemChoice.ChoiceType;
 import eu.trentorise.game.model.Level.Config;
 import eu.trentorise.game.model.Level.Threshold;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, BraveAutoConfiguration.class},
+@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class},
         loader = AnnotationConfigContextLoader.class)
 public class PlayerStateTest {
 
@@ -51,7 +47,7 @@ public class PlayerStateTest {
         List<PlayerLevel> levels = new ArrayList<>();
         levels.add(new PlayerLevel(levelDefinition, 300d));
         state.updateLevels(levels);
-        
+
         state.updateInventory(game, null);
         assertThat(state.getInventory().size(), is(0));
     }
@@ -149,7 +145,7 @@ public class PlayerStateTest {
 
         assertThat(state.getInventory().size(), is(2));
         List<String> availableModelNames = state.getInventory().getChallengeChoices().stream()
-                .map(choice -> choice.getModelName()).collect(Collectors.toList()); 
+                .map(choice -> choice.getModelName()).collect(Collectors.toList());
         assertThat(availableModelNames, hasItems("absoluteIncrement", "runnerChallengeType"));
     }
 

@@ -19,6 +19,9 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import eu.trentorise.game.model.PlayerState;
+import eu.trentorise.game.model.simulation.SimulationResult;
+
 @Service
 public interface Workflow {
 
@@ -27,4 +30,8 @@ public interface Workflow {
 
     public void apply(String gameId, String actionId, String playerId, long executionMoment,
             Map<String, Object> data, List<Object> workingMemoryObjects);
+
+    public SimulationResult simulate(String gameId, String actionId, String playerId,
+            long executionMoment, Map<String, Object> data, PlayerState syntheticState,
+            boolean showDetailedChanges);
 }

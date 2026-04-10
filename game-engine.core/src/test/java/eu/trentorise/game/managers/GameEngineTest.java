@@ -1,11 +1,11 @@
 /**
  * Copyright 2015 Fondazione Bruno Kessler - Trento RISE
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -14,50 +14,14 @@
 
 package eu.trentorise.game.managers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.commons.io.FileUtils;
-import org.joda.time.LocalDate;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.sleuth.autoconfig.brave.BraveAutoConfiguration;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-
+import com.mchange.io.FileUtils;
 import eu.trentorise.game.config.AppConfig;
 import eu.trentorise.game.config.MongoConfig;
 import eu.trentorise.game.config.RabbitConf;
 import eu.trentorise.game.core.TaskSchedule;
 import eu.trentorise.game.core.config.TestCoreConfiguration;
-import eu.trentorise.game.model.BadgeCollectionConcept;
-import eu.trentorise.game.model.Game;
-import eu.trentorise.game.model.Level;
+import eu.trentorise.game.model.*;
 import eu.trentorise.game.model.Level.Threshold;
-import eu.trentorise.game.model.PlayerLevel;
-import eu.trentorise.game.model.PlayerState;
-import eu.trentorise.game.model.PointConcept;
 import eu.trentorise.game.model.core.ClasspathRule;
 import eu.trentorise.game.model.core.DBRule;
 import eu.trentorise.game.model.core.GameConcept;
@@ -68,10 +32,29 @@ import eu.trentorise.game.repo.StatePersistence;
 import eu.trentorise.game.services.GameEngine;
 import eu.trentorise.game.services.PlayerService;
 import eu.trentorise.game.task.GeneralClassificationTask;
+import org.joda.time.LocalDate;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, TestCoreConfiguration.class, BraveAutoConfiguration.class},
-        loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, TestCoreConfiguration.class}, loader = AnnotationConfigContextLoader.class)
 public class GameEngineTest {
 
     @Autowired
@@ -120,10 +103,8 @@ public class GameEngineTest {
         gameManager.addRule(new ClasspathRule(GAME, "rules/" + GAME + "/prBadges.drl"));
         gameManager.addRule(new ClasspathRule(GAME, "rules/" + GAME + "/prPoints.drl"));
         gameManager.addRule(new ClasspathRule(GAME, "rules/" + GAME + "/specialBadges.drl"));
-        gameManager.addRule(
-                new ClasspathRule(GAME, "rules/" + GAME + "/weekClassificationBadges.drl"));
-        gameManager.addRule(
-                new ClasspathRule(GAME, "rules/" + GAME + "/finalClassificationBadges.drl"));
+        gameManager.addRule(new ClasspathRule(GAME, "rules/" + GAME + "/weekClassificationBadges.drl"));
+        gameManager.addRule(new ClasspathRule(GAME, "rules/" + GAME + "/finalClassificationBadges.drl"));
     }
 
     private void initDBRuleGame() {
@@ -133,55 +114,44 @@ public class GameEngineTest {
         // add rules
         try {
 
-            String c = FileUtils
-                    .readFileToString(new File(Thread.currentThread().getContextClassLoader()
-                            .getResource("rules/" + GAME + "/constants").getFile()));
+            String c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/constants").getFile()));
             DBRule rule = new DBRule(GAME, c);
             rule.setName("constants");
             gameManager.addRule(rule);
 
-            c = FileUtils.readFileToString(new File(Thread.currentThread().getContextClassLoader()
-                    .getResource("rules/" + GAME + "/greenBadges.drl").getFile()));
+            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/greenBadges.drl").getFile()));
             rule = new DBRule(GAME, c);
             rule.setName("greenBadges");
             gameManager.addRule(rule);
-            c = FileUtils.readFileToString(new File(Thread.currentThread().getContextClassLoader()
-                    .getResource("rules/" + GAME + "/greenPoints.drl").getFile()));
+            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/greenPoints.drl").getFile()));
             rule = new DBRule(GAME, c);
             rule.setName("greenPoints");
             gameManager.addRule(rule);
-            c = FileUtils.readFileToString(new File(Thread.currentThread().getContextClassLoader()
-                    .getResource("rules/" + GAME + "/healthPoints.drl").getFile()));
+            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/healthPoints.drl").getFile()));
             rule = new DBRule(GAME, c);
             rule.setName("healthPoints");
             gameManager.addRule(rule);
-            c = FileUtils.readFileToString(new File(Thread.currentThread().getContextClassLoader()
-                    .getResource("rules/" + GAME + "/healthBadges.drl").getFile()));
+            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/healthBadges.drl").getFile()));
             rule = new DBRule(GAME, c);
             rule.setName("healthBadges");
             gameManager.addRule(rule);
-            c = FileUtils.readFileToString(new File(Thread.currentThread().getContextClassLoader()
-                    .getResource("rules/" + GAME + "/prPoints.drl").getFile()));
+            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/prPoints.drl").getFile()));
             rule = new DBRule(GAME, c);
             rule.setName("prPoints");
             gameManager.addRule(rule);
-            c = FileUtils.readFileToString(new File(Thread.currentThread().getContextClassLoader()
-                    .getResource("rules/" + GAME + "/prBadges.drl").getFile()));
+            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/prBadges.drl").getFile()));
             rule = new DBRule(GAME, c);
             rule.setName("prBadges");
             gameManager.addRule(rule);
-            c = FileUtils.readFileToString(new File(Thread.currentThread().getContextClassLoader()
-                    .getResource("rules/" + GAME + "/specialBadges.drl").getFile()));
+            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/specialBadges.drl").getFile()));
             rule = new DBRule(GAME, c);
             rule.setName("specialBadges");
             gameManager.addRule(rule);
-            c = FileUtils.readFileToString(new File(Thread.currentThread().getContextClassLoader()
-                    .getResource("rules/" + GAME + "/weekClassificationBadges.drl").getFile()));
+            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/weekClassificationBadges.drl").getFile()));
             rule = new DBRule(GAME, c);
             rule.setName("weekClassificationBadges");
             gameManager.addRule(rule);
-            c = FileUtils.readFileToString(new File(Thread.currentThread().getContextClassLoader()
-                    .getResource("rules/" + GAME + "/finalClassificationBadges.drl").getFile()));
+            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/finalClassificationBadges.drl").getFile()));
             rule = new DBRule(GAME, c);
             rule.setName("finalClassificationBadges");
             gameManager.addRule(rule);
@@ -208,8 +178,7 @@ public class GameEngineTest {
         params.put("sustainable", true);
         params.put("p+r", true);
         params.put("park", "MANIFATTURA");
-        p = engine.execute(GAME, p, ACTION, params, UUID.randomUUID().toString(),
-                System.currentTimeMillis(), null);
+        p = engine.execute(GAME, p, ACTION, params, UUID.randomUUID().toString(), System.currentTimeMillis(), null);
         // expected 70 greenPoints and earned 10-point 50-point green badges
         boolean found = false;
         for (GameConcept gc : p.getState()) {
@@ -219,8 +188,7 @@ public class GameEngineTest {
             }
             if (gc instanceof BadgeCollectionConcept && gc.getName().equals("green leaves")) {
                 found = found && true;
-                Assert.assertArrayEquals(new String[] {"10-point-green", "50-point-green"},
-                        ((BadgeCollectionConcept) gc).getBadgeEarned().toArray(new String[1]));
+                Assert.assertArrayEquals(new String[]{"10-point-green", "50-point-green"}, ((BadgeCollectionConcept) gc).getBadgeEarned().toArray(new String[1]));
             }
 
         }
@@ -252,10 +220,8 @@ public class GameEngineTest {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("bikeDistance", 8.43);
 
-        long oneHourAgo = LocalDateTime.now().minusHours(1).atZone(ZoneId.systemDefault())
-                .toInstant().toEpochMilli();
-        p = engine.execute(GAME, p, ACTION, params, UUID.randomUUID().toString(),
-                oneHourAgo, null);
+        long oneHourAgo = LocalDateTime.now().minusHours(1).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        p = engine.execute(GAME, p, ACTION, params, UUID.randomUUID().toString(), oneHourAgo, null);
 
         PointConcept loaded = (PointConcept) p.getState().stream().findFirst().orElse(null);
 
@@ -275,8 +241,7 @@ public class GameEngineTest {
         params.put("sustainable", true);
         params.put("p+r", true);
         params.put("park", "MANIFATTURA");
-        p = engine.execute(GAME, p, ACTION, params, UUID.randomUUID().toString(),
-                System.currentTimeMillis(), null);
+        p = engine.execute(GAME, p, ACTION, params, UUID.randomUUID().toString(), System.currentTimeMillis(), null);
         // expected 60 greenPoints and earned 10-point 50-point green badges
         boolean found = false;
         for (GameConcept gc : p.getState()) {
@@ -286,8 +251,7 @@ public class GameEngineTest {
             }
             if (gc instanceof BadgeCollectionConcept && gc.getName().equals("green leaves")) {
                 found = found && true;
-                Assert.assertArrayEquals(new String[] {"10-point-green", "50-point-green"},
-                        ((BadgeCollectionConcept) gc).getBadgeEarned().toArray(new String[1]));
+                Assert.assertArrayEquals(new String[]{"10-point-green", "50-point-green"}, ((BadgeCollectionConcept) gc).getBadgeEarned().toArray(new String[1]));
             }
 
         }
@@ -313,8 +277,7 @@ public class GameEngineTest {
         gameManager.addRule(new DBRule(GAME, "my rule"));
 
         game = gameManager.loadGameDefinitionById(GAME);
-        Assert.assertTrue(game.getRules().size() == 1
-                && game.getRules().iterator().next().startsWith("db://"));
+        Assert.assertTrue(game.getRules().size() == 1 && game.getRules().iterator().next().startsWith("db://"));
 
     }
 
@@ -338,14 +301,11 @@ public class GameEngineTest {
         Assert.assertEquals(7, g.getConcepts().size());
         for (GameConcept gc : g.getConcepts()) {
             if (gc instanceof PointConcept) {
-                Assert.assertTrue(gc.getName().equals("green leaves")
-                        || gc.getName().equals("health") || gc.getName().equals("p+r"));
+                Assert.assertTrue(gc.getName().equals("green leaves") || gc.getName().equals("health") || gc.getName().equals("p+r"));
             }
 
             if (gc instanceof BadgeCollectionConcept) {
-                Assert.assertTrue(
-                        gc.getName().equals("green leaves") || gc.getName().equals("health")
-                                || gc.getName().equals("p+r") || gc.getName().equals("special"));
+                Assert.assertTrue(gc.getName().equals("green leaves") || gc.getName().equals("health") || gc.getName().equals("p+r") || gc.getName().equals("special"));
             }
         }
     }
@@ -389,8 +349,7 @@ public class GameEngineTest {
 
         PlayerState p = playerSrv.loadState(GAME, PLAYER, true, false);
 
-        p = engine.execute(GAME, p, ACTION, new HashMap<String, Object>(),
-                UUID.randomUUID().toString(), System.currentTimeMillis(), null);
+        p = engine.execute(GAME, p, ACTION, new HashMap<String, Object>(), UUID.randomUUID().toString(), System.currentTimeMillis(), null);
 
     }
 
@@ -399,7 +358,8 @@ public class GameEngineTest {
         private String userId;
         private Map<String, Object> data;
 
-        public ExecutionData() {}
+        public ExecutionData() {
+        }
 
         public String getActionId() {
             return actionId;
@@ -450,8 +410,7 @@ public class GameEngineTest {
         inputData.put("p+r", true);
         inputData.put("park", "MANIFATTURA");
         PlayerState p = playerSrv.loadState(GAME, "player", true, false);
-        p = engine.execute(GAME, p, ACTION, inputData, UUID.randomUUID().toString(),
-                System.currentTimeMillis(), null);
+        p = engine.execute(GAME, p, ACTION, inputData, UUID.randomUUID().toString(), System.currentTimeMillis(), null);
 
         Assert.assertEquals(1, p.getLevels().size());
         Assert.assertEquals("adept", p.getLevels().get(0).getLevelValue());
@@ -486,8 +445,7 @@ public class GameEngineTest {
         inputData.put("p+r", true);
         inputData.put("park", "MANIFATTURA");
         PlayerState p = playerSrv.loadState(GAME, "player", true, false);
-        p = engine.execute(GAME, p, ACTION, inputData, UUID.randomUUID().toString(),
-                System.currentTimeMillis(), null);
+        p = engine.execute(GAME, p, ACTION, inputData, UUID.randomUUID().toString(), System.currentTimeMillis(), null);
 
         Assert.assertEquals(2, p.getLevels().size());
         Assert.assertEquals("adept", p.getLevels().get(0).getLevelValue());
@@ -523,38 +481,32 @@ public class GameEngineTest {
         // final classifications
         TaskSchedule schedule = new TaskSchedule();
         schedule.setCronExpression("0 20 * * * *");
-        GeneralClassificationTask task1 = new GeneralClassificationTask(schedule, 3, "green leaves",
-                "final classification green");
+        GeneralClassificationTask task1 = new GeneralClassificationTask(schedule, 3, "green leaves", "final classification green");
         game.getTasks().add(task1);
 
         // schedule = new TaskSchedule(); //
         schedule.setCronExpression("0 * * * * *");
-        GeneralClassificationTask task2 =
-                new GeneralClassificationTask(schedule, 3, "health", "final classification health");
+        GeneralClassificationTask task2 = new GeneralClassificationTask(schedule, 3, "health", "final classification health");
         game.getTasks().add(task2);
 
         // schedule = new TaskSchedule(); //
         schedule.setCronExpression("0 * * * * *");
-        GeneralClassificationTask task3 =
-                new GeneralClassificationTask(schedule, 3, "p+r", "final classification p+r");
+        GeneralClassificationTask task3 = new GeneralClassificationTask(schedule, 3, "p+r", "final classification p+r");
         game.getTasks().add(task3);
 
         // week classifications // schedule = new TaskSchedule(); //
         schedule.setCronExpression("0 * * * * *");
-        GeneralClassificationTask task4 = new GeneralClassificationTask(schedule, 1, "green leaves",
-                "week classification green");
+        GeneralClassificationTask task4 = new GeneralClassificationTask(schedule, 1, "green leaves", "week classification green");
         game.getTasks().add(task4);
 
         // schedule = new TaskSchedule(); //
         schedule.setCronExpression("0 * * * * *");
-        GeneralClassificationTask task5 =
-                new GeneralClassificationTask(schedule, 1, "health", "week classification health");
+        GeneralClassificationTask task5 = new GeneralClassificationTask(schedule, 1, "health", "week classification health");
         game.getTasks().add(task5);
 
         // schedule = new TaskSchedule(); //
         schedule.setCronExpression("0 * * * * *");
-        GeneralClassificationTask task6 =
-                new GeneralClassificationTask(schedule, 1, "p+r", "week classification p+r");
+        GeneralClassificationTask task6 = new GeneralClassificationTask(schedule, 1, "p+r", "week classification p+r");
         game.getTasks().add(task6);
 
         return new GamePersistence(game);
@@ -579,15 +531,10 @@ public class GameEngineTest {
         gameManager.addRule(new ClasspathRule(GAME, "rules/testLevel/rules.drl"));
 
 
-
-
         PlayerState p = playerSrv.loadState(GAME, "player", true, false);
-        p.updateLevels(
-                Arrays.asList(new PlayerLevel(levelDefinition, 200d)));
-        p = engine.execute(GAME, p, ACTION, null, UUID.randomUUID().toString(),
-                System.currentTimeMillis(), null);
-        PointConcept green = (PointConcept) p.getState().stream()
-                .filter(gc -> gc.getName().equals("green")).findFirst().orElse(null);
+        p.updateLevels(Arrays.asList(new PlayerLevel(levelDefinition, 200d)));
+        p = engine.execute(GAME, p, ACTION, null, UUID.randomUUID().toString(), System.currentTimeMillis(), null);
+        PointConcept green = (PointConcept) p.getState().stream().filter(gc -> gc.getName().equals("green")).findFirst().orElse(null);
         Assert.assertEquals(10d, green.getScore(), 0);
     }
 
@@ -612,12 +559,9 @@ public class GameEngineTest {
 
 
         PlayerState p = playerSrv.loadState(GAME, "player", true, false);
-        p.updateLevels(
-                Arrays.asList(new PlayerLevel(levelDefinition, 50d)));
-        p = engine.execute(GAME, p, ACTION, null, UUID.randomUUID().toString(),
-                System.currentTimeMillis(), null);
-        PointConcept green = (PointConcept) p.getState().stream()
-                .filter(gc -> gc.getName().equals("green")).findFirst().orElse(null);
+        p.updateLevels(Arrays.asList(new PlayerLevel(levelDefinition, 50d)));
+        p = engine.execute(GAME, p, ACTION, null, UUID.randomUUID().toString(), System.currentTimeMillis(), null);
+        PointConcept green = (PointConcept) p.getState().stream().filter(gc -> gc.getName().equals("green")).findFirst().orElse(null);
         Assert.assertEquals(0d, green.getScore(), 0);
     }
 }

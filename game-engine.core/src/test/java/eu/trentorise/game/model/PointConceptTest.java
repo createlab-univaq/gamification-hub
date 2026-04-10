@@ -1,26 +1,5 @@
 package eu.trentorise.game.model;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.sleuth.autoconfig.brave.BraveAutoConfiguration;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-
 import eu.trentorise.game.config.AppConfig;
 import eu.trentorise.game.config.MongoConfig;
 import eu.trentorise.game.config.RabbitConf;
@@ -31,9 +10,28 @@ import eu.trentorise.game.model.core.ClasspathRule;
 import eu.trentorise.game.model.core.GameConcept;
 import eu.trentorise.game.services.GameService;
 import eu.trentorise.game.services.PlayerService;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, TestCoreConfiguration.class, BraveAutoConfiguration.class},
+@ContextConfiguration(classes = {AppConfig.class, MongoConfig.class, RabbitConf.class, TestCoreConfiguration.class},
         loader = AnnotationConfigContextLoader.class)
 public class PointConceptTest {
 
@@ -98,7 +96,7 @@ public class PointConceptTest {
         long firstHourFromStart = start1.plusHours(1).toDate().getTime();
         pc.setExecutionMoment(firstHourFromStart);
         pc.setScore(2.0);
-        
+
         long tomorrowAt8 = start1.plusDays(1).plusHours(8).toDate().getTime();
         pc.setExecutionMoment(tomorrowAt8);
         pc.setScore(5.0);
@@ -182,26 +180,25 @@ public class PointConceptTest {
         long tomorrowAt7 = startToday.plusDays(1).plusHours(7).toDate().getTime();
         pc.setExecutionMoment(tomorrowAt7);
         pc.setScore(10.0);
-        
+
         long dayAfterTomorrowAt10 = startToday.plusDays(2).plusHours(10).toDate().getTime();
         pc.setExecutionMoment(dayAfterTomorrowAt10);
         pc.setScore(12.0);
-        
+
         long dayAfterTomorrowAt23 = startToday.plusDays(2).plusHours(23).toDate().getTime();
         pc.setExecutionMoment(dayAfterTomorrowAt23);
         pc.setScore(15.0);
-        
+
         assertThat(pc.getPeriodScore("period1", 0), is(4.0));
         assertThat(pc.getPeriodScore("period1", 1), is(6.0));
         assertThat(pc.getPeriodScore("period1", 2), is(2.0));
         assertThat(pc.getPeriodScore("period1", 3), is(0.0));
-        
+
         PeriodInstance instance0 = pc.getPeriodInstance("period1", 0);
         PeriodInstance instance1 = pc.getPeriodInstance("period1", 1);
         PeriodInstance instance2 = pc.getPeriodInstance("period1", 2);
         PeriodInstance instance3 = pc.getPeriodInstance("period1", 3);
         assertThat(new Date(instance2.getEnd()), is(pc.getPeriod("period1").getEnd().get()));
-
 
 
     }
@@ -314,7 +311,7 @@ public class PointConceptTest {
 
         /*
          * period1: today-1 10, today 29
-         * 
+         *
          * period2: 00 4, 01 10, 02 1, 03 14
          */
 
@@ -453,7 +450,7 @@ public class PointConceptTest {
 
     /*
      * Maintain this test to check behavior on pointconcept when its loaded by db.
-     * 
+     *
      * This test is not pure unitary, think about to remove it
      */
     @Test
