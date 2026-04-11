@@ -28,7 +28,7 @@ public class UserSeeder implements ApplicationRunner {
         User user = new User();
         user.setActive(true);
         user.setUsername("admin");
-        user.setPassword(passwordEncoder.encode("admin"));
+        user.setPassword(passwordEncoder.encode("$Admin1"));
         userRepository.save(user);
     }
 

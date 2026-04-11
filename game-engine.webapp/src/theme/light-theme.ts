@@ -25,6 +25,17 @@ export const lightTheme = createTheme({
             secondary: '#6B7280',
         },
         divider: '#E5E7EB',
+        warning: {
+            light: '#ffd455',
+            main: '#ffcc44',
+            dark: '#d09c00',
+            contrastText: '#8a8a8a',
+        },
+        success: {
+            light: '#acf88a',
+            main: '#78ff33',
+            dark: '#41c000',
+        }
     },
     typography: commonTypography,
     shape: commonShape,
@@ -41,13 +52,16 @@ export const lightTheme = createTheme({
         MuiDrawer: {
             styleOverrides: {
                 paper: {
-                    backgroundColor: '#1A56DB',
-                    color: '#FFFFFF',
-                    borderRight: 'none',
+                    backgroundColor: '#FFFFFF',
+                    color: '#111827',
+                    boxShadow: '0 1px 0 0 #E5E7EB',
                 },
             },
         },
         MuiButton: {
+            defaultProps:{
+                size:"large"
+            },
             styleOverrides: {
                 root: {borderRadius: 6, padding: '6px 16px'},
                 containedPrimary: {
@@ -84,7 +98,7 @@ export const lightTheme = createTheme({
             },
         },
         MuiTextField: {
-            defaultProps: {size: 'small', variant: 'outlined'},
+            defaultProps: {size: 'medium', variant: 'outlined'},
         },
         MuiListItemButton: {
             styleOverrides: {

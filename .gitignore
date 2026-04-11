@@ -3,3 +3,5 @@ logs/
 *.class
 *node_modules
 *build
+
+.idea

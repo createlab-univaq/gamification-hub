@@ -25,6 +25,17 @@ export const darkTheme = createTheme({
             secondary: '#94A3B8',
         },
         divider: '#334155',
+        warning: {
+            light: '#ffd455',
+            main: '#ffcc44',
+            dark: '#d09c00',
+            contrastText: '#8a8a8a',
+        },
+        success: {
+            light: '#acf88a',
+            main: '#78ff33',
+            dark: '#41c000',
+        }
     },
     typography: commonTypography,
     shape: commonShape,
@@ -48,6 +59,9 @@ export const darkTheme = createTheme({
             },
         },
         MuiButton: {
+            defaultProps:{
+              size:"large"
+            },
             styleOverrides: {
                 root: {borderRadius: 6, padding: '6px 16px'},
                 containedPrimary: {
@@ -84,7 +98,7 @@ export const darkTheme = createTheme({
             },
         },
         MuiTextField: {
-            defaultProps: {size: 'small', variant: 'outlined'},
+            defaultProps: {size: 'medium', variant: 'outlined'},
         },
         MuiListItemButton: {
             styleOverrides: {

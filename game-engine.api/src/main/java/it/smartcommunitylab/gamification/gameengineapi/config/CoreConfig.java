@@ -6,8 +6,10 @@ import eu.trentorise.game.core.AppContextProvider;
 import eu.trentorise.game.core.Clock;
 import eu.trentorise.game.core.SystemClock;
 import eu.trentorise.game.managers.DBPlayerManager;
+import eu.trentorise.game.managers.DroolsEngine;
 import eu.trentorise.game.managers.QuartzTaskManager;
 import eu.trentorise.game.managers.QueueGameWorkflow;
+import eu.trentorise.game.services.GameEngine;
 import eu.trentorise.game.services.PlayerService;
 import eu.trentorise.game.services.TaskService;
 import eu.trentorise.game.services.Workflow;
@@ -78,6 +80,11 @@ public class CoreConfig {
             logger.error("Error creating Quartz scheduler", e);
             return null;
         }
+    }
+
+    @Bean
+    public GameEngine gameEngine() {
+        return new DroolsEngine();
     }
 
     @Bean

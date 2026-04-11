@@ -1,7 +1,12 @@
 custom:
   cors:
-    allow-origin: "*"
-    allow-headers: "*"
+    allowed-origin-patterns:
+      - "http://localhost:[*]"
+    allowed-methods: '*'
+    allowed-headers: '*'
+    exposed-headers: 'Authorization,Link,X-Total-Count,X-${spring.application.name}-alert,X-${spring.application.name}-error,X-${spring.application.name}-params'
+    allow-credentials: false
+    max-age: 1800
   jwt:
     secret-key: ePzhPkV0RM/iszU9WijGvT5jhjegEK/m7YSH+sHEzgKiATs71IhdKvkq8NEqgCcFGDpKTOwDRs1CHMQdJTeQQw==
     expiration: 86400
