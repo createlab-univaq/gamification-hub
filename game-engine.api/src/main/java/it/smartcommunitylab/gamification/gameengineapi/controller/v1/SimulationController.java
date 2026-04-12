@@ -19,7 +19,9 @@ import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.Poin
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.SimulationRequestDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.SimulationResultDTO;
 import it.smartcommunitylab.gamification.gameengineapi.service.SimulationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,13 +41,10 @@ public class SimulationController {
 
     private final SimulationService simulationService;
 
-    @PostMapping("/games/{gameId}/actions/{actionId}")
-    public ResponseEntity<SimulationResultDTO> simulate(
-            @PathVariable String gameId,
-            @PathVariable String actionId,
-            @RequestBody SimulationRequestDTO request) {
-        log.info("Simulate action={} game={} player={}", actionId, gameId, request.getPlayerId());
-        return ResponseEntity.ok(simulationService.simulate(gameId, actionId, request));
+    @PostMapping
+    public ResponseEntity<SimulationResultDTO> simulate(@RequestBody @Valid SimulationRequestDTO request) {
+        log.info("Simulate action={} game={} player={}", request.getActionId(), request.getGameId(), request.getPlayerId());
+        return ResponseEntity.ok(simulationService.simulate(request.getActionId(), request.getGameId(), request));
     }
 
 }

@@ -8,5 +8,5 @@ import java.util.List;
 public class BadgeCollectionDTO {
     private String id;
     private String name;
-    private List<String> badges;
+    private boolean hidden;
 }

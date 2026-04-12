@@ -9,4 +9,6 @@ public class UserDTO {
 
     private String username;
 
+    private boolean active;
+
 }

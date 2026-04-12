@@ -2,9 +2,17 @@ package it.smartcommunitylab.gamification.gameengineapi.model.dto;
 
 import lombok.Data;
 
+import java.util.Set;
+
 @Data
-public class PointConceptDTO {
+public class ChallengeDTO {
+
     private String id;
+
     private String name;
-    private double score = 0.0;
+    
+    private Set<String> variables;
+
+    private String gameId;
+
 }

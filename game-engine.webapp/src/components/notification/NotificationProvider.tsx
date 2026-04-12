@@ -1,6 +1,7 @@
-import {createContext, PropsWithChildren, useContext, useMemo, useState} from "react";
+import {createContext, PropsWithChildren, useContext, useEffect, useMemo, useState} from "react";
 import type {NotificationType} from "./Notification.tsx";
 import {FullScreenNotification, PopupNotification} from "./Notification.tsx";
+import {useLocation} from "react-router-dom";
 
 
 export interface NotificationMessage {
@@ -50,7 +51,6 @@ export function NotificationProvider({children}: PropsWithChildren) {
 
 
     const NotificationArea = useMemo(() => {
-        console.log(notification, isSnack)
         if (!notification) {
             return <></>;
         }

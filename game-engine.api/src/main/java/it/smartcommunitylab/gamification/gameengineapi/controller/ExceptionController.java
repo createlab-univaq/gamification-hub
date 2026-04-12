@@ -2,8 +2,9 @@ package it.smartcommunitylab.gamification.gameengineapi.controller;
 
 import it.smartcommunitylab.gamification.gameengineapi.exception.RequestException;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ExceptionResponse;
-import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -46,9 +47,19 @@ public class ExceptionController {
         return buildResponseObject(e.getTitle(), e.getMessage(), null, e.getStatus());
     }
 
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ExceptionResponse> handleMongoException(DataAccessException e) {
+        log.error("Mongo Error!\n{}", e.getLocalizedMessage());
+        String message = e.getMessage();
+        if(e instanceof DuplicateKeyException dke) {
+            message = "Duplicated value found!";
+        }
+        return buildResponseObject("Data Access Error", message, null, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleGenericException(Exception e) {
-        log.error("Generic Error!\n{}", e.getLocalizedMessage());
+        log.error("Generic Error! type={}\n{}", e.getClass().getName(), e.getLocalizedMessage());
         return buildResponseObject("Generic Error", "Something went truly wrong...", null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

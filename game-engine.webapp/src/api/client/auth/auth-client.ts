@@ -1,6 +1,6 @@
 import {BaseApiClient, TOKEN_KEY, USER_KEY} from "../base-client.ts";
-import type {LoginRequest, User} from "../../types/types.ts";
 import Cookies from "js-cookie";
+import type {LoginRequestDto, UserDto} from "../../types";
 
 export class AuthClient {
 
@@ -10,8 +10,8 @@ export class AuthClient {
         this.baseClient = baseClient
     }
 
-    public async login(request: LoginRequest) {
-        const response = await this.baseClient.post<{ token: string }>(`/auth`, request)
+    public async login(request: LoginRequestDto) {
+        const response = await this.baseClient.post<{ token: string }>(`/auth`, request, false)
         const token = response.token
         Cookies.set(TOKEN_KEY, token, {
             path: "/",
@@ -19,14 +19,19 @@ export class AuthClient {
             sameSite: "strict",
             secure: true,
         })
-        const userResponse = await this.baseClient.get<User>(`/auth/user`, true)
+        await this.loadAuthUser()
+        return Promise.resolve()
+    }
+
+    public async loadAuthUser() {
+        const userResponse = await this.baseClient.get<UserDto>(`/auth/user`)
         Cookies.set(USER_KEY, JSON.stringify(userResponse), {
             path: "/",
             expires: 1,
             sameSite: "strict",
             secure: true,
         })
-        return Promise.resolve()
+        return userResponse
     }
 
 }

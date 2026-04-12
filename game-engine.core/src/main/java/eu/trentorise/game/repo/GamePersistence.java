@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -41,6 +42,7 @@ import eu.trentorise.game.task.ClassificationTask;
 import eu.trentorise.game.task.GeneralClassificationTask;
 
 @Document(collection = "game")
+@CompoundIndex(name = "owner_name_unique", def = "{'owner':1, 'name':1}", unique = true)
 public class GamePersistence {
 
 	@Transient

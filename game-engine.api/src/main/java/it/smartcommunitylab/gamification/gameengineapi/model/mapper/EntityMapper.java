@@ -7,7 +7,8 @@ import java.util.Collection;
 @MapperConfig(
         componentModel = MappingConstants.ComponentModel.SPRING,
         nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL,
-        collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED
+        collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
 public interface EntityMapper<DTO, ENTITY> {
 

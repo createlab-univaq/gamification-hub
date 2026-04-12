@@ -20,7 +20,6 @@ public class SecurityUtils {
         if(Objects.isNull(authentication) || Objects.isNull(authentication.getPrincipal())) {
             return null;
         }
-        System.out.println("Hello");
         Object principal = authentication.getPrincipal();
         if(principal instanceof UserDetails) {
             return (DomainUserDetails) principal;

@@ -31,7 +31,7 @@ export function SidebarLayout() {
     const {width} = useWindowSize()
 
     const sidebarWidth = useMemo(() => {
-        if (width < 750) {
+        if (width < 800) {
             if (isOpen) {
                 return "50%"
             }
@@ -44,7 +44,7 @@ export function SidebarLayout() {
     }, [isOpen, width])
 
     return <Drawer
-        variant={width < 750 ? "temporary" : "permanent"}
+        variant={width < 800 ? "temporary" : "permanent"}
         ModalProps={{
             keepMounted: false,
         }}

@@ -17,6 +17,9 @@
         <profile>
             <id>local</id>
         </profile>
+        <profile>
+            <id>test</id>
+        </profile>
     </profiles>
 
     <properties>

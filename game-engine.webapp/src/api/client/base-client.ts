@@ -17,11 +17,10 @@ export class BaseApiClient {
         this.baseUrl = baseUrl
     }
 
-    private getHeaders(authenticated?: boolean) {
+    private getHeaders(authenticated=true) {
         const headers = new Headers()
         if (authenticated) {
             const token = Cookies.get(TOKEN_KEY)
-            console.log(token)
             headers.set("Authorization", `Bearer ${token}`)
         }
         headers.set("Content-Type", "application/json")
@@ -31,6 +30,9 @@ export class BaseApiClient {
     private async sendRequest(url: RequestInfo | URL, options?: RequestInit) {
         const result = await fetch(url, options)
         try {
+            if(result.status === 204) {
+                return Promise.resolve()
+            }
             const message = await result.json()
             if(!result.ok) {
                 return Promise.reject(message)
@@ -40,16 +42,15 @@ export class BaseApiClient {
             // message is not a JSON
             const message = await result.text()
             return Promise.reject(message ?? `An error has occured: ${error}`)
-
         }
     }
 
-    public async get<T>(resource: string, authenticated?: boolean): Promise<T> {
+    public async get<T>(resource: string, authenticated=true): Promise<T> {
         const headers = this.getHeaders(authenticated)
         return this.sendRequest(`${this.baseUrl}${resource}`, {headers})
     }
 
-    public async post<T>(resource: string, body: object, authenticated?: boolean): Promise<T> {
+    public async post<T>(resource: string, body: object, authenticated=true): Promise<T> {
         const headers = this.getHeaders(authenticated)
         return this.sendRequest(`${this.baseUrl}${resource}`, {
             headers,
@@ -58,7 +59,7 @@ export class BaseApiClient {
         })
     }
 
-    public async put<T>(resource: string, body: object, authenticated?: boolean): Promise<T> {
+    public async put<T>(resource: string, body: object, authenticated=true): Promise<T> {
         const headers = this.getHeaders(authenticated)
         return this.sendRequest(`${this.baseUrl}${resource}`, {
             headers,
@@ -67,7 +68,7 @@ export class BaseApiClient {
         })
     }
 
-    public async patch<T>(resource: string, body: object, authenticated?: boolean): Promise<T> {
+    public async patch<T>(resource: string, body: object, authenticated=true): Promise<T> {
         const headers = this.getHeaders(authenticated)
         return this.sendRequest(`${this.baseUrl}${resource}`, {
             headers,
@@ -76,7 +77,7 @@ export class BaseApiClient {
         })
     }
 
-    public async delete<T>(resource: string, authenticated?: boolean): Promise<T> {
+    public async delete<T>(resource: string, authenticated=true): Promise<T> {
         const headers = this.getHeaders(authenticated)
         return this.sendRequest(`${this.baseUrl}${resource}`, {
             headers,

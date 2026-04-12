@@ -5,6 +5,8 @@ import {AuthRoutes} from "./AuthRoutes.tsx";
 import {LogoutPage} from "../pages/logout/page.tsx";
 import {PublicRoutes} from "./PublicRoutes.tsx";
 import {AppLayout} from "../components/layout/AppLayout.tsx";
+import {GamesListPage} from "../pages/games/list.tsx";
+import {GameUpsertPage} from "../pages/games/upsert.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -32,7 +34,20 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         path: "/dashboard",
-                        element: <DashboardPage/>
+                        element: <DashboardPage/>,
+                        index:true
+                    },
+                    {
+                        path: "/games",
+                        element: <GamesListPage/>,
+                    },
+                    {
+                        path: "/games/upsert",
+                        element: <GameUpsertPage/>
+                    },
+                    {
+                        path: "/games/upsert/:gameId",
+                        element: <GameUpsertPage/>
                     }
                 ]
             }
