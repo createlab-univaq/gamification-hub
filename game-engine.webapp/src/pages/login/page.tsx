@@ -9,6 +9,7 @@ import {FormInput} from "../../components/form/FormInput.tsx";
 import {useForm} from "react-hook-form";
 import {PasswordField} from "../../components/form/PasswordField.tsx";
 import {router} from "../../router";
+import {PageContainer} from "../../components/layout/PageContainer.tsx";
 
 export function LoginPage() {
 
@@ -34,58 +35,60 @@ export function LoginPage() {
         }
     })
 
-    return <Stack sx={{
-        width: "100%",
-        height: "100dvh",
-        alignItems: "center",
-        justifyContent: "center"
-    }}>
-        <Card sx={{maxWidth: "30%"}}>
-            <CardHeader>
-                <Typography>Accedi</Typography>
-            </CardHeader>
-            <CardContent>
-                <Form form={form} onSubmit={(fieldValues) => mutate({...fieldValues})}>
-                    <Stack sx={{
-                        gap: "2rem",
-                        justifyContent: "center"
-                    }}>
-                        <Typography sx={{textAlign: "center"}} variant={"h4"}>Inserisci le tue credenziali</Typography>
+    return <PageContainer>
+        <Stack sx={{
+            width: "100%",
+            height: "100dvh",
+            alignItems: "center",
+            justifyContent: "center"
+        }}>
+            <Card sx={{maxWidth: "30%"}}>
+                <CardHeader>
+                    <Typography>Accedi</Typography>
+                </CardHeader>
+                <CardContent>
+                    <Form form={form} onSubmit={(fieldValues) => mutate({...fieldValues})}>
                         <Stack sx={{
-                            gap: "1rem"
+                            gap: "2rem",
+                            justifyContent: "center"
                         }}>
-                            <FormInput name={"username"}
-                                       rules={{
-                                           required: "Campo obbligatorio",
-                                           pattern: {
-                                               value: /^[a-zA-Z0-9_]+$/,
-                                               message: "Lo username può contenere solo caratteri lettere e underscore."
-                                           }
-                                       }}>
-                                <TextField type={"text"} label={"Username"} placeholder={"MyUsername"} fullWidth/>
-                            </FormInput>
-                            <FormInput name={"password"}
-                                       rules={{
-                                           required: "Password obbligatoria",
-                                           pattern: {
-                                               value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?])[A-Za-z\d@$!%*?]{4,}$/,
-                                               message: "La password deve contenere almeno 4 caratteri, un carattere maiuscolo e minuscoolo, un numero ed un carattere speciale (@,$,!,%,*,?)"
-                                           }
-                                       }}
-                            >
-                                <PasswordField label={"Password"} placeholder={"**********"} fullWidth/>
-                            </FormInput>
+                            <Typography sx={{textAlign: "center"}} variant={"h4"}>Inserisci le tue credenziali</Typography>
+                            <Stack sx={{
+                                gap: "1rem"
+                            }}>
+                                <FormInput name={"username"}
+                                           rules={{
+                                               required: "Campo obbligatorio",
+                                               pattern: {
+                                                   value: /^[a-zA-Z0-9_]+$/,
+                                                   message: "Lo username può contenere solo caratteri lettere e underscore."
+                                               }
+                                           }}>
+                                    <TextField type={"text"} label={"Username"} placeholder={"MyUsername"} fullWidth/>
+                                </FormInput>
+                                <FormInput name={"password"}
+                                           rules={{
+                                               required: "Password obbligatoria",
+                                               pattern: {
+                                                   value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?])[A-Za-z\d@$!%*?]{4,}$/,
+                                                   message: "La password deve contenere almeno 4 caratteri, un carattere maiuscolo e minuscoolo, un numero ed un carattere speciale (@,$,!,%,*,?)"
+                                               }
+                                           }}
+                                >
+                                    <PasswordField label={"Password"} placeholder={"**********"} fullWidth/>
+                                </FormInput>
+                            </Stack>
+                            <CardActions sx={{
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "1rem"
+                            }}>
+                                <Button fullWidth={true} type={"submit"} variant={"contained"}>Accedi</Button>
+                            </CardActions>
                         </Stack>
-                        <CardActions sx={{
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: "1rem"
-                        }}>
-                            <Button fullWidth={true} type={"submit"} variant={"contained"}>Accedi</Button>
-                        </CardActions>
-                    </Stack>
-                </Form>
-            </CardContent>
-        </Card>
-    </Stack>
+                    </Form>
+                </CardContent>
+            </Card>
+        </Stack>
+    </PageContainer>
 }

@@ -5,7 +5,6 @@ import {useMutation} from "@tanstack/react-query";
 import {gameClient} from "../api";
 import {getApiError, translateApiErrorToNotification} from "../utils/error-utils.ts";
 import {useEffect} from "react";
-import {PageContainer} from "./layout/PageContainer.tsx";
 import {Form} from "./form/Form.tsx";
 import {Button, Stack, TextField} from "@mui/material";
 import {FormInput} from "./form/FormInput.tsx";
@@ -19,9 +18,9 @@ export interface GameFormProps {
 export function GameForm({game}: GameFormProps) {
 
     const form = useForm<GameDto>({
-        defaultValues:{
-            name:"",
-            domain:""
+        defaultValues: {
+            name: "",
+            domain: ""
         }
     })
     const {setNotification} = useNotificationContext()
@@ -34,7 +33,7 @@ export function GameForm({game}: GameFormProps) {
             return gameClient.addGame(request)
         },
         onSuccess: (data) => {
-            navigateTo("/games", {
+            navigateTo("/dashboard", {
                 state: {
                     type: "success",
                     title: `Gioco salvato!`,
@@ -92,7 +91,7 @@ export function GameForm({game}: GameFormProps) {
                        alignItems: "center"
                    }}
             >
-                <Button href={"/games"} variant={"contained"}>Back</Button>
+                <Button href={"/dashboard"} variant={"contained"}>Back</Button>
                 <Stack direction={"row"} sx={{gap: 2}}>
                     <Button type={"submit"} variant={"contained"}>Save</Button>
                     <Button type={"reset"} onClick={() => initForm(game)} variant={"outlined"}>Reset</Button>

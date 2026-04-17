@@ -1,12 +1,15 @@
 import {createBrowserRouter, Navigate} from "react-router-dom";
 import {LoginPage} from "../pages/login/page.tsx";
-import {DashboardPage} from "../pages/dashboard/page.tsx";
 import {AuthRoutes} from "./AuthRoutes.tsx";
 import {LogoutPage} from "../pages/logout/page.tsx";
 import {PublicRoutes} from "./PublicRoutes.tsx";
 import {AppLayout} from "../components/layout/AppLayout.tsx";
-import {GamesListPage} from "../pages/games/list.tsx";
-import {GameUpsertPage} from "../pages/games/upsert.tsx";
+import {GamesListPage} from "../pages/dashboard/list.tsx";
+import {GameUpsertPage} from "../pages/dashboard/upsert.tsx";
+import {RulesPage} from "../pages/rules/page.tsx";
+import {GameRoutes} from "./GameRoutes.tsx";
+import {Stack} from "@mui/material";
+import {GamePage} from "../pages/games/page.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -34,20 +37,30 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         path: "/dashboard",
-                        element: <DashboardPage/>,
-                        index:true
-                    },
-                    {
-                        path: "/games",
                         element: <GamesListPage/>,
+                        index: true
                     },
                     {
-                        path: "/games/upsert",
+                        path: "/upsert-game",
                         element: <GameUpsertPage/>
                     },
                     {
-                        path: "/games/upsert/:gameId",
+                        path: "/upsert-game/:gameId",
                         element: <GameUpsertPage/>
+                    },
+                    {
+                        path: "/games/:gameId",
+                        element: <GameRoutes/>,
+                        children: [
+                            {
+                                path: "",
+                                element: <GamePage/>
+                            },
+                            {
+                                path: "rules",
+                                element: <RulesPage/>
+                            }
+                        ]
                     }
                 ]
             }

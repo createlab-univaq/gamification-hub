@@ -1,14 +1,15 @@
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {Button, Card, Stack, Typography} from "@mui/material";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import {gameClient, queryClient} from "../../api";
-import {Add, Delete, Edit} from "@mui/icons-material"
+import {Add, Delete, Edit, PanoramaFishEye} from "@mui/icons-material"
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useState} from "react";
 import type {GameDto} from "../../api/types";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {navigateTo} from "../../utils/navigation-utils.ts";
 
 export function GamesListPage() {
 
@@ -55,7 +56,7 @@ export function GamesListPage() {
                     buttons={[
                         {
                             children: <>Add <Add/></>,
-                            href: "/games/upsert",
+                            href: "/upsert-game",
                             variant: "contained"
                         }
                     ]}
@@ -68,15 +69,29 @@ export function GamesListPage() {
         {!data.length && <Typography>No games found.</Typography>}
         <Stack sx={{gap: 2, mt: 2}}>
             {data.map((game) => {
-                return <Card key={`game-card-${game.id}`} sx={{padding: 2}}>
+                return <Card key={`game-card-${game.id}`}
+                             sx={{
+                                 padding: 2,
+                                 cursor: "pointer",
+                                 "&:hover":{
+                                     boxShadow:"0rem 0rem 1rem gray"
+                                 }
+                             }}
+                             onClick={() => navigateTo(`/games/${game.id}/`)}
+                >
                     <Stack direction={"row"} sx={{justifyContent: "space-between"}}>
                         <Stack>
                             <Typography variant={"h5"}>{game.name}</Typography>
                             <Typography variant={"body1"}>{game.domain}</Typography>
                         </Stack>
                         <Stack direction={"row"}>
-                            <Button href={`/games/upsert/${game.id}`}><Edit sx={{fontSize: "2rem"}}/></Button>
-                            <Button color={"error"} onClick={() => setDeleteGame(game)}><Delete
+                            <Button href={`/games/${game.id}`}><PanoramaFishEye sx={{fontSize: "2rem"}}/></Button>
+                            <Button href={`/upsert-game/${game.id}`}><Edit sx={{fontSize: "2rem"}}/></Button>
+                            <Button color={"error"} onClick={(event) => {
+                                event.stopPropagation()
+                                event.preventDefault()
+                                setDeleteGame(game)
+                            }}><Delete
                                 sx={{fontSize: "2rem", color: (theme) => theme.palette.error.main}}/></Button>
                         </Stack>
                     </Stack>
