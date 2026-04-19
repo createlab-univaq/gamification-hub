@@ -44,9 +44,9 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
     const {mutate: upsertRuleMutate, isPending: upsertRulePending} = useMutation({
         mutationFn: (request) => {
             setConsoleMessages([...consoleMessages, {
-                time:new Date(),
-                type:"text",
-                content:rule ? "Updating rule..." : "Creating rule...."
+                time: new Date(),
+                type: "text",
+                content: rule ? "Updating rule..." : "Creating rule...."
             }])
             if (rule) {
 
@@ -70,12 +70,11 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
         mutationFn: (request) => {
             setConsoleMessages([{
                 content: "Started validation...",
-                time:new Date()
+                time: new Date()
             }])
             return ruleClient.validateRule(request)
         },
         onSettled: (data) => {
-            console.log("SETTLED")
             if (!Object.keys(data).length) {
                 setNotification({
                     notification: {
@@ -88,17 +87,18 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                 return
             }
             const errors = Object.entries(data)
-            setConsoleMessages(errors.map(e => {
+            updateConsoleMessages(errors.map(e => {
                 return {
                     content: e[1],
                     type: "error",
-                    time:new Date()
+                    time: new Date()
                 } satisfies ConsoleMessage
             }))
             setNotification({
                 notification: {
                     type: "error",
-                    content: <Stack>{errors.map(e => <Typography>{e[0]}: {e[1]}</Typography>)}</Stack>,
+                    content: <Stack>{errors.map((e, index) => <Typography
+                        key={`notification-detail-${index}`}>{e[0]}: {e[1]}</Typography>)}</Stack>,
                     title: "Rule validation failed",
                 },
                 isSnack: true
@@ -119,12 +119,19 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                         time: new Date()
                     } satisfies ConsoleMessage
                 })
-            setConsoleMessages(detailsError)
+            updateConsoleMessages(detailsError)
         }
         setNotification({
             notification: translateApiErrorToNotification(apiError),
             isSnack: true
         })
+    }
+
+    function updateConsoleMessages(messages: ConsoleMessage[]) {
+        if (messages.length > 0 && consolePanelRef.current.isCollapsed()) {
+            consolePanelRef.current.resize("40%")
+        }
+        setConsoleMessages(messages)
     }
 
     const regenerateDrl = useDebounced((nextFile: DroolsFile) => {
@@ -143,16 +150,19 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
             setDrlContent(drl)
             setInitialRule(regeneratedFile)
         } catch (e) {
-            console.error(e)
-            // TODO notify
+            updateConsoleMessages([{
+                time:new Date(),
+                type:"warning",
+                content: e
+            }])
         }
     }, 400)
 
-    return <Group orientation={"vertical"} style={{display: "flex", gap: "1.5rem", width: "100%"}}>
-        <Panel collapsible={true} minSize={"10%"} maxSize={"100%"}>
-            <Group orientation={"horizontal"} style={{display: "flex", gap: "1.5rem"}}>
-                {(validateIsPending || upsertRulePending) && <Loading fullScreen={true}/>}
-                <Panel collapsible={true} defaultSize={"50%"} minSize={"10%"} panelRef={builderPanelRef}
+    return <Group orientation={"horizontal"} style={{display: "flex", gap: "1.5rem", width: "100%"}}>
+        {(validateIsPending || upsertRulePending) && <Loading fullScreen={true}/>}
+        <Panel collapsible={true} minSize={"10%"} maxSize={"100%"} panelRef={builderPanelRef}>
+            <Group orientation={"vertical"} style={{display: "flex", gap: "1.5rem"}}>
+                <Panel collapsible={true} defaultSize={"50%"} minSize={"10%"}
                        style={{scrollbarWidth: "none"}}>
                     <RuleBuilder initialFile={initialRule}
                                  onSave={(file, drl) => {
@@ -171,14 +181,25 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                                  }}
                     />
                 </Panel>
-                <PanelSeparator sx={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                <PanelSeparator
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        "&:hover > .MuiStack-root": {
+                            opacity: "1"
+                        }
+                    }}
+                >
                     <Stack
+                        direction={"row"}
                         sx={{
                             alignItems: "center",
                             justifyContent: "center",
+                            transition: "opacity ease-in-out 0.2s",
+                            opacity: "0",
                             gap: 1,
-                            position: 'sticky',
-                            top: '30dvh',
+                            width: "fit-content",
                         }}
                     >
                         <Button
@@ -188,11 +209,12 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                                 width: "min-content"
                             }}
                             onClick={() => {
-                                builderPanelRef.current.collapse()
+                                consolePanelRef.current.collapse()
                             }}
                             variant={"contained"}
                         >
                             <ChevronLeft sx={{
+                                transform: "rotate(-90deg)",
                                 width: {
                                     lg: "2rem",
                                     md: "2rem",
@@ -216,6 +238,7 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                             variant={"contained"}
                         >
                             <DragIndicator sx={{
+                                transform: "rotate(90deg)",
                                 width: {
                                     lg: "1.5rem",
                                     md: "1.5rem",
@@ -237,11 +260,16 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                                 width: "min-content"
                             }}
                             onClick={() => {
-                                droolEditorPanelRef.current.collapse()
+                                if (consolePanelRef.current.isCollapsed()) {
+                                    consolePanelRef.current.expand()
+                                    return
+                                }
+                                consolePanelRef.current.resize("100%")
                             }}
                             variant={"contained"}
                         >
                             <ChevronRight sx={{
+                                transform: "rotate(-90deg)",
                                 width: {
                                     lg: "2rem",
                                     md: "2rem",
@@ -258,67 +286,35 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                         </Button>
                     </Stack>
                 </PanelSeparator>
-                <Panel collapsible={true} defaultSize={"30%"} minSize={"10%"} panelRef={droolEditorPanelRef}>
-                    <Stack sx={{gap: 2}}>
-                        <ButtonGroup>
-                            <Button
-                                fullWidth={true}
-                                onClick={() => {
-                                    setReadonly(!readonly)
-                                }}
-                                variant={readonly ? "outlined" : "contained"}
-                                endIcon={readonly ? <Edit/> : <Stop/>}
-                            >
-                                {readonly ? "Edit" : "Stop"}
-                            </Button>
-                            <Button
-                                fullWidth={true}
-                                variant={"contained"}
-                                endIcon={<FactCheck/>}
-                                onClick={() => {
-                                    validateReset()
-                                    const tmpRule = {
-                                        content: drlContent,
-                                        name: initialRule?.name ?? "validation-test-rule",
-                                        gameId: gameId
-                                    } satisfies RuleDto
-                                    console.log(tmpRule)
-                                    validateMutation(tmpRule)
-                                }}
-                            >
-                                Validate
-                            </Button>
-                        </ButtonGroup>
-                        <DroolEditor sx={{width: "100%"}}
-                                     drl={initialDrlPreview}
-                                     readonly={readonly || validateIsPending || upsertRulePending}
-                                     onChange={(drl) => {
-                                         regenerateDroolFile(drl)
-                                         console.log(drl)
-                                         setDrlContent(drl)
-                                     }}
-                        />
-                    </Stack>
+                <Panel defaultSize={0}
+                       collapsible={true}
+                       panelRef={consolePanelRef}
+                >
+                    <MessageConsole messages={consoleMessages}
+                                    onClear={() => setConsoleMessages([])}
+                    />
                 </Panel>
             </Group>
         </Panel>
-        <PanelSeparator sx={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+        <PanelSeparator
+            sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                "&:hover > .MuiStack-root": {
+                    opacity: "1"
+                }
+            }}
+        >
             <Stack
-                direction={"row"}
                 sx={{
                     alignItems: "center",
                     justifyContent: "center",
+                    transition: "opacity ease-in-out 0.2s",
+                    opacity: "0",
                     gap: 1,
-                    left: {
-                        lg: '50%',
-                        md: '50%',
-                        sm: '50%',
-                        xs: '35%'
-                    },
-                    width: "fit-content",
-                    "&:hover":{
-                        visibility:"visible"
-                    }
+                    position: 'sticky',
+                    top: '30dvh',
                 }}
             >
                 <Button
@@ -328,12 +324,11 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                         width: "min-content"
                     }}
                     onClick={() => {
-                        consolePanelRef.current.collapse()
+                        builderPanelRef.current.collapse()
                     }}
                     variant={"contained"}
                 >
                     <ChevronLeft sx={{
-                        transform: "rotate(-90deg)",
                         width: {
                             lg: "2rem",
                             md: "2rem",
@@ -357,7 +352,6 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                     variant={"contained"}
                 >
                     <DragIndicator sx={{
-                        transform: "rotate(90deg)",
                         width: {
                             lg: "1.5rem",
                             md: "1.5rem",
@@ -379,12 +373,11 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                         width: "min-content"
                     }}
                     onClick={() => {
-                        consolePanelRef.current.expand()
+                        droolEditorPanelRef.current.collapse()
                     }}
                     variant={"contained"}
                 >
                     <ChevronRight sx={{
-                        transform: "rotate(-90deg)",
                         width: {
                             lg: "2rem",
                             md: "2rem",
@@ -401,13 +394,45 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                 </Button>
             </Stack>
         </PanelSeparator>
-        <Panel defaultSize={0}
-               collapsible={true}
-               panelRef={consolePanelRef}
-        >
-            <MessageConsole messages={consoleMessages}
-                            onClear={()=>setConsoleMessages([])}
-            />
+        <Panel collapsible={true} defaultSize={"30%"} minSize={"10%"} panelRef={droolEditorPanelRef}>
+            <Stack sx={{gap: 2}}>
+                <ButtonGroup>
+                    <Button
+                        fullWidth={true}
+                        onClick={() => {
+                            setReadonly(!readonly)
+                        }}
+                        variant={readonly ? "outlined" : "contained"}
+                        endIcon={readonly ? <Edit/> : <Stop/>}
+                    >
+                        {readonly ? "Edit" : "Stop"}
+                    </Button>
+                    <Button
+                        fullWidth={true}
+                        variant={"contained"}
+                        endIcon={<FactCheck/>}
+                        onClick={() => {
+                            validateReset()
+                            const tmpRule = {
+                                content: drlContent,
+                                name: initialRule?.name ?? "validation-test-rule",
+                                gameId: gameId
+                            } satisfies RuleDto
+                            validateMutation(tmpRule)
+                        }}
+                    >
+                        Validate
+                    </Button>
+                </ButtonGroup>
+                <DroolEditor sx={{width: "100%", height: "70dvh"}}
+                             drl={initialDrlPreview}
+                             readonly={readonly || validateIsPending || upsertRulePending}
+                             onChange={(drl) => {
+                                 regenerateDroolFile(drl)
+                                 setDrlContent(drl)
+                             }}
+                />
+            </Stack>
         </Panel>
     </Group>
 

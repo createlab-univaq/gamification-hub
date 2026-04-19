@@ -23,10 +23,11 @@ export function DroolEditor({readonly, onChange, drl, sx}: DroolEditorProps) {
 
     return <Stack sx={{
         cursor: readonly ? "not-allowed" : "",
-        ...(sx??{})
+        ...(sx ?? {})
     }}>
         <ReactCodeMirror
             readOnly={readonly}
+            height={sx.height}
             value={code}
             onChange={(value) => {
                 onChange?.(value)
