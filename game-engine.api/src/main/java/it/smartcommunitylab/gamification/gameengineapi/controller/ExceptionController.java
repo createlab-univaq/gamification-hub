@@ -1,6 +1,7 @@
 package it.smartcommunitylab.gamification.gameengineapi.controller;
 
 import it.smartcommunitylab.gamification.gameengineapi.exception.RequestException;
+import it.smartcommunitylab.gamification.gameengineapi.exception.RuleValidationException;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ExceptionResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -35,6 +36,13 @@ public class ExceptionController {
         return buildResponseObject("Validation Error!", "One or more values are not correct.", details, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(RuleValidationException.class)
+    public ResponseEntity<ExceptionResponse> handleValidationException(RuleValidationException e) {
+        log.error("Validation error!\n{}\nError List={}", e.getMessage(), e.getErrors());
+        Map<String, Object> details = new HashMap<>(e.getErrors());
+        return buildResponseObject(e.getTitle(), e.getMessage(), details, e.getStatus());
+    }
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ExceptionResponse> handleBadCredentialsException(BadCredentialsException ex) {
         log.error("User authentication failed. Bad Credentials");
@@ -44,6 +52,7 @@ public class ExceptionController {
     @ExceptionHandler(RequestException.class)
     public ResponseEntity<ExceptionResponse> handleResponseException(RequestException e) {
         log.error("Response Error!\n{}", e.toString());
+        e.printStackTrace();
         return buildResponseObject(e.getTitle(), e.getMessage(), null, e.getStatus());
     }
 

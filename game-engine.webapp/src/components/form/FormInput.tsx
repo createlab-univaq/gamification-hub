@@ -3,10 +3,10 @@ import {Controller, useFormContext} from "react-hook-form";
 import React, {ReactElement} from "react";
 
 
-interface FormInputProps<
+export interface FormInputProps<
     TFieldValues extends FieldValues = FieldValues,
     TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
-> extends Omit<ControllerProps, "render"> {
+> extends Omit<ControllerProps, "render" | "control"> {
     children: ReactElement;
 }
 

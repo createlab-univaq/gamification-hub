@@ -10,6 +10,8 @@ import type {GameDto} from "../../api/types";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
 import {navigateTo} from "../../utils/navigation-utils.ts";
+import {LinkCard} from "../../components/LinkCard.tsx";
+import {Loading} from "../../components/Loading.tsx";
 
 export function GamesListPage() {
 
@@ -48,8 +50,9 @@ export function GamesListPage() {
     const [deleteGame, setDeleteGame] = useState<GameDto>()
 
     if (isPending) {
-        return <></>
+        return <Loading fullScreen={true}/>
     }
+
 
     return <PageContainer>
         <PageHeader title={"Your games"}
@@ -66,26 +69,16 @@ export function GamesListPage() {
                       setElement={setDeleteGame}
                       element={deleteGame}
         />
-        {!data.length && <Typography>No games found.</Typography>}
-        <Stack sx={{gap: 2, mt: 2}}>
+        {!data || !data.length && <Typography>No games found.</Typography>}
+        {data && <Stack sx={{gap: 2, mt: 2}}>
             {data.map((game) => {
-                return <Card key={`game-card-${game.id}`}
-                             sx={{
-                                 padding: 2,
-                                 cursor: "pointer",
-                                 "&:hover":{
-                                     boxShadow:"0rem 0rem 1rem gray"
-                                 }
-                             }}
-                             onClick={() => navigateTo(`/games/${game.id}/`)}
-                >
+                return <LinkCard key={`game-card-${game.id}`} href={`/games/${game.id}`}>
                     <Stack direction={"row"} sx={{justifyContent: "space-between"}}>
                         <Stack>
                             <Typography variant={"h5"}>{game.name}</Typography>
                             <Typography variant={"body1"}>{game.domain}</Typography>
                         </Stack>
                         <Stack direction={"row"}>
-                            <Button href={`/games/${game.id}`}><PanoramaFishEye sx={{fontSize: "2rem"}}/></Button>
                             <Button href={`/upsert-game/${game.id}`}><Edit sx={{fontSize: "2rem"}}/></Button>
                             <Button color={"error"} onClick={(event) => {
                                 event.stopPropagation()
@@ -95,9 +88,10 @@ export function GamesListPage() {
                                 sx={{fontSize: "2rem", color: (theme) => theme.palette.error.main}}/></Button>
                         </Stack>
                     </Stack>
-                </Card>
+                </LinkCard>
             })}
         </Stack>
+        }
     </PageContainer>
 
 }

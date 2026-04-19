@@ -1,13 +1,14 @@
-import {createContext, PropsWithChildren, useContext, useEffect, useMemo, useState} from "react";
+import {createContext, PropsWithChildren, ReactNode, useContext, useEffect, useMemo, useState} from "react";
 import type {NotificationType} from "./Notification.tsx";
 import {FullScreenNotification, PopupNotification} from "./Notification.tsx";
 import {useLocation} from "react-router-dom";
 
 
 export interface NotificationMessage {
-    title: string
-    content: string
+    title: ReactNode
+    content: ReactNode
     type: NotificationType
+    details?:Record<string, string>
 }
 
 interface NotificationContextState {

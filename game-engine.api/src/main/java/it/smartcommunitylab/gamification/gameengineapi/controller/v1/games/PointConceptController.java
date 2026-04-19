@@ -7,10 +7,8 @@ import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityCreationException;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.PointConceptDTO;
-import it.smartcommunitylab.gamification.gameengineapi.model.mapper.BadgeCollectionMapper;
-import it.smartcommunitylab.gamification.gameengineapi.model.mapper.ChallengeMapper;
-import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
-import it.smartcommunitylab.gamification.gameengineapi.model.mapper.PointConceptMapper;
+import it.smartcommunitylab.gamification.gameengineapi.model.mapper.*;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +24,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PointConceptController extends BaseGameController {
 
-    public PointConceptController(GameService gameService, GameMapper gameMapper, ChallengeMapper challengeMapper, PointConceptMapper pointConceptMapper, BadgeCollectionMapper badgeCollectionMapper) {
-        super(gameService, gameMapper, challengeMapper, pointConceptMapper, badgeCollectionMapper);
+    protected final PointConceptMapper pointConceptMapper;
+
+    public PointConceptController(GameService gameService, GameMapper gameMapper, PointConceptMapper pointConceptMapper) {
+        super(gameService, gameMapper);
+        this.pointConceptMapper = pointConceptMapper;
     }
 
     @GetMapping

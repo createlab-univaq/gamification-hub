@@ -3,8 +3,8 @@ import type {GameDto} from "../api/types";
 import {Navigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {gameClient} from "../api";
-import {Stack} from "@mui/material";
 import {getObjectFromLocalStorage} from "../utils/storage-utils.ts";
+import {Loading} from "./Loading.tsx";
 
 
 const GameContext = createContext<GameDto>(null)
@@ -38,7 +38,7 @@ export function GameContextProvider({children}: PropsWithChildren) {
     })
 
     if (isLoading) {
-        return <Stack>Loading...</Stack>
+        return <Loading fullScreen={true}/>
     }
 
     if (isError) {

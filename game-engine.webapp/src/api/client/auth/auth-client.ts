@@ -1,6 +1,7 @@
-import {BaseApiClient, TOKEN_KEY, USER_KEY} from "../base-client.ts";
 import Cookies from "js-cookie";
 import type {LoginRequestDto, UserDto} from "../../types";
+import type {BaseApiClient} from "../base-client.ts";
+import {TOKEN_KEY, USER_KEY} from "../../../utils/storage-utils.ts";
 
 export class AuthClient {
 

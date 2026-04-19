@@ -11,7 +11,9 @@ import {
 import {Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, Toolbar, Typography} from "@mui/material";
 import {useWindowSize} from "../../hooks/use-window-size.ts";
 import {getSidebarItems} from "./sidebarItems.ts";
-import {useLocation} from "react-router-dom";
+import {href, useLocation} from "react-router-dom";
+import {SIDEBAR_OPEN_KEY} from "../../utils/storage-utils.ts";
+import {getBaseGamePath} from "../../utils/navigation-utils.ts";
 
 interface SidebarContextProps {
     isOpen: boolean
@@ -24,23 +26,17 @@ const SidebarContext = createContext<SidebarContextProps>({
     }
 })
 
-const SIDEBAR_OPEN_KEY = "game-engine.ui.sidebar-open"
-
 export const useSidebarContext = () => useContext(SidebarContext)
 
 export function SidebarContextProvider({defaultOpen, children}: PropsWithChildren<{ defaultOpen: boolean }>) {
 
-    const [isOpen, setOpen] = useState(defaultOpen)
+    const isSidebarOpen = localStorage.getItem(SIDEBAR_OPEN_KEY) === "true"
+    const [isOpen, setOpen] = useState(isSidebarOpen ?? defaultOpen)
 
     const updateSideBarState = (open: boolean) => {
         setOpen(open)
-        localStorage.setItem(SIDEBAR_OPEN_KEY, open)
+        localStorage.setItem(SIDEBAR_OPEN_KEY, `${open}`)
     }
-
-    useEffect(() => {
-        const storageState = localStorage.getItem(SIDEBAR_OPEN_KEY) ?? defaultOpen
-        setOpen(storageState)
-    }, []);
 
     return <SidebarContext value={{isOpen, setOpen: updateSideBarState}}>
         {children}
@@ -90,6 +86,7 @@ export function SidebarLayout() {
                 {getSidebarItems().map(item => {
                     const Icon = item.icon
                     const isSelected = location.pathname.endsWith(item.href?.replace(".", ""))
+                    const basePath = getBaseGamePath()
                     return <ListItem key={`sidebar-item-${item.title}`}
                                      sx={{
                                          backgroundColor: (theme) => isSelected ? theme.palette.background.default : theme.palette.background.paper,
@@ -98,7 +95,7 @@ export function SidebarLayout() {
                                          }
                                      }}
                     >
-                        <ListItemButton href={item.href} sx={{margin: 0, padding: 0}}>
+                        <ListItemButton href={`${basePath}${item.href}`} sx={{margin: 0, padding: 0}}>
                             <ListItemIcon>
                                 <Icon color={isSelected ? "primary" : "background.paper"} sx={{fontSize:"2rem"}}/>
                             </ListItemIcon>

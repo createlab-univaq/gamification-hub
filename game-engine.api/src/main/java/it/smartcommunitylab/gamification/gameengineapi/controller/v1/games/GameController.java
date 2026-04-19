@@ -4,13 +4,13 @@ import eu.trentorise.game.model.Game;
 import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.config.security.DomainUserDetails;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityCreationException;
+import it.smartcommunitylab.gamification.gameengineapi.model.criteria.GameCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.GameDTO;
-import it.smartcommunitylab.gamification.gameengineapi.model.mapper.BadgeCollectionMapper;
-import it.smartcommunitylab.gamification.gameengineapi.model.mapper.ChallengeMapper;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
-import it.smartcommunitylab.gamification.gameengineapi.model.mapper.PointConceptMapper;
 import it.smartcommunitylab.gamification.gameengineapi.utils.SecurityUtils;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GameController extends BaseGameController {
 
-    public GameController(GameService gameService, GameMapper gameMapper, ChallengeMapper challengeMapper, PointConceptMapper pointConceptMapper, BadgeCollectionMapper badgeCollectionMapper) {
-        super(gameService, gameMapper, challengeMapper, pointConceptMapper, badgeCollectionMapper);
+    public GameController(GameService gameService, GameMapper gameMapper) {
+        super(gameService, gameMapper);
     }
 
     @PostMapping
@@ -55,12 +55,13 @@ public class GameController extends BaseGameController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GameDTO>> getGames() {
-        log.info("Get all games");
+    public ResponseEntity<List<GameDTO>> getGames(@ParameterObject GameCriteria criteria) {
+        log.info("Get all games by criteria: {}", criteria);
         DomainUserDetails userDetails = SecurityUtils.getCurrentUser();
         List<GameDTO> games = gameService.loadGameByOwner(userDetails.getId()).stream()
                 .map(gameMapper::toDTO)
                 .collect(Collectors.toList());
+        games = GameCriteria.filter(criteria, games);
         return ResponseEntity.ok(games);
     }
 

@@ -10,11 +10,24 @@ import {RulesPage} from "../pages/rules/page.tsx";
 import {GameRoutes} from "./GameRoutes.tsx";
 import {Stack} from "@mui/material";
 import {GamePage} from "../pages/games/page.tsx";
+import {ErrorPage} from "../pages/error/page.tsx";
+import {RuleListPage} from "../pages/rules/list.tsx";
+import {RuleUpsertPage} from "../pages/rules/upsert.tsx";
+import {TestPage} from "../pages/TestPage.tsx";
 
 export const router = createBrowserRouter([
     {
+      path:"*",
+      element: <ErrorPage/>
+    },
+    {
         path: "/",
-        element: <Navigate to={"/login"}/>
+        element: <Navigate to={"/login"}/>,
+    },
+    {
+        path: "/testing",
+        element: <TestPage/>,
+        errorElement:<ErrorPage/>
     },
     {
         element: <PublicRoutes/>,
@@ -31,6 +44,7 @@ export const router = createBrowserRouter([
     },
     {
         element: <AuthRoutes/>,
+        errorElement:<ErrorPage/>,
         children: [
             {
                 element: <AppLayout/>,
@@ -58,8 +72,16 @@ export const router = createBrowserRouter([
                             },
                             {
                                 path: "rules",
-                                element: <RulesPage/>
-                            }
+                                element: <RuleListPage/>
+                            },
+                            {
+                                path: "upsert-rule",
+                                element: <RuleUpsertPage/>
+                            },
+                            {
+                                path: "upsert-rule/:ruleId",
+                                element: <RuleUpsertPage/>
+                            },
                         ]
                     }
                 ]

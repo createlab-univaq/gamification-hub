@@ -24,6 +24,7 @@ public class AuthController {
     public ResponseEntity<UserDTO> getAuthenticatedUser() {
         log.info("Request to get authenticated user info");
         UserDTO userDTO = authenticationService.getAuthUser();
+        log.info("Retrieved info for current authentcated user: {}", userDTO);
         return ResponseEntity.ok(userDTO);
     }
 

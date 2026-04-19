@@ -1,11 +1,11 @@
 /**
  * Copyright 2015 Fondazione Bruno Kessler - Trento RISE
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -14,26 +14,32 @@
 
 package eu.trentorise.game.managers;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import eu.trentorise.game.core.LogHub;
+import eu.trentorise.game.core.LoggingRuleListener;
+import eu.trentorise.game.core.StatsLogger;
+import eu.trentorise.game.core.Utility;
+import eu.trentorise.game.managers.drools.KieContainerFactory;
 import eu.trentorise.game.model.*;
+import eu.trentorise.game.model.Level.Threshold;
+import eu.trentorise.game.model.core.GameConcept;
+import eu.trentorise.game.model.core.Notification;
+import eu.trentorise.game.model.core.Rule;
+import eu.trentorise.game.model.core.UrlRule;
 import eu.trentorise.game.model.simulation.ConceptChange;
 import eu.trentorise.game.model.simulation.FiredRuleResult;
 import eu.trentorise.game.model.simulation.SimulationResult;
+import eu.trentorise.game.notification.ChallengeCompletedNotication;
+import eu.trentorise.game.notification.LevelGainedNotification;
+import eu.trentorise.game.repo.ChallengeConceptPersistence;
+import eu.trentorise.game.repo.ChallengeConceptRepo;
+import eu.trentorise.game.services.GameEngine;
+import eu.trentorise.game.services.GameService;
+import eu.trentorise.game.services.PlayerService;
+import eu.trentorise.game.services.Workflow;
 import org.apache.commons.collections4.CollectionUtils;
-import org.kie.api.event.rule.AfterMatchFiredEvent;
-import org.kie.api.event.rule.DefaultAgendaEventListener;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -46,6 +52,8 @@ import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.Message;
 import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
+import org.kie.api.event.rule.AfterMatchFiredEvent;
+import org.kie.api.event.rule.DefaultAgendaEventListener;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.StatelessKieSession;
@@ -58,27 +66,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-
-import eu.trentorise.game.core.LogHub;
-import eu.trentorise.game.core.LoggingRuleListener;
-import eu.trentorise.game.core.StatsLogger;
-import eu.trentorise.game.core.Utility;
-import eu.trentorise.game.managers.drools.KieContainerFactory;
-import eu.trentorise.game.model.Level.Threshold;
-import eu.trentorise.game.model.core.GameConcept;
-import eu.trentorise.game.model.core.Notification;
-import eu.trentorise.game.model.core.Rule;
-import eu.trentorise.game.model.core.UrlRule;
-import eu.trentorise.game.notification.ChallengeCompletedNotication;
-import eu.trentorise.game.notification.LevelGainedNotification;
-import eu.trentorise.game.repo.ChallengeConceptPersistence;
-import eu.trentorise.game.repo.ChallengeConceptRepo;
-import eu.trentorise.game.services.GameEngine;
-import eu.trentorise.game.services.GameService;
-import eu.trentorise.game.services.PlayerService;
-import eu.trentorise.game.services.Workflow;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 @Component
 public class DroolsEngine implements GameEngine {
@@ -103,13 +93,13 @@ public class DroolsEngine implements GameEngine {
 
     @Autowired
     private KieContainerFactory kieContainerFactory;
-    
+
     @Autowired
     private ChallengeConceptRepo challengeConceptRepo;
 
     public PlayerState execute(String gameId, PlayerState state, String action,
-            Map<String, Object> data, String executionId, long executionMoment,
-            List<Object> factObjects) {
+                               Map<String, Object> data, String executionId, long executionMoment,
+                               List<Object> factObjects) {
 
         StopWatch stopWatch =
                 LogManager.getLogger(StopWatch.DEFAULT_LOGGER_NAME).getAppender("perf-file") != null
@@ -158,8 +148,8 @@ public class DroolsEngine implements GameEngine {
 
         //push team state to kb.
         List<TeamState> playerTeams = playerSrv.readTeams(gameId, state.getPlayerId());
-        for (TeamState ts: playerTeams) {
-        	cmds.add(commands.newInsert(new Player(ts)));
+        for (TeamState ts : playerTeams) {
+            cmds.add(commands.newInsert(new Player(ts)));
             CustomData insCustomData = ts.getCustomData();
             cmds.add(commands.newInsert(insCustomData));
         }
@@ -317,26 +307,26 @@ public class DroolsEngine implements GameEngine {
             stopWatch.stop("game execution", String.format("execution for game %s of player %s",
                     gameId, state.getPlayerId()));
         }
-        
+
         boolean result = playerSrv.saveState(state) != null;
-        
+
         iter = ((QueryResults) results.getValue("retrieveNotifications")).iterator();
         while (iter.hasNext()) {
             Notification note = (Notification) iter.next().get("$notifications");
             notificationSrv.notificate(note);
             LogHub.info(gameId, logger, "send notification: {}", note.toString());
         }
-        
+
         LogHub.info(gameId, logger, "player state updated: {}", result);
-        
+
         return state;
     }
 
 
     @Override
     public SimulationResult simulate(String gameId, PlayerState state, String action,
-            Map<String, Object> data, String executionId, long executionMoment,
-            List<Object> factObjects, boolean showDetailedChanges) {
+                                     Map<String, Object> data, String executionId, long executionMoment,
+                                     List<Object> factObjects, boolean showDetailedChanges) {
 
         // Load challenges from DB (same as execute)
         List<ChallengeConceptPersistence> listCcs =
@@ -415,11 +405,11 @@ public class DroolsEngine implements GameEngine {
             // Has O(active_concepts × rules_fired) overhead — use only for debugging.
             kSession.addEventListener(new DefaultAgendaEventListener() {
 
-                private final Map<String, Double>       scoresBefore         = new HashMap<>();
-                private final Map<String, List<String>> badgesBefore         = new HashMap<>();
-                private final Map<String, String>       challengeStateBefore = new HashMap<>();
+                private final Map<String, Double> scoresBefore = new HashMap<>();
+                private final Map<String, List<String>> badgesBefore = new HashMap<>();
+                private final Map<String, String> challengeStateBefore = new HashMap<>();
                 // tracks the last rule that modified each concept — used to determine cause
-                private final Map<String, String>       lastModifier         = new HashMap<>();
+                private final Map<String, String> lastModifier = new HashMap<>();
 
                 private void snapshot() {
                     for (GameConcept gc : activeConcepts) {
@@ -530,7 +520,7 @@ public class DroolsEngine implements GameEngine {
     }
 
     private List<ConceptChange> computeDiff(PlayerState before,
-            List<ChallengeConcept> challengesBefore, PlayerState after) {
+                                            List<ChallengeConcept> challengesBefore, PlayerState after) {
 
         List<ConceptChange> changes = new ArrayList<>();
 
@@ -583,8 +573,8 @@ public class DroolsEngine implements GameEngine {
     }
 
     private void sendLevelNotifications(String domain, String gameId, String playerId,
-            String executionId, long executionTime, long timestamp,
-            List<LevelInstance> newGainedLevels, Game game) {
+                                        String executionId, long executionTime, long timestamp,
+                                        List<LevelInstance> newGainedLevels, Game game) {
         newGainedLevels.forEach(instance -> {
             LevelGainedNotification notification = new LevelGainedNotification();
             notification.setGameId(gameId);
@@ -605,8 +595,8 @@ public class DroolsEngine implements GameEngine {
 
 
     private List<LevelInstance> newGainedLevels(Game game, PlayerState state,
-            List<PlayerLevel> levels) {
-        
+                                                List<PlayerLevel> levels) {
+
         List<PlayerLevel> oldLevels = state.getLevels();
         ListMultimap<String, String> levelProgression = ArrayListMultimap.create();
 
@@ -632,7 +622,7 @@ public class DroolsEngine implements GameEngine {
                 int indexOfPreviousLevel =
                         neverGainedLevelOfThisType ? 0
                                 : levelInstances
-                        .indexOf(new LevelInstance(levelName, instanceProgression.get(0))) + 1;
+                                .indexOf(new LevelInstance(levelName, instanceProgression.get(0))) + 1;
                 for (int i = indexOfPreviousLevel; i <= indexOfNewLevel; i++) {
                     levelsGainedInGameAction.add(levelInstances.get(i));
                 }
@@ -661,21 +651,22 @@ public class DroolsEngine implements GameEngine {
 
     private void logLevelStatus(String gameId, List<PlayerLevel> levels) {
         if (levels != null && !levels.isEmpty()) {
-        StringBuffer levelStatus = new StringBuffer();
-        for (PlayerLevel lev : levels) {
+            StringBuffer levelStatus = new StringBuffer();
+            for (PlayerLevel lev : levels) {
                 if (levelStatus.length() != 0) {
                     levelStatus.append(",");
                 }
                 levelStatus.append(String.format("{levelName=%s,levelValue=%s,toNextLevel=%s}",
-                    lev.getLevelName(), lev.getLevelValue(), lev.getToNextLevel()));
-        }
+                        lev.getLevelName(), lev.getLevelValue(), lev.getToNextLevel()));
+            }
             LogHub.info(gameId, logger, "Level status: " + levelStatus.toString());
         }
 
 
     }
+
     private void logCompletedChallenge(String domain, String gameId, String executionId,
-            long executionMoment, Player player, ChallengeConcept challenge) {
+                                       long executionMoment, Player player, ChallengeConcept challenge) {
         if (challenge != null && challenge.isCompleted()) {
             StatsLogger.logChallengeCompleted(domain, gameId, player.getId(), executionId,
                     executionMoment, System.currentTimeMillis(), challenge.getName());
@@ -683,7 +674,7 @@ public class DroolsEngine implements GameEngine {
     }
 
     private void sendChallengeCompletedNotifications(ChallengeConcept stateElement, String gameId,
-            String playerId, long executionMoment) {
+                                                     String playerId, long executionMoment) {
         if (stateElement.isCompleted()) {
             ChallengeCompletedNotication challengeNotification = new ChallengeCompletedNotication();
             challengeNotification.setGameId(gameId);
@@ -691,7 +682,7 @@ public class DroolsEngine implements GameEngine {
             challengeNotification.setChallengeName(stateElement.getName());
             challengeNotification.setTimestamp(executionMoment);
             challengeNotification.setModel(stateElement.getModelName());
-            challengeNotification.setPointConcept(stateElement.getFields().containsKey("counterName")? String.valueOf(stateElement.getFields().get("counterName")): "");
+            challengeNotification.setPointConcept(stateElement.getFields().containsKey("counterName") ? String.valueOf(stateElement.getFields().get("counterName")) : "");
             challengeNotification.setStart(stateElement.getStart().getTime());
             challengeNotification.setEnd(stateElement.getEnd().getTime());
             notificationSrv.notificate(challengeNotification);
@@ -769,8 +760,8 @@ public class DroolsEngine implements GameEngine {
 
 
     @Override
-    public List<String> validateRule(String gameId, String content) {
-        List<String> result = new ArrayList<String>();
+    public Map<String, Message> validateRule(String gameId, String content) {
+        Map<String, Message> result = new HashMap<>();
         if (content != null) {
             KieServices ks = KieServices.get();
             KieFileSystem kfs = ks.newKieFileSystem();
@@ -780,7 +771,9 @@ public class DroolsEngine implements GameEngine {
             KieBuilder kieBuilder = ks.newKieBuilder(kfs);
             kieBuilder.buildAll(ExecutableModelProject.class);
             kieBuilder.getResults().getMessages(Message.Level.ERROR)
-                    .forEach(msg -> result.add(msg.getText()));
+                    .forEach(msg -> {
+                        result.put(String.valueOf(msg.getId()), msg);
+                    });
         }
         return result;
     }

@@ -1,18 +1,6 @@
 import type {Dispatch, ReactNode, SetStateAction} from "react";
 import type {SlideProps, SxProps, Theme} from '@mui/material';
-import {
-    Button,
-    Card,
-    CardContent,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Slide,
-    Snackbar,
-    Stack,
-    Typography
-} from "@mui/material";
+import {Card, CardContent, Dialog, DialogContent, DialogTitle, Slide, Snackbar, Stack, Typography} from "@mui/material";
 
 import {DoneAll, Error, Warning} from '@mui/icons-material'
 
@@ -21,7 +9,7 @@ export type NotificationType = "error" | "warning" | "success"
 
 interface NotificationProps {
     title: ReactNode
-    message: ReactNode
+    message: ReactNode,
     type: NotificationType
     isOpen: boolean
     setOpen: Dispatch<SetStateAction<boolean>>
@@ -99,7 +87,7 @@ export function PopupNotification({message, title, type, isOpen, setOpen}: Notif
             background: PopupNotificationGradients[type]
         }}>
             <Stack direction={"row"} sx={{
-                py:"0.5rem",
+                py: "0.5rem",
                 justifyContent: "center",
                 gap: "0.5rem"
             }}>

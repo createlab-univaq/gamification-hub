@@ -4,13 +4,6 @@ export type ClientOptions = {
     baseUrl: 'http://localhost:8080' | (string & {});
 };
 
-export type RuleDto = {
-    id?: string;
-    gameId: string;
-    name: string;
-    content: string;
-};
-
 export type GameConcept = {
     id?: string;
     name?: string;
@@ -46,6 +39,13 @@ export type TaskSchedule = {
 export type TimeInterval = {
     value?: number;
     unit?: 'MILLISEC' | 'SEC' | 'MINUTE' | 'HOUR' | 'DAY';
+};
+
+export type RuleDto = {
+    id?: string;
+    gameId: string;
+    name: string;
+    content: string;
 };
 
 export type ChallengeDto = {
@@ -143,58 +143,6 @@ export type UserDto = {
     active?: boolean;
 };
 
-export type DeleteRuleData = {
-    body?: never;
-    path: {
-        ruleId: string;
-    };
-    query?: never;
-    url: '/api/v1/rules/{ruleId}';
-};
-
-export type DeleteRuleResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
-export type GetRuleData = {
-    body?: never;
-    path: {
-        ruleId: string;
-    };
-    query?: never;
-    url: '/api/v1/rules/{ruleId}';
-};
-
-export type GetRuleResponses = {
-    /**
-     * OK
-     */
-    200: RuleDto;
-};
-
-export type GetRuleResponse = GetRuleResponses[keyof GetRuleResponses];
-
-export type EditRuleData = {
-    body: RuleDto;
-    path: {
-        ruleId: string;
-    };
-    query?: never;
-    url: '/api/v1/rules/{ruleId}';
-};
-
-export type EditRuleResponses = {
-    /**
-     * OK
-     */
-    200: RuleDto;
-};
-
-export type EditRuleResponse = EditRuleResponses[keyof EditRuleResponses];
-
 export type DeleteGameData = {
     body?: never;
     path: {
@@ -246,6 +194,61 @@ export type UpdateGameResponses = {
 };
 
 export type UpdateGameResponse = UpdateGameResponses[keyof UpdateGameResponses];
+
+export type DeleteRuleData = {
+    body?: never;
+    path: {
+        gameId: string;
+        ruleId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/rules/{ruleId}';
+};
+
+export type DeleteRuleResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetRuleData = {
+    body?: never;
+    path: {
+        gameId: string;
+        ruleId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/rules/{ruleId}';
+};
+
+export type GetRuleResponses = {
+    /**
+     * OK
+     */
+    200: RuleDto;
+};
+
+export type GetRuleResponse = GetRuleResponses[keyof GetRuleResponses];
+
+export type EditRuleData = {
+    body: RuleDto;
+    path: {
+        gameId: string;
+        ruleId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/rules/{ruleId}';
+};
+
+export type EditRuleResponses = {
+    /**
+     * OK
+     */
+    200: RuleDto;
+};
+
+export type EditRuleResponse = EditRuleResponses[keyof EditRuleResponses];
 
 export type DeleteGameChallengeData = {
     body?: never;
@@ -299,60 +302,15 @@ export type SimulateResponses = {
 
 export type SimulateResponse = SimulateResponses[keyof SimulateResponses];
 
-export type GetRulesData = {
-    body?: never;
-    path?: never;
-    query: {
-        gameId: string;
-    };
-    url: '/api/v1/rules';
-};
-
-export type GetRulesResponses = {
-    /**
-     * OK
-     */
-    200: Array<RuleDto>;
-};
-
-export type GetRulesResponse = GetRulesResponses[keyof GetRulesResponses];
-
-export type AddRuleData = {
-    body: RuleDto;
-    path?: never;
-    query?: never;
-    url: '/api/v1/rules';
-};
-
-export type AddRuleResponses = {
-    /**
-     * OK
-     */
-    200: RuleDto;
-};
-
-export type AddRuleResponse = AddRuleResponses[keyof AddRuleResponses];
-
-export type ValidateRuleData = {
-    body: RuleDto;
-    path?: never;
-    query?: never;
-    url: '/api/v1/rules/validate';
-};
-
-export type ValidateRuleResponses = {
-    /**
-     * OK
-     */
-    200: Array<string>;
-};
-
-export type ValidateRuleResponse = ValidateRuleResponses[keyof ValidateRuleResponses];
-
 export type GetGamesData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        id?: string;
+        name?: string;
+        domain?: string;
+        terminated?: boolean;
+    };
     url: '/api/v1/games';
 };
 
@@ -380,6 +338,65 @@ export type CreateGameResponses = {
 };
 
 export type CreateGameResponse = CreateGameResponses[keyof CreateGameResponses];
+
+export type GetRulesData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: {
+        id?: string;
+        name?: string;
+    };
+    url: '/api/v1/games/{gameId}/rules';
+};
+
+export type GetRulesResponses = {
+    /**
+     * OK
+     */
+    200: Array<RuleDto>;
+};
+
+export type GetRulesResponse = GetRulesResponses[keyof GetRulesResponses];
+
+export type AddRuleData = {
+    body: RuleDto;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/rules';
+};
+
+export type AddRuleResponses = {
+    /**
+     * OK
+     */
+    200: RuleDto;
+};
+
+export type AddRuleResponse = AddRuleResponses[keyof AddRuleResponses];
+
+export type ValidateRuleData = {
+    body: RuleDto;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/rules/validate';
+};
+
+export type ValidateRuleResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type ValidateRuleResponse = ValidateRuleResponses[keyof ValidateRuleResponses];
 
 export type GetPointsData = {
     body?: never;

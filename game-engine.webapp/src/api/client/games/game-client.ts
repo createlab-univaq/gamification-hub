@@ -1,5 +1,7 @@
 import {BaseApiClient} from "../base-client.ts";
 import type {GameDto} from "../../types";
+import type {GetFilter} from "../../types/filters.ts";
+import {buildSearchParams} from "../../filters/filters.ts";
 
 export class GameClient {
 
@@ -9,23 +11,23 @@ export class GameClient {
         this.baseClient = baseClient
     }
 
-    public async getGames() {
-        return await this.baseClient.get<GameDto[]>(`/games`)
+    public async getGames(criteria?: GetFilter<GameDto>[]) {
+        return await this.baseClient.get<GameDto[]>(`/games?${buildSearchParams(criteria)}`)
     }
 
-    public async getGame(gameId:string) {
+    public async getGame(gameId: string) {
         return await this.baseClient.get<GameDto>(`/games/${gameId}`)
     }
 
-    public async addGame(game:Omit<GameDto, "id">) {
-        return await this.baseClient.post<GameDto>(`/games`,  game)
+    public async addGame(game: Omit<GameDto, "id">) {
+        return await this.baseClient.post<GameDto>(`/games`, game)
     }
 
-    public async updateGame(gameId:string, game:GameDto) {
+    public async updateGame(gameId: string, game: GameDto) {
         return await this.baseClient.put<GameDto>(`/games/${gameId}`, game)
     }
 
-    public async deleteGame(gameId:string) {
+    public async deleteGame(gameId: string) {
         return await this.baseClient.delete(`/games/${gameId}`)
     }
 

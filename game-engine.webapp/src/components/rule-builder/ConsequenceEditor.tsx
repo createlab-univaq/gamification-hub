@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import {
   Autocomplete, Button, Card, CardContent, IconButton, MenuItem,
   Select, Stack, TextField, Tooltip, Typography,
@@ -27,6 +27,11 @@ interface ConsequenceEditorProps {
 export function ConsequenceEditor({ consequence: initialConsequence, bindings, onChange, onDelete }: ConsequenceEditorProps) {
   const [consequence, setConsequence] = useState<Consequence>(initialConsequence)
   const debouncedOnChange = useDebounced(onChange, 300)
+
+  // Update condition if initialCondition changes
+  useEffect(() => {
+    setConsequence(initialConsequence)
+  }, [initialConsequence]);
 
   const handleChange = (next: Consequence) => {
     setConsequence(next)
@@ -141,7 +146,7 @@ function ModifyEditor({ consequence, bindings, onChange }: ModifyEditorProps) {
         label="Binding to modify"
         value={consequence.binding}
         bindings={bindings}
-        onChange={v => handleChange({ ...consequence, binding: v })}
+        onChange={v => onChange({ ...consequence, binding: v })}
       />
       <Stack sx={{ gap: 1 }}>
         <Stack sx={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>

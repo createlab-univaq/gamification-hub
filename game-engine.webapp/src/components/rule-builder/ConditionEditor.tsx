@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {
     Autocomplete,
     Box,
@@ -27,7 +27,7 @@ import type {
 } from 'drools-builder'
 import {ConstraintEditor} from './ConstraintEditor'
 import {RawCodeInput} from './RawCodeInput'
-import {normalizeBinding} from './utils'
+import {KNOWN_FACT_TYPES, normalizeBinding} from './utils'
 
 const CONDITION_KINDS = [
     {value: 'FactPattern', label: 'Pattern'},
@@ -53,6 +53,11 @@ export function ConditionEditor({condition: initialCondition, onChange, onDelete
     // onChange is debounced so RuleBuilder only updates after the user pauses.
     const [condition, setCondition] = useState<Condition>(initialCondition)
     const debouncedOnChange = useDebounced(onChange, 300)
+
+    // Update condition if initialCondition changes
+    useEffect(() => {
+        setCondition(initialCondition)
+    }, [initialCondition]);
 
     const handleChange = (next: Condition) => {
         setCondition(next)

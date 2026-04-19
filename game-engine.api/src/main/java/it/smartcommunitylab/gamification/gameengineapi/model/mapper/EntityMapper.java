@@ -3,6 +3,7 @@ package it.smartcommunitylab.gamification.gameengineapi.model.mapper;
 import org.mapstruct.*;
 
 import java.util.Collection;
+import java.util.List;
 
 @MapperConfig(
         componentModel = MappingConstants.ComponentModel.SPRING,
@@ -14,11 +15,11 @@ public interface EntityMapper<DTO, ENTITY> {
 
     ENTITY toEntity(DTO dto);
 
-    Collection<ENTITY> toEntity(Collection<DTO> dtos);
+    List<ENTITY> toEntity(Collection<DTO> dtos);
 
     DTO toDTO(ENTITY entity);
 
-    Collection<DTO> toDTO(Collection<ENTITY> entities);
+    List<DTO> toDTO(Collection<ENTITY> entities);
 
     void updateEntity(@MappingTarget ENTITY entity, DTO dto);
 

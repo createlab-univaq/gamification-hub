@@ -19,6 +19,7 @@ package eu.trentorise.game.services;
 import java.util.List;
 import java.util.Map;
 
+import org.kie.api.builder.Message;
 import org.springframework.stereotype.Service;
 
 import eu.trentorise.game.model.PlayerState;
@@ -46,5 +47,5 @@ public interface GameEngine {
 	 * @return the list of syntax errors, or an empty list if validation gone
 	 *         fine
 	 */
-	public List<String> validateRule(String gameId, String content);
+	public Map<String, Message> validateRule(String gameId, String content);
 }

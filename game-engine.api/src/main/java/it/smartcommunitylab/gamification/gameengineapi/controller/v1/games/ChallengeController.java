@@ -6,11 +6,10 @@ import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityCreationException;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ChallengeDTO;
-import it.smartcommunitylab.gamification.gameengineapi.model.mapper.BadgeCollectionMapper;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.ChallengeMapper;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
-import it.smartcommunitylab.gamification.gameengineapi.model.mapper.PointConceptMapper;
 import jakarta.validation.Valid;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +25,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ChallengeController extends BaseGameController {
 
-    public ChallengeController(GameService gameService, GameMapper gameMapper, ChallengeMapper challengeMapper, PointConceptMapper pointConceptMapper, BadgeCollectionMapper badgeCollectionMapper) {
-        super(gameService, gameMapper, challengeMapper, pointConceptMapper, badgeCollectionMapper);
+    private final ChallengeMapper challengeMapper;
+
+    public ChallengeController(GameService gameService, GameMapper gameMapper, ChallengeMapper challengeMapper) {
+        super(gameService, gameMapper);
+        this.challengeMapper = challengeMapper;
     }
 
     @GetMapping
@@ -42,7 +44,7 @@ public class ChallengeController extends BaseGameController {
     @PostMapping
     public ResponseEntity<ChallengeDTO> addGameChallenge(@PathVariable final String gameId, @RequestBody @Valid ChallengeDTO challengeDTO) {
         log.info("Add new challenge={} to game={}", challengeDTO, gameId);
-        if(!Objects.isNull(challengeDTO.getId())) {
+        if (!Objects.isNull(challengeDTO.getId())) {
             throw new EntityCreationException("Challenge", "A new game challenge cannot already have an ID");
         }
         Game game = findGameByIdOrThrow(gameId);

@@ -17,9 +17,9 @@ export function PageHeader({buttons, subTitle, title}:PageHeaderProps) {
     return <Stack>
         <Stack direction={"row"} sx={{gap:2, justifyContent:"space-between", alignItems:"center"}}>
             {Title}
-            <Box sx={{gap:1}}>
+            <Stack direction={"row"} sx={{gap:2}}>
                 {buttons?.map((b, index)=><Button {...b} key={`page-header-btn-${index}`}/>)}
-            </Box>
+            </Stack>
         </Stack>
         {SubTitle}
     </Stack>

@@ -19,6 +19,7 @@ export const darkTheme = createTheme({
         background: {
             default: '#0F172A',
             paper: '#1E293B',
+            secondary:'#1d2838'
         },
         text: {
             primary: '#F1F5F9',
@@ -52,7 +53,7 @@ export const darkTheme = createTheme({
         MuiDrawer: {
             styleOverrides: {
                 paper: {
-                    backgroundColor: '#0B1629',
+                    backgroundColor: '#1E293B',
                     color: '#F1F5F9',
                     borderRight: 'none',
                 },

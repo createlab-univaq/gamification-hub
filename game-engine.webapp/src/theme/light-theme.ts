@@ -19,6 +19,7 @@ export const lightTheme = createTheme({
         background: {
             default: '#F7F9FC',
             paper: '#FFFFFF',
+            secondary: '#d2d2d2'
         },
         text: {
             primary: '#111827',
@@ -26,10 +27,10 @@ export const lightTheme = createTheme({
         },
         divider: '#E5E7EB',
         warning: {
-            light: '#ffd455',
-            main: '#ffcc44',
-            dark: '#d09c00',
-            contrastText: '#8a8a8a',
+            light: '#ffca24',
+            main: '#ffd200',
+            dark: '#d7a000',
+            contrastText: '#674600',
         },
         success: {
             light: '#acf88a',

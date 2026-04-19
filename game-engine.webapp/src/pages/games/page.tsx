@@ -1,13 +1,120 @@
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
 import {useGame} from "../../components/GameContext.tsx";
+import type {GridSize} from "@mui/material";
+import {Grid, Stack, Typography} from "@mui/material";
+import {LinkCard} from "../../components/LinkCard.tsx";
+import {Delete, Edit} from "@mui/icons-material";
+import {DeleteDialog} from "../../components/DeleteDialog.tsx";
+import {useMutation} from "@tanstack/react-query";
+import {gameClient} from "../../api";
+import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
+import {navigateTo} from "../../utils/navigation-utils.ts";
+import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {GAME_STORAGE_KEY} from "../../utils/storage-utils.ts";
+import {useState} from "react";
+import type {GameDto} from "../../api/types";
+import {getCurrentUser} from "../../utils/auth-utils.ts";
+import {StatusDot} from "../../components/StatusDot.tsx";
+
+interface GameConceptGridElementProps {
+    href: string,
+    title: string,
+    content: string,
+    size?: GridSize
+}
+
+function GameConceptGridElement({content, href, title, size}: GameConceptGridElementProps) {
+    return <Grid size={size ?? 1}>
+        <LinkCard href={href} title={title}>
+            <Typography>{content}</Typography>
+        </LinkCard>
+    </Grid>
+}
 
 export function GamePage() {
 
     const game = useGame()
+    const user = getCurrentUser()
+    const {setNotification} = useNotificationContext()
+    const [deleteElement, setDeleteElement] = useState<GameDto>()
+
+    const {mutate} = useMutation({
+        mutationKey: ["delete-game"],
+        mutationFn: (gameId) => gameClient.deleteGame(gameId),
+        onSuccess: () => {
+            // Remove cached game
+            localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify({}))
+            navigateTo("/dashboard", {
+                state: {
+                    type: "success",
+                    title: "Game deleted",
+                    content: `The game has been successfully deleted`
+                }
+            })
+        },
+        onError: (error) => {
+            console.error(error)
+            const apiError = getApiError(error)
+            setNotification({
+                notification: translateApiErrorToNotification(apiError),
+                isSnack: true
+            })
+        }
+    })
 
     return <PageContainer>
-        <PageHeader title={game?.name}/>
+        <PageHeader
+            title={
+                <Stack direction={"row"} sx={{alignItems:"center", gap:2}}>
+                    <Typography variant={"h4"}>{game.name}</Typography>
+                    <StatusDot size={"1.5rem"} title={!game.terminated ? "Game has not terminated" : "Game is terminated"} type={game.terminated ? "success" : "error"}/>
+                </Stack>
+            }
+            buttons={[
+                {
+                    endIcon: <Edit/>,
+                    children: "Update",
+                    href: `/upsert-game/${game.id}`,
+                    variant: "contained"
+                },
+                {
+                    endIcon: <Delete/>,
+                    children: "Delete",
+                    variant: "contained",
+                    color: "error",
+                    onClick: () => setDeleteElement(game)
+                }
+            ]}
+        />
+        <DeleteDialog message={`Do you want to delete the game "${deleteElement?.name}" forever?`}
+                      deleteFn={() => mutate(deleteElement?.id)}
+                      setElement={setDeleteElement}
+                      element={deleteElement}
+        />
+        <Stack sx={{marginY: 2}}>
+            {user.id === game.owner && <Typography>Owner: {user.username}</Typography>}
+            <Typography>Domain: {game.domain}</Typography>
+            <Typography>Expiration: {game.expiration}</Typography>
+        </Stack>
+        <Grid container={true} columns={{
+            md: "3",
+            lg: "3",
+            sm: "1",
+            xs: "1"
+        }} spacing={"2rem"}
+        >
+            <GameConceptGridElement size={1.5} href={`/games/${game.id}/rules`} title={"Rules"}
+                                    content={`Total rules: ${game.rules?.length ?? 0}`}/>
+            <GameConceptGridElement size={1.5} href={`/games/${game.id}/actions`} title={"Actions"}
+                                    content={`Total actions: ${game.actions?.length ?? 0}`}/>
+            <GameConceptGridElement href={`/games/${game.id}/point-concepts`} title={"Point Concepts"}
+                                    content={`Total point concepts: ${game.concepts?.filter(concept => "score" in concept).length ?? 0}`}/>
+            <GameConceptGridElement href={`/games/${game.id}/badges`} title={"Badges"}
+                                    content={`Total badges: ${game.concepts?.filter(concept => "icon" in concept || "badgeEarned" in concept).length ?? 0}`}/>
+            <GameConceptGridElement href={`/games/${game.id}/challenges`} title={"Challenges"}
+                                    content={`Total challenges: ${game.concepts?.filter(concept => "modelName" in concept).length ?? 0}`}/>
+        </Grid>
     </PageContainer>
 
 }

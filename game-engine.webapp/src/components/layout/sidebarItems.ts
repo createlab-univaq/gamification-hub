@@ -30,28 +30,28 @@ const gameItems = [
     {
         title: "Rules",
         icon: Rule,
-        href: "./rules",
+        href: "/rules",
 
     },
     {
         title: "Actions",
         icon: PlayArrow,
-        href: "./actions"
+        href: "/actions"
     },
     {
         title: "Point Concepts",
         icon: EmojiEvents,
-        href: "./points"
+        href: "/points"
     },
     {
         title: "Tasks",
         icon: Checklist,
-        href: "./tasks"
+        href: "/tasks"
     },
     {
         title: "Badges",
         icon: MilitaryTech,
-        href: "./badges"
+        href: "/badges"
     },
     {
         title: "Levels",
