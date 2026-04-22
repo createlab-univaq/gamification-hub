@@ -16,6 +16,7 @@ export function droolsFileToBlocklyState(file: DroolsFile): object {
                 },
                 inputs: {
                     ...chainInputKey('IMPORTS', file.imports, importToBlock),
+                    ...chainInputKey('GLOBALS', file.globals ?? [], globalToBlock),
                     ...chainInputKey('WHEN', rule.conditions, conditionToBlock),
                     ...chainInputKey('THEN', rule.consequences, consequenceToBlock),
                 },
@@ -29,6 +30,14 @@ export function droolsFileToBlocklyState(file: DroolsFile): object {
 function importToBlock(cls: string): object | null {
     const trimmed = cls.trim()
     return trimmed ? { type: 'drool_import', fields: { CLASS: trimmed } } : null
+}
+
+// ─── Global mapping ───────────────────────────────────────────────────────────
+
+function globalToBlock(g: { type: string; name: string }): object | null {
+    return g.type && g.name
+        ? { type: 'drool_global', fields: { TYPE: g.type, NAME: g.name } }
+        : null
 }
 
 // ─── Condition mapping ────────────────────────────────────────────────────────

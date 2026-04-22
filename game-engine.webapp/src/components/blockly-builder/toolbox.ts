@@ -17,6 +17,7 @@ export const TOOLBOX = {
             colour: String(BLOCK_COLORS.import),
             contents: [
                 { kind: 'block', type: 'drool_import' },
+                { kind: 'block', type: 'drool_global' },
             ],
         },
         {

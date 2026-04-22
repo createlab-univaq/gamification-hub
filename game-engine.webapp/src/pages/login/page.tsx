@@ -43,16 +43,13 @@ export function LoginPage() {
             justifyContent: "center"
         }}>
             <Card sx={{maxWidth: "30%"}}>
-                <CardHeader>
-                    <Typography>Accedi</Typography>
-                </CardHeader>
                 <CardContent>
                     <Form form={form} onSubmit={(fieldValues) => mutate({...fieldValues})}>
                         <Stack sx={{
                             gap: "2rem",
                             justifyContent: "center"
                         }}>
-                            <Typography sx={{textAlign: "center"}} variant={"h4"}>Inserisci le tue credenziali</Typography>
+                            <Typography sx={{textAlign: "center"}} variant={"h4"}>Sign in</Typography>
                             <Stack sx={{
                                 gap: "1rem"
                             }}>

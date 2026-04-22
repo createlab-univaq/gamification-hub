@@ -6,8 +6,8 @@ import {
 import { Add, Delete } from '@mui/icons-material'
 import type { Consequence, Modification } from 'drools-builder'
 import { RawCodeInput } from './RawCodeInput'
-import { normalizeBinding } from './utils'
 import { useDebounced } from '../../hooks/use-debounced'
+import {normalizeBinding} from "../../utils/builder-utils.ts";
 
 const CONSEQUENCE_KINDS = [
   { value: 'ModifyConsequence',    label: 'Modify' },

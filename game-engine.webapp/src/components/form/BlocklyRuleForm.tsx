@@ -23,6 +23,7 @@ import {getApiError, translateApiErrorToNotification} from "../../utils/error-ut
 import {useNotificationContext} from "../notification/NotificationProvider.tsx";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {Loading} from "../Loading.tsx";
+import {isUpdateEvent} from "../../utils/builder-utils.ts";
 
 interface BlocklyRuleFormProps {
     title?: ReactElement,
@@ -134,13 +135,13 @@ export function BlocklyRuleForm({rule, gameId, title, subTitle}: BlocklyRuleForm
     }
 
     const handleBuilderChange = useDebounced((workspace: WorkspaceSvg, event: Abstract) => {
-        console.log("Builder Chainged", event.type, event.isUiEvent, event.recordUndo, event.group)
-        if (!event.group || !event.recordUndo) {
+        console.log(event)
+        if (!isUpdateEvent(event)) {
             return
         }
         try {
+            console.log("Changing builder")
             const drools = generateDrlFromWorkspace(workspace)
-            console.log("Regenerated drool", drools)
             setDrl(drools)
         } catch (e) {
             pushMessage([{

@@ -34,6 +34,12 @@ drlGenerator.forBlock['drool_import'] = function (block: Block): string {
     return cls ? `import ${cls};` : ''
 }
 
+drlGenerator.forBlock['drool_global'] = function (block: Block): string {
+    const type = (block.getFieldValue('TYPE') ?? '').trim()
+    const name = (block.getFieldValue('NAME') ?? '').trim()
+    return type && name ? `global ${type} ${name};` : ''
+}
+
 drlGenerator.forBlock['drool_rule'] = function (block: Block): string {
     const name = block.getFieldValue('RULE_NAME') || 'my_rule'
     const salience = Number(block.getFieldValue('SALIENCE') ?? 0)
@@ -42,6 +48,7 @@ drlGenerator.forBlock['drool_rule'] = function (block: Block): string {
     const lockOnActive = block.getFieldValue('ACTIVE_ON_LOCK') === 'TRUE'
 
     const imports = collectChain(block, 'IMPORTS').map(generateBlock).filter(Boolean)
+    const globals = collectChain(block, 'GLOBALS').map(generateBlock).filter(Boolean)
     const attrs: string[] = []
     if (salience !== 0) {
         attrs.push(`${I}salience ${salience}`)
@@ -57,7 +64,8 @@ drlGenerator.forBlock['drool_rule'] = function (block: Block): string {
 
     return [
         ...imports,
-        ...(imports.length ? [''] : []),
+        ...globals,
+        ...(imports.length || globals.length ? [''] : []),
         `rule "${name}"`,
         ...attrs,
         `${I}when`,

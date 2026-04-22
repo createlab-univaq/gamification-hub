@@ -2,7 +2,7 @@ import { Autocomplete, IconButton, MenuItem, Select, Stack, TextField, Tooltip, 
 import { Delete } from '@mui/icons-material'
 import type { Constraint, ConstraintOperator } from 'drools-builder'
 import { RawCodeInput } from './RawCodeInput'
-import { normalizeBinding } from './utils'
+import {normalizeBinding} from "../../utils/builder-utils.ts";
 
 const OPERATORS: ConstraintOperator[] = [
   '==', '!=', '>', '<', '>=', '<=',

@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly'
-import {KNOWN_FACT_TYPES, KNOWN_IMPORTS} from '../rule-builder/utils'
+import {KNOWN_FACT_TYPES, KNOWN_IMPORTS} from "../../utils/builder-utils.ts";
 
 export const BLOCK_COLORS = {
     rule:        '#6366F1', // indigo
@@ -39,6 +39,21 @@ const BLOCK_DEFS = [
         helpUrl: '',
     },
 
+    // ─── Global declaration ───────────────────────────────────────────────────
+    {
+        type: 'drool_global',
+        message0: 'global %1 %2',
+        args0: [
+            { type: 'field_input', name: 'TYPE', text: 'com.example.MyService' },
+            { type: 'field_input', name: 'NAME', text: 'myService' },
+        ],
+        previousStatement: 'Global',
+        nextStatement: 'Global',
+        colour: BLOCK_COLORS.import,
+        tooltip: 'Declare a global variable available to all rules.',
+        helpUrl: '',
+    },
+
     // ─── Rule root ────────────────────────────────────────────────────────────
     {
         type: 'drool_rule',
@@ -53,10 +68,12 @@ const BLOCK_DEFS = [
         ],
         message2: 'imports %1',
         args2: [{ type: 'input_statement', name: 'IMPORTS', check: 'Import' }],
-        message3: 'when %1',
-        args3: [{ type: 'input_statement', name: 'WHEN', check: 'Condition' }],
-        message4: 'then %1',
-        args4: [{ type: 'input_statement', name: 'THEN', check: 'Consequence' }],
+        message3: 'global %1',
+        args3: [{ type: 'input_statement', name: 'GLOBALS', check: 'Global' }],
+        message4: 'when %1',
+        args4: [{ type: 'input_statement', name: 'WHEN', check: 'Condition' }],
+        message5: 'then %1',
+        args5: [{ type: 'input_statement', name: 'THEN', check: 'Consequence' }],
         colour: BLOCK_COLORS.rule,
         tooltip: 'A Drools rule with conditions (when) and consequences (then).',
         helpUrl: '',
