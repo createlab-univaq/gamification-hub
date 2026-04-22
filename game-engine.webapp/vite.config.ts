@@ -22,6 +22,7 @@ export default defineConfig({
       '@mui/material',
       '@mui/material/styles',
       '@mui/icons-material',
+      'blockly',
     ],
   },
   build: {

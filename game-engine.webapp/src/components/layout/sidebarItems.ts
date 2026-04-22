@@ -1,5 +1,6 @@
 import type {ReactElement} from "react";
 import {
+    AccountTree,
     Checklist,
     EmojiEvents,
     FormatListNumbered,
@@ -31,7 +32,11 @@ const gameItems = [
         title: "Rules",
         icon: Rule,
         href: "/rules",
-
+    },
+    {
+        title: "Blockly Builder",
+        icon: AccountTree,
+        href: "/blockly",
     },
     {
         title: "Actions",
