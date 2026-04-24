@@ -1,4 +1,6 @@
 import type {Abstract} from "blockly/core/events/events_abstract";
+import type {WorkspaceSvg} from "blockly";
+import {drlGenerator} from "../components/blockly-builder/drl-generator.ts";
 
 /** Ensures a binding variable always starts with $ */
 export const normalizeBinding = (value: string): string => {
@@ -8,6 +10,14 @@ export const normalizeBinding = (value: string): string => {
 
 export function isUpdateEvent(event:Abstract) {
     return !event.isUiEvent && event.type != "finished_loading" && event.type != "click"
+}
+
+export function getRuleNameFromBlock(workspace:WorkspaceSvg) {
+    const topBlock = workspace.getTopBlocks(true)[0]
+    if(topBlock.type != "drool_rule"){
+        return ""
+    }
+    return topBlock.getFieldValue("RULE_NAME")
 }
 
 export const KNOWN_FACT_TYPES: string[] = [

@@ -83,7 +83,7 @@ drlGenerator.forBlock['drool_fact_pattern'] = function (block: Block): string {
     const binding = (block.getFieldValue('BINDING') ?? '').trim()
     const factType = block.getFieldValue('FACT_TYPE') || 'PointConcept'
     const constraints = buildConstraints(block)
-    const prefix = binding ? `${binding} : ` : ''
+    const prefix = binding ? `$${binding} : ` : ''
     return `${II}${prefix}${factType}(${constraints})`
 }
 

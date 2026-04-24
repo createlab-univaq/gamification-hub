@@ -1,7 +1,7 @@
-import {ReactElement, useEffect, useRef, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import type {PanelImperativeHandle} from 'react-resizable-panels'
 import {Group, Panel} from 'react-resizable-panels'
-import {Button, Stack} from '@mui/material'
+import {Button, Stack, TextField} from '@mui/material'
 import {ChevronLeft, ChevronRight, DragIndicator, FactCheck, Save, Terminal} from '@mui/icons-material'
 import {DRLToMetaTransformer} from 'drools-builder'
 import {PageContainer} from '../layout/PageContainer.tsx'
@@ -23,17 +23,14 @@ import {getApiError, translateApiErrorToNotification} from "../../utils/error-ut
 import {useNotificationContext} from "../notification/NotificationProvider.tsx";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {Loading} from "../Loading.tsx";
-import {isUpdateEvent} from "../../utils/builder-utils.ts";
+import {getRuleNameFromBlock, isUpdateEvent} from "../../utils/builder-utils.ts";
 
 interface BlocklyRuleFormProps {
-    title?: ReactElement,
-    subTitle?: ReactElement
     rule?: RuleDto
     gameId: string
 }
 
-export function BlocklyRuleForm({rule, gameId, title, subTitle}: BlocklyRuleFormProps) {
-
+export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
     const [drl, setDrl] = useState('')
     const [blocklyState, setBlocklyState] = useState<object | undefined>()
     const [consoleMessages, setConsoleMessages] = useState<ConsoleMessage[]>([])
@@ -42,6 +39,7 @@ export function BlocklyRuleForm({rule, gameId, title, subTitle}: BlocklyRuleForm
     const consolePanelRef = useRef<PanelImperativeHandle>(null)
     const {setNotification} = useNotificationContext()
     const [consoleActive, setConsoleActive] = useState(false)
+    const [ruleName, setRuleName] = useState(rule?.name ?? "")
 
     const {mutate: upsertRuleMutate, isPending: upsertRulePending} = useMutation({
         mutationFn: (request) => {
@@ -105,6 +103,12 @@ export function BlocklyRuleForm({rule, gameId, title, subTitle}: BlocklyRuleForm
         onError: handleErrors
     })
 
+    function updateRuleName(name: string) {
+        setRuleName((prev) => {
+            return !prev ? name : prev
+        })
+    }
+
     function handleErrors(errors) {
         console.error(errors)
         const apiError = getApiError(errors)
@@ -135,13 +139,12 @@ export function BlocklyRuleForm({rule, gameId, title, subTitle}: BlocklyRuleForm
     }
 
     const handleBuilderChange = useDebounced((workspace: WorkspaceSvg, event: Abstract) => {
-        console.log(event)
         if (!isUpdateEvent(event)) {
             return
         }
         try {
-            console.log("Changing builder")
             const drools = generateDrlFromWorkspace(workspace)
+            updateRuleName(getRuleNameFromBlock(workspace))
             setDrl(drools)
         } catch (e) {
             pushMessage([{
@@ -154,8 +157,8 @@ export function BlocklyRuleForm({rule, gameId, title, subTitle}: BlocklyRuleForm
 
     const handleDrlChange = useDebounced((rawDrl: string) => {
         try {
-            console.log("Changing DRL")
             const file = DRLToMetaTransformer.parse(rawDrl)
+            updateRuleName(file.name)
             setDrl(rawDrl)
             setBlocklyState(droolsFileToBlocklyState(file))
         } catch (e) {
@@ -168,12 +171,11 @@ export function BlocklyRuleForm({rule, gameId, title, subTitle}: BlocklyRuleForm
     }, 400)
 
     const handleSave = () => {
-        const drlFile = DRLToMetaTransformer.parse(drl)
         upsertRuleMutate({
             id: rule?.id,
             gameId: gameId,
             content: drl,
-            name: drlFile.name
+            name: ruleName
         } satisfies RuleDto)
     }
 
@@ -187,8 +189,18 @@ export function BlocklyRuleForm({rule, gameId, title, subTitle}: BlocklyRuleForm
         <PageContainer>
             {upsertRulePending && <Loading fullScreen={true}/>}
             <PageHeader
-                title={title}
-                subTitle={subTitle}
+                title={
+                    <TextField
+                        placeholder={"My rule"}
+                        size={"small"}
+                        value={ruleName}
+                        onChange={(e) => setRuleName(e.target.value)}
+                        sx={{
+                            width: "fit-content",
+                            minWidth: "30%"
+                        }}
+                    />
+                }
                 buttons={
                     [
                         {
@@ -298,7 +310,7 @@ export function BlocklyRuleForm({rule, gameId, title, subTitle}: BlocklyRuleForm
                                         </Button>
                                     </Stack>
                                 </PanelSeparator>
-                                <Panel defaultSize={0} collapsible={true} panelRef={consolePanelRef}>
+                                <Panel defaultSize={"30%"} collapsible={true} panelRef={consolePanelRef}>
                                     <MessageConsole
                                         messages={consoleMessages}
                                         onClear={() => setConsoleMessages([])}

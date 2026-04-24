@@ -34,11 +34,6 @@ const gameItems = [
         href: "/rules",
     },
     {
-        title: "Blockly Builder",
-        icon: AccountTree,
-        href: "/blockly",
-    },
-    {
         title: "Actions",
         icon: PlayArrow,
         href: "/actions"

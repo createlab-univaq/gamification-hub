@@ -29,8 +29,6 @@ export function BlocklyRuleUpsertPage() {
     }
 
     return <BlocklyRuleForm
-        title={data ? "Update rule" : "Create rule"}
-        subTitle={""}
         gameId={game.id}
         rule={data}
     />

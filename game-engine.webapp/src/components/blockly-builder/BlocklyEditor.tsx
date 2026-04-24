@@ -3,12 +3,12 @@ import {useEffect, useRef} from 'react'
 import type {WorkspaceSvg} from 'blockly'
 import * as Blockly from 'blockly'
 import {registerBlockDefinitions} from './blocks-definition.ts'
-import {registerFields} from './fields'
 import {TOOLBOX} from './toolbox'
 import {useThemeProvider} from '../../theme/ThemeProvider'
 import {useTheme} from "@mui/material";
 import type {Abstract} from "blockly/core/events/events_abstract";
 import {blocklyDarkTheme, blocklyLightTheme} from "../../theme/blockly-theme.ts";
+import {registerFields} from "./fields";
 
 
 const BLOCKLY_CONTAINER_ID = 'blockly-editor-root'
