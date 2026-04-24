@@ -54,12 +54,13 @@ public class SimulationServiceImpl implements SimulationService {
     }
 
     @Override
-    public SimulationResultDTO simulate(String gameId, String actionId, SimulationRequestDTO simulationRequestDTO) {
-        log.info("Request to simulate game={}, and action={}", gameId, actionId);
+    public SimulationResultDTO simulate(SimulationRequestDTO simulationRequestDTO) {
+        log.info("Request to simulate game={}, and action={}", simulationRequestDTO.getGameId(), simulationRequestDTO.getActionId());
         long executionMoment = Objects.requireNonNullElse(simulationRequestDTO.getExecutionMoment(), Instant.now().toEpochMilli());
-        PlayerState syntheticState = buildSyntheticState(gameId, simulationRequestDTO.getSyntheticState());
+        PlayerState syntheticState = buildSyntheticState(simulationRequestDTO.getGameId(), simulationRequestDTO.getSyntheticState());
         SimulationResult result = workflow.simulate(
-                gameId, actionId, simulationRequestDTO.getPlayerId(),
+                simulationRequestDTO.getGameId(), simulationRequestDTO.getActionId(),
+                simulationRequestDTO.getPlayerId(),
                 executionMoment, simulationRequestDTO.getData(), syntheticState,
                 simulationRequestDTO.isShowDetailedChanges());
         return simulationResultMapper.toDTO(result);

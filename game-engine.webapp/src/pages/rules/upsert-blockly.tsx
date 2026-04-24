@@ -3,13 +3,10 @@ import {Navigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {ruleClient} from "../../api";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {PageContainer} from "../../components/layout/PageContainer.tsx";
-import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {Stack} from "@mui/material";
-import {RuleForm} from "../../components/form/RuleForm.tsx";
 import {Loading} from "../../components/Loading.tsx";
+import {BlocklyRuleForm} from "../../components/form/BlocklyRuleForm.tsx";
 
-export function RuleUpsertPage() {
+export function BlocklyRuleUpsertPage() {
 
     const game = useGame()
     const {ruleId} = useParams()
@@ -31,13 +28,9 @@ export function RuleUpsertPage() {
         return <Loading fullScreen={true}/>
     }
 
-    return <PageContainer>
-        <PageHeader title={data ? "Update existing rule" : "Create new rule"}
-                    subTitle={"Use the integrated rule builder or update the drool's code directly."}
-        />
-        <Stack sx={{marginTop: 3, minHeight: "80dvh"}}>
-            <RuleForm gameId={game.id} rule={data}/>
-        </Stack>
-    </PageContainer>
+    return <BlocklyRuleForm
+        gameId={game.id}
+        rule={data}
+    />
 
 }

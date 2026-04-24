@@ -5,6 +5,6 @@ import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.Simu
 
 public interface SimulationService {
 
-    SimulationResultDTO simulate(String gameId, String actionId, SimulationRequestDTO simulationRequestDTO);
+    SimulationResultDTO simulate(SimulationRequestDTO simulationRequestDTO);
 
 }

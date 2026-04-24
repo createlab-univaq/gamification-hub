@@ -20,7 +20,7 @@ import type {Condition, Consequence, DroolsFile, Rule} from 'drools-builder'
 import {MetaToDRLTransformer} from 'drools-builder'
 import {ConditionEditor} from './ConditionEditor'
 import {ConsequenceEditor} from './ConsequenceEditor'
-import {KNOWN_IMPORTS} from "./utils.ts";
+import {KNOWN_IMPORTS} from "../../utils/builder-utils.ts";
 
 interface RuleBuilderProps {
     initialFile?: Partial<DroolsFile>
@@ -41,14 +41,14 @@ export function RuleBuilder({initialFile, onSave, onChange, onReset, onBack}: Ru
     const [rule, setRule] = useState<Rule>(file.rules[0] ?? {name: '', conditions: [], consequences: []})
     const [nextImport, setNextImport] = useState<string | null>(null)
 
-    useEffect(() => {
-        reset(initialFile)
-    }, [initialFile]);
-
     const reset = (file:DroolsFile) => {
         setFile({...emptyFile(), ...file})
         setRule(file?.rules[0] ?? emptyFile().rules[0])
     }
+
+    useEffect(() => {
+        reset(initialFile)
+    }, [initialFile]);
 
     const updateRule = (partial: Partial<Rule>) => {
         const nextRule = {...rule, ...partial}

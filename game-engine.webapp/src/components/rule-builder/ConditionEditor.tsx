@@ -27,7 +27,7 @@ import type {
 } from 'drools-builder'
 import {ConstraintEditor} from './ConstraintEditor'
 import {RawCodeInput} from './RawCodeInput'
-import {KNOWN_FACT_TYPES, normalizeBinding} from './utils'
+import {KNOWN_FACT_TYPES, normalizeBinding} from "../../utils/builder-utils.ts";
 
 const CONDITION_KINDS = [
     {value: 'FactPattern', label: 'Pattern'},

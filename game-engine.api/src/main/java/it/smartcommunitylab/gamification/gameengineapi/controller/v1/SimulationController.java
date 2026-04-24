@@ -44,7 +44,7 @@ public class SimulationController {
     @PostMapping
     public ResponseEntity<SimulationResultDTO> simulate(@RequestBody @Valid SimulationRequestDTO request) {
         log.info("Simulate action={} game={} player={}", request.getActionId(), request.getGameId(), request.getPlayerId());
-        return ResponseEntity.ok(simulationService.simulate(request.getActionId(), request.getGameId(), request));
+        return ResponseEntity.ok(simulationService.simulate(request));
     }
 
 }

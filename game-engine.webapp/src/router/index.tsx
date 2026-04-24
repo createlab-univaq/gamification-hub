@@ -13,7 +13,10 @@ import {GamePage} from "../pages/games/page.tsx";
 import {ErrorPage} from "../pages/error/page.tsx";
 import {RuleListPage} from "../pages/rules/list.tsx";
 import {RuleUpsertPage} from "../pages/rules/upsert.tsx";
+import {BlocklyRuleForm} from "../components/form/BlocklyRuleForm.tsx";
 import {TestPage} from "../pages/TestPage.tsx";
+import {BlocklyRuleUpsertPage} from "../pages/rules/upsert-blockly.tsx";
+import {SimulationPage} from "../pages/simulation/page.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -75,13 +78,25 @@ export const router = createBrowserRouter([
                                 element: <RuleListPage/>
                             },
                             {
-                                path: "upsert-rule",
+                                path: "upsert-rule-old/",
                                 element: <RuleUpsertPage/>
                             },
                             {
-                                path: "upsert-rule/:ruleId",
+                                path: "upsert-rule-old/:ruleId",
                                 element: <RuleUpsertPage/>
                             },
+                            {
+                                path: "upsert-rule",
+                                element: <BlocklyRuleUpsertPage/>
+                            },
+                            {
+                                path: "upsert-rule/:ruleId",
+                                element: <BlocklyRuleUpsertPage/>
+                            },
+                            {
+                                path: "simulate/:ruleId",
+                                element: <SimulationPage/>
+                            }
                         ]
                     }
                 ]

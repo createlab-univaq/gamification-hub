@@ -33,9 +33,6 @@ function GameEngineUIThemeProvider({children}: PropsWithChildren) {
 
     const theme = useMemo(() => {
         switch (mode) {
-            case "light": {
-                return lightTheme
-            }
             case "dark":
                 return darkTheme
             default:
@@ -51,7 +48,9 @@ function GameEngineUIThemeProvider({children}: PropsWithChildren) {
     return <ThemeProviderContext.Provider value={{mode: mode, switchTheme: setTheme}}>
         <ThemeProvider theme={theme}>
             <CssBaseline/>
-            {children}
+            <div data-mui-color-scheme={mode}>
+                {children}
+            </div>
         </ThemeProvider>
     </ThemeProviderContext.Provider>
 }

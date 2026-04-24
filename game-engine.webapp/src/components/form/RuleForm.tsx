@@ -37,10 +37,6 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
     const droolEditorPanelRef = useRef<PanelImperativeHandle>()
     const consolePanelRef = useRef<PanelImperativeHandle>()
 
-    useEffect(() => {
-        console.log(consoleMessages)
-    }, [consoleMessages]);
-
     const {mutate: upsertRuleMutate, isPending: upsertRulePending} = useMutation({
         mutationFn: (request) => {
             setConsoleMessages([...consoleMessages, {
