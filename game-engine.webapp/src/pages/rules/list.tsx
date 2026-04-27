@@ -8,7 +8,7 @@ import {Navigate} from "react-router-dom";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {Button, Stack, Typography} from "@mui/material";
 import {LinkCard} from "../../components/LinkCard.tsx";
-import {Add, Delete, Edit} from "@mui/icons-material";
+import {Add, Delete, Edit, PlayArrow} from "@mui/icons-material";
 import {useState} from "react";
 import type {RuleDto} from "../../api/types";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
@@ -89,7 +89,6 @@ export function RuleListPage() {
                             //setDeleteGame(rule)
                         }}><Delete
                             sx={{fontSize: "2rem", color: (theme) => theme.palette.error.main}}/></Button>
-                        <Button href={`/games/${game.id}/simulate/${rule.id}`}><Edit sx={{fontSize: "2rem"}}/></Button>
                     </Stack>
                 </LinkCard>
             })}

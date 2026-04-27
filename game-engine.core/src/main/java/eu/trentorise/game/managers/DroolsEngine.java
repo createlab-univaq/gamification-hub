@@ -21,6 +21,9 @@ import eu.trentorise.game.core.LogHub;
 import eu.trentorise.game.core.LoggingRuleListener;
 import eu.trentorise.game.core.StatsLogger;
 import eu.trentorise.game.core.Utility;
+import eu.trentorise.game.core.listener.BaseSimulationEventListener;
+import eu.trentorise.game.core.listener.SimpleSimulationAgendaEventListener;
+import eu.trentorise.game.core.listener.SimulationAgendaEventListener;
 import eu.trentorise.game.managers.drools.KieContainerFactory;
 import eu.trentorise.game.model.*;
 import eu.trentorise.game.model.Level.Threshold;
@@ -52,8 +55,6 @@ import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.Message;
 import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
-import org.kie.api.event.rule.AfterMatchFiredEvent;
-import org.kie.api.event.rule.DefaultAgendaEventListener;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.StatelessKieSession;
@@ -398,110 +399,21 @@ public class DroolsEngine implements GameEngine {
         cmds.add(commands.newQuery("retrieveState", "getGameConcepts"));
 
         List<FiredRuleResult> firedRules = new ArrayList<>();
+        BaseSimulationEventListener simulationChangesListener = null;
 
         if (showDetailedChanges) {
-            // Full listener: snapshots state before each rule fires and diffs after,
-            // tracking per-rule concept changes and which rule caused each activation.
-            // Has O(active_concepts × rules_fired) overhead — use only for debugging.
-            kSession.addEventListener(new DefaultAgendaEventListener() {
-
-                private final Map<String, Double> scoresBefore = new HashMap<>();
-                private final Map<String, List<String>> badgesBefore = new HashMap<>();
-                private final Map<String, String> challengeStateBefore = new HashMap<>();
-                // tracks the last rule that modified each concept — used to determine cause
-                private final Map<String, String> lastModifier = new HashMap<>();
-
-                private void snapshot() {
-                    for (GameConcept gc : activeConcepts) {
-                        if (gc instanceof PointConcept) {
-                            scoresBefore.put(gc.getName(), ((PointConcept) gc).getScore());
-                        } else if (gc instanceof BadgeCollectionConcept) {
-                            badgesBefore.put(gc.getName(),
-                                    new ArrayList<>(((BadgeCollectionConcept) gc).getBadgeEarned()));
-                        } else if (gc instanceof ChallengeConcept) {
-                            ChallengeConcept cc = (ChallengeConcept) gc;
-                            challengeStateBefore.put(gc.getName(),
-                                    cc.getState() != null ? cc.getState().toString() : null);
-                        }
-                    }
-                }
-
-                @Override
-                public void beforeMatchFired(org.kie.api.event.rule.BeforeMatchFiredEvent event) {
-                    snapshot();
-                }
-
-                @Override
-                public void afterMatchFired(AfterMatchFiredEvent event) {
-                    String ruleName = event.getMatch().getRule().getName();
-
-                    // Determine cause: find the last rule that modified any matched concept
-                    String cause = null;
-                    for (Object obj : event.getMatch().getObjects()) {
-                        if (obj instanceof GameConcept) {
-                            String modifier = lastModifier.get(((GameConcept) obj).getName());
-                            if (modifier != null) {
-                                cause = modifier;
-                                break;
-                            }
-                        }
-                    }
-
-                    // Compute per-rule changes
-                    List<ConceptChange> ruleChanges = new ArrayList<>();
-                    for (GameConcept gc : activeConcepts) {
-                        if (gc instanceof PointConcept) {
-                            PointConcept pc = (PointConcept) gc;
-                            double before = scoresBefore.getOrDefault(gc.getName(), 0d);
-                            if (Double.compare(before, pc.getScore()) != 0) {
-                                ruleChanges.add(new ConceptChange("PointConcept", gc.getName(),
-                                        "score", before, pc.getScore()));
-                            }
-                        } else if (gc instanceof BadgeCollectionConcept) {
-                            BadgeCollectionConcept bcc = (BadgeCollectionConcept) gc;
-                            List<String> before = badgesBefore.getOrDefault(
-                                    gc.getName(), Collections.<String>emptyList());
-                            List<String> newBadges = new ArrayList<>(bcc.getBadgeEarned());
-                            newBadges.removeAll(before);
-                            for (String badge : newBadges) {
-                                ruleChanges.add(new ConceptChange("BadgeCollectionConcept",
-                                        gc.getName(), "badgeEarned", null, badge));
-                            }
-                        } else if (gc instanceof ChallengeConcept) {
-                            ChallengeConcept cc = (ChallengeConcept) gc;
-                            String before = challengeStateBefore.get(gc.getName());
-                            String after = cc.getState() != null ? cc.getState().toString() : null;
-                            if (!java.util.Objects.equals(before, after)) {
-                                ruleChanges.add(new ConceptChange("ChallengeConcept",
-                                        gc.getName(), "state", before, after));
-                            }
-                        }
-                    }
-
-                    // Update lastModifier for each concept changed by this rule
-                    for (ConceptChange change : ruleChanges) {
-                        lastModifier.put(change.getConceptName(), ruleName);
-                    }
-
-                    firedRules.add(new FiredRuleResult(ruleName, cause,
-                            Collections.emptyList(), Collections.emptyList(), ruleChanges));
-                }
-            });
+            simulationChangesListener = new SimulationAgendaEventListener(activeConcepts.stream().toList(), firedRules);
         } else {
-            // Lightweight listener: only tracks which rules fired and in what order
-            kSession.addEventListener(new DefaultAgendaEventListener() {
-                @Override
-                public void afterMatchFired(AfterMatchFiredEvent event) {
-                    firedRules.add(new FiredRuleResult(event.getMatch().getRule().getName(), null,
-                            Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
-                }
-            });
+            simulationChangesListener = new SimpleSimulationAgendaEventListener(activeConcepts.stream().toList());
         }
+
+        kSession.addEventListener(simulationChangesListener);
 
         kSession.setGlobal("utils", new Utility(gameId));
         kSession = loadGameConstants(kSession, gameId);
 
         ExecutionResults results = kSession.execute(commands.newBatchExecution(cmds));
+        firedRules = simulationChangesListener.getFiredRule();
 
         // Build final state from query results — no persistence, no notifications
         Set<GameConcept> newState = new HashSet<>(inactiveConcepts);
@@ -528,11 +440,12 @@ public class DroolsEngine implements GameEngine {
 
             if (afterConcept instanceof PointConcept) {
                 PointConcept afterPc = (PointConcept) afterConcept;
-                double beforeScore = before.getState().stream()
+                PointConcept beforePc = before.getState().stream()
                         .filter(c -> c instanceof PointConcept && c.getName().equals(afterPc.getName()))
-                        .map(c -> ((PointConcept) c).getScore())
-                        .findFirst().orElse(0d);
-                if (Double.compare(afterPc.getScore(), beforeScore) != 0) {
+                        .map(c -> (PointConcept) c)
+                        .findFirst().orElse(null);
+                if (Objects.isNull(beforePc) || Double.compare(afterPc.getScore(), beforePc.getScore()) != 0) {
+                    Double beforeScore = Objects.isNull(beforePc) ? null : beforePc.getScore();
                     changes.add(new ConceptChange("PointConcept", afterPc.getName(),
                             "score", beforeScore, afterPc.getScore()));
                 }
@@ -765,6 +678,12 @@ public class DroolsEngine implements GameEngine {
         if (content != null) {
             KieServices ks = KieServices.get();
             KieFileSystem kfs = ks.newKieFileSystem();
+            // Load core.drl first to establish the package context and make all
+            // engine fact types (Action, PointConcept, InputData, etc.) resolvable
+            // without explicit imports — same as loadGameRules() does at runtime.
+            kfs.write(ks.getResources()
+                    .newClassPathResource("rules/core.drl")
+                    .setSourcePath("rules/core.drl"));
             kfs.write(ks.getResources()
                     .newReaderResource(new java.io.StringReader(content))
                     .setSourcePath("rules/validate/rule.drl"));

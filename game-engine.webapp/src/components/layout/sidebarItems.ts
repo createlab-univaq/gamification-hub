@@ -1,6 +1,5 @@
 import type {ReactElement} from "react";
 import {
-    AccountTree,
     Checklist,
     EmojiEvents,
     FormatListNumbered,
@@ -15,15 +14,15 @@ import {
 interface SidebarItem {
     title: string
     icon: ReactElement,
-    href: string
+    href: string,
+    relative?: boolean
 }
 
 const dashboardItems = [
     {
         title: "Games",
         icon: Games,
-        href: "/dashboard",
-        relative: "path"
+        href: "/dashboard"
     }
 ] satisfies SidebarItem[]
 
@@ -32,38 +31,46 @@ const gameItems = [
         title: "Rules",
         icon: Rule,
         href: "/rules",
+        relative: true
     },
     {
         title: "Actions",
         icon: PlayArrow,
-        href: "/actions"
+        href: "/actions",
+        relative: true
     },
     {
         title: "Point Concepts",
         icon: EmojiEvents,
-        href: "/points"
+        href: "/points",
+        relative: true
     },
     {
         title: "Tasks",
         icon: Checklist,
-        href: "/tasks"
+        href: "/tasks",
+        relative: true
     },
     {
         title: "Badges",
         icon: MilitaryTech,
-        href: "/badges"
+        href: "/badges",
+        relative: true
     },
     {
         title: "Levels",
-        icon: Layers
+        icon: Layers,
+        relative: true
     },
     {
         title: "Challenges",
-        icon: FormatListNumbered
+        icon: FormatListNumbered,
+        relative: true
     },
     {
         title: "Monitors",
-        icon: Monitor
+        icon: Monitor,
+        relative: true
     }
 ] satisfies SidebarItem[]
 

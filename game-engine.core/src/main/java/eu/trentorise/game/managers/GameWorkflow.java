@@ -226,28 +226,21 @@ public class GameWorkflow implements Workflow {
     }
 
     @Override
-    public SimulationResult simulate(String gameId, String actionId, String playerId,
-            long executionMoment, Map<String, Object> data, PlayerState syntheticState,
-            boolean showDetailedChanges) {
+    public SimulationResult simulate(String gameId, PlayerState syntheticState,
+            Map<String, Object> data, long executionMoment, List<String> actions, boolean showDetailedChanges) {
 
         Game g = gameSrv.loadGameDefinitionById(gameId);
-        if (g == null || g.getActions() == null
-                || (!actionId.startsWith(GameManager.INTERNAL_ACTION_PREFIX)
-                        && !g.getActions().contains(actionId))) {
-            throw new IllegalArgumentException(String
-                    .format("game %s not exist or action %s not belong to it", gameId, actionId));
+        if (g == null) {
+            throw new IllegalArgumentException(String.format("game %s does not exist", gameId));
         }
 
-        PlayerState state;
-        if (syntheticState != null) {
-            state = syntheticState;
-        } else {
-            state = playerSrv.loadState(gameId, playerId, true, false);
-        }
+        List<Object> factObjects = actions != null
+                ? actions.stream().map(id -> (Object) new eu.trentorise.game.model.Action(id)).collect(Collectors.toList())
+                : null;
 
         String executionId = generateExecutionId();
-        return gameEngine.simulate(gameId, state, actionId, data, executionId, executionMoment,
-                null, showDetailedChanges);
+        return gameEngine.simulate(gameId, syntheticState, null, data, executionId,
+                executionMoment, factObjects, showDetailedChanges);
     }
 
     private String generateExecutionId() {

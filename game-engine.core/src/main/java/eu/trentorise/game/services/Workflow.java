@@ -31,7 +31,6 @@ public interface Workflow {
     public void apply(String gameId, String actionId, String playerId, long executionMoment,
             Map<String, Object> data, List<Object> workingMemoryObjects);
 
-    public SimulationResult simulate(String gameId, String actionId, String playerId,
-            long executionMoment, Map<String, Object> data, PlayerState syntheticState,
-            boolean showDetailedChanges);
+    public SimulationResult simulate(String gameId, PlayerState syntheticState,
+            Map<String, Object> data, long executionMoment, List<String> actions, boolean showDetailedChanges);
 }

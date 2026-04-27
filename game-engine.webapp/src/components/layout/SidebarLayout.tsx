@@ -87,6 +87,7 @@ export function SidebarLayout() {
                     const Icon = item.icon
                     const isSelected = location.pathname.endsWith(item.href?.replace(".", ""))
                     const basePath = getBaseGamePath()
+                    const itemHref = item.relative ? basePath+item.href : item.href
                     return <ListItem key={`sidebar-item-${item.title}`}
                                      sx={{
                                          backgroundColor: (theme) => isSelected ? theme.palette.background.default : theme.palette.background.paper,
@@ -95,7 +96,7 @@ export function SidebarLayout() {
                                          }
                                      }}
                     >
-                        <ListItemButton href={`${basePath}${item.href}`} sx={{margin: 0, padding: 0}}>
+                        <ListItemButton href={itemHref} sx={{margin: 0, padding: 0}}>
                             <ListItemIcon>
                                 <Icon color={isSelected ? "primary" : "background.paper"} sx={{fontSize:"2rem"}}/>
                             </ListItemIcon>

@@ -60,6 +60,17 @@ export type BadgeCollectionDto = {
     badges?: Array<string>;
 };
 
+export type ChallengeConceptDto = {
+    name?: string;
+    modelName?: string;
+    state?: string;
+    fields?: {
+        [key: string]: unknown;
+    };
+    start?: string;
+    end?: string;
+};
+
 export type PointConceptDto = {
     name?: string;
     score?: number;
@@ -67,8 +78,6 @@ export type PointConceptDto = {
 
 export type SimulationRequestDto = {
     gameId: string;
-    actionId: string;
-    playerId?: string;
     syntheticState: SyntheticStateDto;
     data?: {
         [key: string]: unknown;
@@ -78,15 +87,14 @@ export type SimulationRequestDto = {
 };
 
 export type SyntheticStateDto = {
-    playerId: string;
-    pointConcepts: Array<PointConceptDto>;
+    playerId?: string;
+    actionIds?: Array<string>;
+    pointConcepts?: Array<PointConceptDto>;
     badgeCollections?: Array<BadgeCollectionDto>;
-};
-
-export type ChallengeConceptDto = {
-    name?: string;
-    modelName?: string;
-    state?: string;
+    challenges?: Array<ChallengeConceptDto>;
+    customData?: {
+        [key: string]: unknown;
+    };
 };
 
 export type ConceptChangeDto = {

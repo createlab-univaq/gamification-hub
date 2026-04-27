@@ -34,7 +34,7 @@ public abstract class GameConceptMapper {
             ccDto.setName(cc.getName());
             ccDto.setModelName(cc.getModelName());
             ccDto.setState(cc.getState() != null ? cc.getState().toString() : null);
-            return cc;
+            return ccDto;
         }
         return null;
     }

@@ -46,3 +46,11 @@ export const KNOWN_IMPORTS: Record<string, string> = {
     GroupChallenge:          'eu.trentorise.game.model.GroupChallenge',
     Reward:                  'eu.trentorise.game.model.Reward',
 }
+
+export function parseValue(value: string): unknown {
+    if (value === "true") return true;
+    if (value === "false") return false;
+    const n = Number(value);
+    if (value !== "" && !isNaN(n)) return n;
+    return value;
+}

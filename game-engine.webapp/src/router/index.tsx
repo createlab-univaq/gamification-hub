@@ -94,7 +94,7 @@ export const router = createBrowserRouter([
                                 element: <BlocklyRuleUpsertPage/>
                             },
                             {
-                                path: "simulate/:ruleId",
+                                path: "simulate",
                                 element: <SimulationPage/>
                             }
                         ]

@@ -1,10 +1,10 @@
 package it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.util.List;
 import java.util.Map;
 
 @Data
@@ -13,12 +13,8 @@ public class SimulationRequestDTO {
     @NotBlank
     private String gameId;
 
-    @NotBlank
-    private String actionId;
-
-    private String playerId;
-
     @NotNull
+    @Valid
     private SyntheticStateDTO syntheticState;
 
     private Map<String, Object> data;

@@ -4,7 +4,7 @@ import {useGame} from "../../components/GameContext.tsx";
 import type {GridSize} from "@mui/material";
 import {Grid, Stack, Typography} from "@mui/material";
 import {LinkCard} from "../../components/LinkCard.tsx";
-import {Delete, Edit} from "@mui/icons-material";
+import {Delete, Edit, PlayArrow} from "@mui/icons-material";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useMutation} from "@tanstack/react-query";
 import {gameClient} from "../../api";
@@ -72,6 +72,12 @@ export function GamePage() {
                 </Stack>
             }
             buttons={[
+                {
+                    endIcon: <PlayArrow/>,
+                    children: "Simulate",
+                    href: `/games/${game.id}/simulate`,
+                    variant: "contained"
+                },
                 {
                     endIcon: <Edit/>,
                     children: "Update",
