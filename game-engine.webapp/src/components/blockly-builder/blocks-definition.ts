@@ -43,6 +43,29 @@ const OPERATOR_OPTIONS: [string, string][] = [
 ]
 
 const BLOCK_DEFS = [
+    // ─── Package declaration ──────────────────────────────────────────────────
+    {
+        type: 'drool_package',
+        message0: 'package %1',
+        args0: [{type: 'field_input', name: 'PACKAGE', text: 'eu.trentorise.game.model'}],
+        previousStatement: 'Import',
+        nextStatement: 'Import',
+        colour: BLOCK_COLORS.import,
+        tooltip: 'Declare the package for this DRL file. Place at the top of the imports block.',
+        helpUrl: '',
+    },
+
+    // ─── Imports group ────────────────────────────────────────────────────────
+    {
+        type: 'drool_imports',
+        message0: 'imports',
+        message1: '%1',
+        args1: [{type: 'input_statement', name: 'IMPORTS', check: 'Import'}],
+        colour: BLOCK_COLORS.import,
+        tooltip: 'Container for all import statements.',
+        helpUrl: '',
+    },
+
     // ─── Import statement ─────────────────────────────────────────────────────
     {
         type: 'drool_import',
@@ -57,6 +80,17 @@ const BLOCK_DEFS = [
         nextStatement: 'Import',
         colour: BLOCK_COLORS.import,
         tooltip: 'A Java import statement.',
+        helpUrl: '',
+    },
+
+    // ─── Globals group ────────────────────────────────────────────────────────
+    {
+        type: 'drool_globals',
+        message0: 'globals',
+        message1: '%1',
+        args1: [{type: 'input_statement', name: 'GLOBALS', check: 'Global'}],
+        colour: BLOCK_COLORS.global,
+        tooltip: 'Container for all global declarations.',
         helpUrl: '',
     },
 
@@ -87,14 +121,10 @@ const BLOCK_DEFS = [
             {type: 'field_checkbox', name: 'NO_LOOP', checked: false},
             {type: 'field_checkbox', name: 'ACTIVE_ON_LOCK', checked: false}
         ],
-        message2: 'imports %1',
-        args2: [{type: 'input_statement', name: 'IMPORTS', check: 'Import'}],
-        message3: 'global %1',
-        args3: [{type: 'input_statement', name: 'GLOBALS', check: 'Global'}],
-        message4: 'when %1',
-        args4: [{type: 'input_statement', name: 'WHEN', check: 'Condition'}],
-        message5: 'then %1',
-        args5: [{type: 'input_statement', name: 'THEN', check: 'Consequence'}],
+        message2: 'when %1',
+        args2: [{type: 'input_statement', name: 'WHEN', check: 'Condition'}],
+        message3: 'then %1',
+        args3: [{type: 'input_statement', name: 'THEN', check: 'Consequence'}],
         colour: BLOCK_COLORS.rule,
         tooltip: 'A Drools rule with conditions (when) and consequences (then).',
         helpUrl: '',
@@ -343,6 +373,200 @@ const BLOCK_DEFS = [
         nextStatement: 'Consequence',
         colour: BLOCK_COLORS.consequence,
         tooltip: 'A raw Java/MVEL code consequence.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_declare',
+        message0: 'declare %1',
+        args0: [{type: 'field_input', name: 'CLASS_NAME', text: 'MyFact'}],
+        message1: 'attributes %1',
+        args1: [{type: 'input_statement', name: 'ATTRIBUTES', check: 'Attribute'}],
+        colour: BLOCK_COLORS.rule,
+        tooltip: 'Declare a custom Drools fact type with typed attributes.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_attribute',
+        message0: '%1 : %2',
+        args0: [
+            {type: 'field_input', name: 'NAME', text: 'myField'},
+            {type: 'field_input', name: 'TYPE', text: 'String'},
+        ],
+        previousStatement: 'Attribute',
+        nextStatement: 'Attribute',
+        colour: BLOCK_COLORS.constraint,
+        tooltip: 'A typed attribute inside a declare block.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_function',
+        message0: 'function %1 %2 ( %3 )',
+        args0: [
+            {type: 'field_input', name: 'RETURN_TYPE', text: 'void'},
+            {type: 'field_input', name: 'NAME', text: 'myFunction'},
+            {type: 'field_input', name: 'PARAMS', text: ''},
+        ],
+        message1: 'body %1',
+        args1: [{type: 'input_statement', name: 'BODY', check: 'Consequence'}],
+        colour: BLOCK_COLORS.rule,
+        tooltip: 'A DRL helper function. The body uses the same consequence blocks as rule then-blocks.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_return',
+        message0: 'return %1',
+        args0: [{type: 'field_input', name: 'EXPRESSION', text: ''}],
+        previousStatement: 'Consequence',
+        nextStatement: 'Consequence',
+        colour: BLOCK_COLORS.consequence,
+        tooltip: 'Return a value (or nothing for void functions).',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_while',
+        message0: 'while ( %1 )',
+        args0: [{type: 'field_input', name: 'CONDITION', text: 'condition'}],
+        message1: 'body %1',
+        args1: [{type: 'input_statement', name: 'BODY', check: 'Consequence'}],
+        previousStatement: 'Consequence',
+        nextStatement: 'Consequence',
+        colour: BLOCK_COLORS.consequence,
+        tooltip: 'A while loop.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_for_each',
+        message0: 'for ( %1 %2 : %3 )',
+        args0: [
+            {type: 'field_input', name: 'TYPE', text: 'Object'},
+            {type: 'field_input', name: 'VAR_NAME', text: 'item'},
+            {type: 'field_input', name: 'COLLECTION', text: '$collection'},
+        ],
+        message1: 'body %1',
+        args1: [{type: 'input_statement', name: 'BODY', check: 'Consequence'}],
+        previousStatement: 'Consequence',
+        nextStatement: 'Consequence',
+        colour: BLOCK_COLORS.consequence,
+        tooltip: 'An enhanced for-each loop over a collection.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_for',
+        message0: 'for ( %1 ; %2 ; %3 )',
+        args0: [
+            {type: 'field_input', name: 'INIT', text: 'int i = 0'},
+            {type: 'field_input', name: 'CONDITION', text: 'i < n'},
+            {type: 'field_input', name: 'UPDATE', text: 'i++'},
+        ],
+        message1: 'body %1',
+        args1: [{type: 'input_statement', name: 'BODY', check: 'Consequence'}],
+        previousStatement: 'Consequence',
+        nextStatement: 'Consequence',
+        colour: BLOCK_COLORS.consequence,
+        tooltip: 'A classic for loop.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_var_decl',
+        message0: 'instantiate %1 %2 = %3',
+        args0: [
+            {type: 'field_input', name: 'TYPE', text: 'String'},
+            {type: 'field_input', name: 'NAME', text: 'myVar'},
+            {type: 'field_input', name: 'VALUE', text: 'new String()'},
+        ],
+        previousStatement: 'Consequence',
+        nextStatement: 'Consequence',
+        colour: BLOCK_COLORS.consequence,
+        tooltip: 'Declare and initialise a local variable.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_method_call',
+        message0: 'call %1 . %2 ( %3 )',
+        args0: [
+            {type: 'field_input', name: 'OBJECT', text: '$obj'},
+            {type: 'field_input', name: 'METHOD', text: 'method'},
+            {type: 'field_input', name: 'ARGS', text: ''},
+        ],
+        previousStatement: 'Consequence',
+        nextStatement: 'Consequence',
+        colour: BLOCK_COLORS.consequence,
+        tooltip: 'Call a method on a variable.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_switch',
+        message0: 'switch ( %1 )',
+        args0: [{type: 'field_input', name: 'EXPRESSION', text: '$variable'}],
+        message1: 'cases %1',
+        args1: [{type: 'input_statement', name: 'CASES', check: 'SwitchCase'}],
+        previousStatement: 'Consequence',
+        nextStatement: 'Consequence',
+        colour: BLOCK_COLORS.consequence,
+        tooltip: 'A switch block. Add case and default blocks inside.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_case',
+        message0: 'case %1',
+        args0: [{type: 'field_input', name: 'VALUE', text: '"value"'}],
+        message1: 'body %1',
+        args1: [{type: 'input_statement', name: 'BODY', check: 'Consequence'}],
+        previousStatement: 'SwitchCase',
+        nextStatement: 'SwitchCase',
+        colour: BLOCK_COLORS.consequence,
+        tooltip: 'A case inside a switch block.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_default',
+        message0: 'default',
+        message1: 'body %1',
+        args1: [{type: 'input_statement', name: 'BODY', check: 'Consequence'}],
+        previousStatement: 'SwitchCase',
+        nextStatement: 'SwitchCase',
+        colour: BLOCK_COLORS.consequence,
+        tooltip: 'The default case inside a switch block.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_if',
+        message0: 'if ( %1 )',
+        args0: [{type: 'field_input', name: 'CONDITION', text: 'condition'}],
+        message1: 'then %1',
+        args1: [{type: 'input_statement', name: 'THEN', check: 'Consequence'}],
+        previousStatement: 'Consequence',
+        nextStatement: 'Consequence',
+        colour: BLOCK_COLORS.consequence,
+        tooltip: 'A conditional if block.',
+        helpUrl: '',
+    },
+
+    {
+        type: 'drool_if_else',
+        message0: 'if ( %1 )',
+        args0: [{type: 'field_input', name: 'CONDITION', text: 'condition'}],
+        message1: 'then %1',
+        args1: [{type: 'input_statement', name: 'THEN', check: 'Consequence'}],
+        message2: 'else %1',
+        args2: [{type: 'input_statement', name: 'ELSE', check: 'Consequence'}],
+        previousStatement: 'Consequence',
+        nextStatement: 'Consequence',
+        colour: BLOCK_COLORS.consequence,
+        tooltip: 'A conditional if/else block.',
         helpUrl: '',
     },
 ]

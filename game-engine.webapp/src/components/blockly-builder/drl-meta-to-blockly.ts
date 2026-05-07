@@ -1,27 +1,76 @@
-import type {Condition, Consequence, Constraint, DroolsFile} from 'drools-builder'
+import type {ClassDeclaration, Condition, Consequence, Constraint, DroolsFile, FunctionDefinition} from 'drools-builder'
 
 // ─── Public entry point ───────────────────────────────────────────────────────
+
+function buildImportsChain(file: DroolsFile): object {
+    const blocks: object[] = []
+    if (file.package)
+        blocks.push({ type: 'drool_package', fields: { PACKAGE: file.package } })
+    file.imports.forEach(imp => {
+        const b = importToBlock(imp)
+        if (b) blocks.push(b)
+    })
+    if (!blocks.length) return {}
+    let chain = blocks[blocks.length - 1]
+    for (let i = blocks.length - 2; i >= 0; i--)
+        chain = { ...blocks[i], next: { block: chain } }
+    return { IMPORTS: { block: chain } }
+}
 
 export function droolsFileToBlocklyState(file: DroolsFile): object {
     return {
         blocks: {
             languageVersion: 0,
-            blocks: file.rules.map(rule => ({
-                type: 'drool_rule',
-                fields: {
-                    RULE_NAME: rule.name,
-                    SALIENCE: rule.salience ?? 0,
-                    AGENDA_GROUP: rule.agendaGroup ?? '',
-                    NO_LOOP: rule.noLoop ? 'TRUE' : 'FALSE',
-                },
-                inputs: {
-                    ...chainInputKey('IMPORTS', file.imports, importToBlock),
-                    ...chainInputKey('GLOBALS', file.globals ?? [], globalToBlock),
-                    ...chainInputKey('WHEN', rule.conditions, conditionToBlock),
-                    ...chainInputKey('THEN', rule.consequences, consequenceToBlock),
-                },
-            })),
+            blocks: [
+                ...((file.package || file.imports.length) ? [{
+                    type: 'drool_imports',
+                    inputs: buildImportsChain(file),
+                }] : []),
+                ...((file.globals ?? []).length ? [{ type: 'drool_globals', inputs: chainInputKey('GLOBALS', file.globals!, globalToBlock) }] : []),
+                ...(file.declarations ?? []).map(declarationToBlock).filter((b): b is object => b !== null),
+                ...(file.functions ?? []).map(functionToBlock).filter((b): b is object => b !== null),
+                ...file.rules.map(rule => ({
+                    type: 'drool_rule',
+                    fields: {
+                        RULE_NAME: rule.name,
+                        SALIENCE: rule.salience ?? 0,
+                        AGENDA_GROUP: rule.agendaGroup ?? '',
+                        NO_LOOP: rule.noLoop ? 'TRUE' : 'FALSE',
+                    },
+                    inputs: {
+                        ...chainInputKey('WHEN', rule.conditions, conditionToBlock),
+                        ...chainInputKey('THEN', rule.consequences, consequenceToBlock),
+                    },
+                })),
+            ],
         },
+    }
+}
+
+// ─── Declaration mapping ──────────────────────────────────────────────────────
+
+function declarationToBlock(decl: ClassDeclaration): object | null {
+    return {
+        type: 'drool_declare',
+        fields: { CLASS_NAME: decl.className },
+        inputs: chainInputKey('ATTRIBUTES', decl.attributes, attr => ({
+            type: 'drool_attribute',
+            fields: { NAME: attr.name, TYPE: attr.type },
+        })),
+    }
+}
+
+// ─── Function mapping ─────────────────────────────────────────────────────────
+
+function functionToBlock(fn: FunctionDefinition): object | null {
+    return {
+        type: 'drool_function',
+        fields: {
+            RETURN_TYPE: fn.returnType,
+            NAME: fn.name,
+            PARAMS: fn.params,
+        },
+        inputs: chainInputKey('BODY', fn.body, consequenceToBlock),
     }
 }
 
@@ -159,6 +208,78 @@ function consequenceToBlock(consequence: Consequence): object | null {
                 type: 'drool_raw_consequence',
                 fields: { CODE: consequence.code },
             }
+
+        case 'ReturnConsequence':
+            return {
+                type: 'drool_return',
+                fields: { EXPRESSION: consequence.expression },
+            }
+
+        case 'WhileConsequence':
+            return {
+                type: 'drool_while',
+                fields: { CONDITION: consequence.condition },
+                inputs: chainInputKey('BODY', consequence.body, consequenceToBlock),
+            }
+
+        case 'ForEachConsequence':
+            return {
+                type: 'drool_for_each',
+                fields: { TYPE: consequence.typeName, VAR_NAME: consequence.varName, COLLECTION: consequence.collection },
+                inputs: chainInputKey('BODY', consequence.body, consequenceToBlock),
+            }
+
+        case 'ForConsequence':
+            return {
+                type: 'drool_for',
+                fields: { INIT: consequence.init, CONDITION: consequence.condition, UPDATE: consequence.update },
+                inputs: chainInputKey('BODY', consequence.body, consequenceToBlock),
+            }
+
+        case 'VarDeclConsequence':
+            return {
+                type: 'drool_var_decl',
+                fields: { TYPE: consequence.typeName, NAME: consequence.name, VALUE: consequence.value },
+            }
+
+        case 'MethodCallConsequence':
+            return {
+                type: 'drool_method_call',
+                fields: { OBJECT: consequence.object, METHOD: consequence.method, ARGS: consequence.args },
+            }
+
+        case 'SwitchConsequence':
+            return {
+                type: 'drool_switch',
+                fields: { EXPRESSION: consequence.expression },
+                inputs: chainInputKey('CASES', [
+                    ...consequence.cases.map(c => ({
+                        type: 'drool_case' as const,
+                        fields: { VALUE: c.value },
+                        inputs: chainInputKey('BODY', c.body, consequenceToBlock),
+                    })),
+                    ...(consequence.default?.length ? [{
+                        type: 'drool_default' as const,
+                        inputs: chainInputKey('BODY', consequence.default, consequenceToBlock),
+                    }] : []),
+                ], b => b),
+            }
+
+        case 'IfConsequence':
+            return consequence.else?.length
+                ? {
+                    type: 'drool_if_else',
+                    fields: { CONDITION: consequence.condition },
+                    inputs: {
+                        ...chainInputKey('THEN', consequence.then, consequenceToBlock),
+                        ...chainInputKey('ELSE', consequence.else, consequenceToBlock),
+                    },
+                }
+                : {
+                    type: 'drool_if',
+                    fields: { CONDITION: consequence.condition },
+                    inputs: chainInputKey('THEN', consequence.then, consequenceToBlock),
+                }
 
         default:
             return null

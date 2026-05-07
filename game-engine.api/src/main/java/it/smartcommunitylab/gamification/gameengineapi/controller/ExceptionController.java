@@ -68,6 +68,7 @@ public class ExceptionController {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleGenericException(Exception e) {
+        e.printStackTrace();
         log.error("Generic Error! type={}\n{}", e.getClass().getName(), e.getLocalizedMessage());
         return buildResponseObject("Generic Error", "Something went truly wrong...", null, HttpStatus.INTERNAL_SERVER_ERROR);
     }

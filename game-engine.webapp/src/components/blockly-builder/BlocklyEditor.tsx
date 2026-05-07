@@ -9,6 +9,7 @@ import {useTheme} from "@mui/material";
 import type {Abstract} from "blockly/core/events/events_abstract";
 import {blocklyDarkTheme, blocklyLightTheme} from "../../theme/blockly-theme.ts";
 import {registerFields} from "./fields";
+import {layoutWorkspace} from '../../utils/builder-utils.ts';
 
 
 const BLOCKLY_CONTAINER_ID = 'blockly-editor-root'
@@ -64,6 +65,8 @@ export function BlocklyEditor({onChange, initialState}: BlocklyEditorProps) {
         if (initialState) {
             try {
                 Blockly.serialization.workspaces.load(initialState, workspace, {recordUndo: false})
+                Blockly.Events.disable()
+                try { layoutWorkspace(workspace) } finally { Blockly.Events.enable() }
             } catch (e) {
                 console.warn('[BlocklyEditor] Could not load initial state:', e)
             }
@@ -96,6 +99,8 @@ export function BlocklyEditor({onChange, initialState}: BlocklyEditorProps) {
         }
         try {
             Blockly.serialization.workspaces.load(initialState, workspace, {recordUndo: false})
+            Blockly.Events.disable()
+            try { layoutWorkspace(workspace) } finally { Blockly.Events.enable() }
         } catch (e) {
             console.warn('[BlocklyEditor] Could not reload state:', e)
         }

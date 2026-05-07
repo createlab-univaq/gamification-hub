@@ -7,7 +7,10 @@ public class TimeInterval {
 	private int value;
 	private TimeUnit unit;
 
-	@JsonCreator
+    public TimeInterval() {
+    }
+
+    @JsonCreator
 	public TimeInterval(@JsonProperty("value") int value,
 			@JsonProperty("unit") TimeUnit unit) {
 		this.value = value;

@@ -23,6 +23,7 @@ export default defineConfig({
       '@mui/material/styles',
       '@mui/icons-material',
       'blockly',
+      'drools-builder',
     ],
   },
   build: {

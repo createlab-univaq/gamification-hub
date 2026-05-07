@@ -68,6 +68,7 @@ public class GamePersistence {
 	private List<Level> levels = new ArrayList<>();
 
 	private long expiration;
+
 	private boolean terminated;
 
 	private Settings settings;

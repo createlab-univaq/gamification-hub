@@ -128,6 +128,70 @@ export type SimulationResultDto = {
     changes?: Array<ConceptChangeDto>;
 };
 
+export type ChallengeDisclosure = {
+    startDate?: string;
+    frequency?: TimeInterval;
+};
+
+export type ChallengeSettings = {
+    disclosure?: ChallengeDisclosure;
+};
+
+export type Config = {
+    choices?: number;
+    availableModels?: Array<string>;
+    activeModels?: Array<string>;
+};
+
+export type GamePersistence = {
+    id?: string;
+    name?: string;
+    owner?: string;
+    domain?: string;
+    actions?: Array<string>;
+    tasks?: Array<GenericObjectPersistence>;
+    rules?: Array<string>;
+    concepts?: Array<GenericObjectPersistence>;
+    levels?: Array<Level>;
+    expiration?: number;
+    terminated?: boolean;
+    settings?: Settings;
+    notifyPCName?: Array<string>;
+};
+
+export type GenericObjectPersistence = {
+    obj?: {
+        [key: string]: unknown;
+    };
+    type?: string;
+};
+
+export type ImportGameDto = {
+    game: GamePersistence;
+    challengeModels: Array<ChallengeDto>;
+    rules: Array<RuleDto>;
+};
+
+export type Level = {
+    name?: string;
+    pointConceptName?: string;
+    thresholds?: Array<Threshold>;
+};
+
+export type Settings = {
+    statisticsConfig?: {
+        [key: string]: string;
+    };
+    challengeSettings?: ChallengeSettings;
+};
+
+export type Threshold = {
+    name?: string;
+    value?: number;
+    index?: number;
+    config?: Config;
+};
+
 export type LoginRequestDto = {
     username: string;
     password: string;
@@ -513,6 +577,22 @@ export type AddBadgeCollectionResponses = {
 };
 
 export type AddBadgeCollectionResponse = AddBadgeCollectionResponses[keyof AddBadgeCollectionResponses];
+
+export type ImportGamesData = {
+    body: Array<ImportGameDto>;
+    path?: never;
+    query?: never;
+    url: '/api/v1/games/import';
+};
+
+export type ImportGamesResponses = {
+    /**
+     * OK
+     */
+    200: Array<GamePersistence>;
+};
+
+export type ImportGamesResponse = ImportGamesResponses[keyof ImportGamesResponses];
 
 export type LoginData = {
     body: LoginRequestDto;

@@ -45,7 +45,6 @@ function buildRequest(gameId: string, values: SimulationFormValues): SimulationR
     return {
         gameId,
         syntheticState: {
-            playerId: values.playerId || undefined,
             actionIds: values.actionIds.map(a => a.value).filter(Boolean),
             pointConcepts: values.pointConcepts
                 .filter(pc => pc.name)

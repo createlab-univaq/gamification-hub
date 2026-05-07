@@ -91,4 +91,5 @@ public class CoreConfig {
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         return new ThreadPoolTaskScheduler();
     }
+
 }

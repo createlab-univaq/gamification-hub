@@ -27,14 +27,18 @@ export function GameForm({game}: GameFormProps) {
         }
     })
     const {setNotification} = useNotificationContext()
-    const terminated = form.watch("terminated")
 
-    const {mutate, isPending} = useMutation({
+    const {mutate, isPending} = useMutation<GameDto, unknown, GameDto>({
         mutationFn: (request) => {
+            const requestData = {
+                ...request,
+                concepts: [],
+                tasks: []
+            } satisfies GameDto
             if (game) {
-                return gameClient.updateGame(game.id, request)
+                return gameClient.updateGame(game.id!, requestData)
             }
-            return gameClient.addGame(request)
+            return gameClient.addGame(requestData)
         },
         onSuccess: (data) => {
             // Remove cached game

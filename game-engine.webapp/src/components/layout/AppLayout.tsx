@@ -11,7 +11,9 @@ export function AppLayout() {
             <Stack
                 component="main"
                 sx={{
-                    width: "100%"
+                    width: "100%",
+                    minWidth: 0,
+                    overflow: "hidden",
                 }}
             >
                 <NavbarLayout/>

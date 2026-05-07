@@ -29,9 +29,22 @@ function firstBlock(parent: Block, inputName: string): Block | null {
 
 // ─── Rule ─────────────────────────────────────────────────────────────────────
 
+drlGenerator.forBlock['drool_package'] = function (block: Block): string {
+    const pkg = (block.getFieldValue('PACKAGE') ?? '').trim()
+    return pkg ? `package ${pkg}` : ''
+}
+
+drlGenerator.forBlock['drool_imports'] = function (block: Block): string {
+    return collectChain(block, 'IMPORTS').map(generateBlock).filter(Boolean).join('\n')
+}
+
 drlGenerator.forBlock['drool_import'] = function (block: Block): string {
     const cls = (block.getFieldValue('CLASS') ?? '').trim()
     return cls ? `import ${cls};` : ''
+}
+
+drlGenerator.forBlock['drool_globals'] = function (block: Block): string {
+    return collectChain(block, 'GLOBALS').map(generateBlock).filter(Boolean).join('\n')
 }
 
 drlGenerator.forBlock['drool_global'] = function (block: Block): string {
@@ -47,15 +60,9 @@ drlGenerator.forBlock['drool_rule'] = function (block: Block): string {
     const noLoop = block.getFieldValue('NO_LOOP') === 'TRUE'
     const lockOnActive = block.getFieldValue('ACTIVE_ON_LOCK') === 'TRUE'
 
-    const imports = collectChain(block, 'IMPORTS').map(generateBlock).filter(Boolean)
-    const globals = collectChain(block, 'GLOBALS').map(generateBlock).filter(Boolean)
     const attrs: string[] = []
-    if (salience !== 0) {
-        attrs.push(`${I}salience ${salience}`)
-    }
-    if(agendaGroup) {
-        attrs.push(`${I}agenda-group ${agendaGroup}`)
-    }
+    if (salience !== 0) attrs.push(`${I}salience ${salience}`)
+    if (agendaGroup) attrs.push(`${I}agenda-group ${agendaGroup}`)
     attrs.push(`${I}no-loop ${noLoop}`)
     attrs.push(`${I}lock-on-active ${lockOnActive}`)
 
@@ -63,9 +70,6 @@ drlGenerator.forBlock['drool_rule'] = function (block: Block): string {
     const consequences = collectChain(block, 'THEN').map(generateBlock).filter(Boolean)
 
     return [
-        ...imports,
-        ...globals,
-        ...(imports.length || globals.length ? [''] : []),
         `rule "${name}"`,
         ...attrs,
         `${I}when`,
@@ -73,7 +77,6 @@ drlGenerator.forBlock['drool_rule'] = function (block: Block): string {
         `${I}then`,
         ...(consequences.length ? consequences : [`${II}// no consequences`]),
         'end',
-        '',
     ].join('\n')
 }
 
@@ -189,7 +192,132 @@ drlGenerator.forBlock['drool_set_global'] = function (block: Block): string {
 }
 
 drlGenerator.forBlock['drool_raw_consequence'] = function (block: Block): string {
-    return `${II}${(block.getFieldValue('CODE') ?? '').trim()}`
+    const code = (block.getFieldValue('CODE') ?? '').trim()
+    return `${II}${code.endsWith(';') ? code : code + ';'}`
+}
+
+drlGenerator.forBlock['drool_declare'] = function (block: Block): string {
+    const className = (block.getFieldValue('CLASS_NAME') ?? '').trim()
+    const attrs = collectChain(block, 'ATTRIBUTES')
+        .map(b => {
+            const name = (b.getFieldValue('NAME') ?? '').trim()
+            const type = (b.getFieldValue('TYPE') ?? '').trim()
+            return name && type ? `${I}${name} : ${type}` : ''
+        })
+        .filter(Boolean)
+    return attrs.length
+        ? `declare ${className}\n${attrs.join('\n')}\nend`
+        : `declare ${className}\nend`
+}
+
+drlGenerator.forBlock['drool_attribute'] = function (block: Block): string {
+    // Consumed by drool_declare — stub for orphaned blocks
+    const name = (block.getFieldValue('NAME') ?? '').trim()
+    const type = (block.getFieldValue('TYPE') ?? '').trim()
+    return `${I}${name} : ${type}`
+}
+
+drlGenerator.forBlock['drool_return'] = function (block: Block): string {
+    const expression = (block.getFieldValue('EXPRESSION') ?? '').trim()
+    return `${II}${expression ? `return ${expression};` : 'return;'}`
+}
+
+drlGenerator.forBlock['drool_function'] = function (block: Block): string {
+    const returnType = (block.getFieldValue('RETURN_TYPE') ?? '').trim()
+    const name = (block.getFieldValue('NAME') ?? '').trim()
+    const params = (block.getFieldValue('PARAMS') ?? '').trim()
+    const body = collectChain(block, 'BODY').map(generateBlock).filter(Boolean).join('\n')
+    return `function ${returnType} ${name}(${params}) {\n${body}\n}`
+}
+
+const addIndent = (code: string, levels = 1): string =>
+    code.split('\n').map(line => line ? I.repeat(levels) + line : line).join('\n')
+
+const indentBlock = (code: string): string =>
+    code.split('\n').map(line => line ? `${I}${line}` : line).join('\n')
+
+drlGenerator.forBlock['drool_while'] = function (block: Block): string {
+    const condition = (block.getFieldValue('CONDITION') ?? '').trim()
+    const body = indentBlock(collectChain(block, 'BODY').map(generateBlock).filter(Boolean).join('\n'))
+    return `${II}while (${condition}) {\n${body}\n${II}}`
+}
+
+drlGenerator.forBlock['drool_for_each'] = function (block: Block): string {
+    const type       = (block.getFieldValue('TYPE')       ?? '').trim()
+    const varName    = (block.getFieldValue('VAR_NAME')   ?? '').trim()
+    const collection = (block.getFieldValue('COLLECTION') ?? '').trim()
+    const body = indentBlock(collectChain(block, 'BODY').map(generateBlock).filter(Boolean).join('\n'))
+    return `${II}for (${type} ${varName} : ${collection}) {\n${body}\n${II}}`
+}
+
+drlGenerator.forBlock['drool_for'] = function (block: Block): string {
+    const init      = (block.getFieldValue('INIT')      ?? '').trim()
+    const condition = (block.getFieldValue('CONDITION') ?? '').trim()
+    const update    = (block.getFieldValue('UPDATE')    ?? '').trim()
+    const body = indentBlock(collectChain(block, 'BODY').map(generateBlock).filter(Boolean).join('\n'))
+    return `${II}for (${init}; ${condition}; ${update}) {\n${body}\n${II}}`
+}
+
+drlGenerator.forBlock['drool_var_decl'] = function (block: Block): string {
+    const type  = (block.getFieldValue('TYPE')  ?? '').trim()
+    const name  = (block.getFieldValue('NAME')  ?? '').trim()
+    const value = (block.getFieldValue('VALUE') ?? '').trim()
+    return `${II}${type} ${name} = ${value};`
+}
+
+drlGenerator.forBlock['drool_method_call'] = function (block: Block): string {
+    const obj    = (block.getFieldValue('OBJECT') ?? '').trim()
+    const method = (block.getFieldValue('METHOD') ?? '').trim()
+    const args   = (block.getFieldValue('ARGS')   ?? '').trim()
+    return `${II}${obj}.${method}(${args});`
+}
+
+drlGenerator.forBlock['drool_switch'] = function (block: Block): string {
+    const expression = (block.getFieldValue('EXPRESSION') ?? '').trim()
+    const cases = collectChain(block, 'CASES')
+    const caseLines = cases.map(b => {
+        if (b.type === 'drool_case') {
+            const value = (b.getFieldValue('VALUE') ?? '').trim()
+            const body = addIndent(collectChain(b, 'BODY').map(generateBlock).filter(Boolean).join('\n'), 2)
+            return `${II}${I}case ${value}:\n${body}`
+        }
+        if (b.type === 'drool_default') {
+            const body = addIndent(collectChain(b, 'BODY').map(generateBlock).filter(Boolean).join('\n'), 2)
+            return `${II}${I}default:\n${body}`
+        }
+        return ''
+    }).filter(Boolean)
+    return `${II}switch (${expression}) {\n${caseLines.join('\n')}\n${II}}`
+}
+
+drlGenerator.forBlock['drool_case'] = function (block: Block): string {
+    // Consumed by drool_switch — stub for orphaned blocks
+    const value = (block.getFieldValue('VALUE') ?? '').trim()
+    return `${II}${I}case ${value}: // (place inside a switch block)`
+}
+
+drlGenerator.forBlock['drool_default'] = function (block: Block): string {
+    // Consumed by drool_switch — stub for orphaned blocks
+    return `${II}${I}default: // (place inside a switch block)`
+}
+
+drlGenerator.forBlock['drool_if'] = function (block: Block): string {
+    const condition = (block.getFieldValue('CONDITION') ?? '').trim()
+    const thenCode = indentBlock(collectChain(block, 'THEN').map(generateBlock).filter(Boolean).join('\n'))
+    return `${II}if (${condition}) {\n${thenCode}\n${II}}`
+}
+
+drlGenerator.forBlock['drool_if_else'] = function (block: Block): string {
+    const condition = (block.getFieldValue('CONDITION') ?? '').trim()
+    const thenCode = indentBlock(collectChain(block, 'THEN').map(generateBlock).filter(Boolean).join('\n'))
+    const elseFirst = firstBlock(block, 'ELSE')
+    // If the else branch starts with an if block, render as 'else if' rather than 'else { if }'
+    if (elseFirst && (elseFirst.type === 'drool_if' || elseFirst.type === 'drool_if_else')) {
+        const elseIfCode = generateBlock(elseFirst).trimStart()
+        return `${II}if (${condition}) {\n${thenCode}\n${II}} else ${elseIfCode}`
+    }
+    const elseCode = indentBlock(collectChain(block, 'ELSE').map(generateBlock).filter(Boolean).join('\n'))
+    return `${II}if (${condition}) {\n${thenCode}\n${II}} else {\n${elseCode}\n${II}}`
 }
 
 // ─── Private helpers ──────────────────────────────────────────────────────────
@@ -224,7 +352,19 @@ function constraintText(block: Block): string {
 // ─── Entry point ──────────────────────────────────────────────────────────────
 
 export function generateDrlFromWorkspace(workspace: Workspace): string {
-    const ruleBlocks = workspace.getTopBlocks(true).filter(b => b.type === 'drool_rule')
-    if (!ruleBlocks.length) return ''
-    return ruleBlocks.map(generateBlock).join('\n')
+    const topBlocks = workspace.getTopBlocks(true)
+    const importBlocks   = topBlocks.filter(b => b.type === 'drool_imports' || b.type === 'drool_import')
+    const globalBlocks   = topBlocks.filter(b => b.type === 'drool_globals' || b.type === 'drool_global')
+    const declareBlocks  = topBlocks.filter(b => b.type === 'drool_declare')
+    const functionBlocks = topBlocks.filter(b => b.type === 'drool_function')
+    const ruleBlocks     = topBlocks.filter(b => b.type === 'drool_rule')
+
+    const sections: string[] = []
+    if (importBlocks.length)   sections.push(importBlocks.map(generateBlock).filter(Boolean).join('\n'))
+    if (globalBlocks.length)   sections.push(globalBlocks.map(generateBlock).filter(Boolean).join('\n'))
+    if (declareBlocks.length)  sections.push(declareBlocks.map(generateBlock).filter(Boolean).join('\n\n'))
+    if (functionBlocks.length) sections.push(functionBlocks.map(generateBlock).filter(Boolean).join('\n\n'))
+    if (ruleBlocks.length)     sections.push(ruleBlocks.map(generateBlock).filter(Boolean).join('\n\n'))
+
+    return sections.join('\n\n')
 }
