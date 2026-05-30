@@ -16,7 +16,7 @@ import {MessageConsole} from '../MessageConsole.tsx'
 import type {WorkspaceSvg} from "blockly";
 import type {Abstract} from "blockly/core/events/events_abstract";
 import {generateDrlFromWorkspace} from "../blockly-builder/drl-generator.ts";
-import type {RuleDto} from "../../api/types";
+import type {RuleDto, ValidationMessageDto} from "../../api/types";
 import {useMutation} from "@tanstack/react-query";
 import {ruleClient} from "../../api";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
@@ -66,7 +66,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
         onError: handleErrors
     })
 
-    const {mutate: validateMutation, isPending: validateIsPending, reset: validateReset} = useMutation({
+    const {mutate: validateMutation, isPending: validateIsPending, reset: validateReset} = useMutation<ValidationMessageDto[], unknown, RuleDto>({
         mutationFn: (request) => {
             pushMessage([{
                 content: "Started validation...",
@@ -75,7 +75,12 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
             return ruleClient.validateRule(request)
         },
         onSettled: (data) => {
-            if (!Object.keys(data).length) {
+            if(!data) {
+                return;
+            }
+            const errors = data.filter(msg=>msg.level === "ERROR")
+            const warnings = data.filter(msg=>msg.level === "WARNING")
+            if (!errors.length && !warnings.length) {
                 setNotification({
                     notification: {
                         type: "success",
@@ -91,14 +96,24 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                 }])
                 return
             }
-            const errors = Object.entries(data)
-            pushMessage(errors.map(e => {
+            if(warnings.length && !errors.length) {
+                setNotification({
+                    notification: {
+                        type: "warning",
+                        content: "Rule was compiled successfully but with warnings",
+                        title: "Rule validation complete"
+                    },
+                    isSnack: true
+                })
+            }
+            pushMessage(data.map(msg=>{
                 return {
-                    content: e[1],
-                    type: "error",
-                    time: new Date()
-                } satisfies ConsoleMessage
+                    content: msg.text,
+                    time: new Date(),
+                    type: msg.level?.toLocaleLowerCase() ?? "error"
+                }
             }))
+            setConsoleActive(true)
         },
         onError: handleErrors
     })
@@ -135,7 +150,9 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                 consolePanelRef.current.resize("40%")
             }
         }
-        setConsoleMessages(messages)
+        setConsoleMessages((prevState)=>{
+            return [...prevState, ...messages]
+        })
     }
 
     const handleBuilderChange = useDebounced((workspace: WorkspaceSvg, event: Abstract) => {
@@ -219,7 +236,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                                 validateReset()
                                 const tmpRule = {
                                     content: drl,
-                                    name: "validation-test-rule",
+                                    name: ruleName ?? "validate-rule",
                                     gameId: gameId
                                 } satisfies RuleDto
                                 validateMutation(tmpRule)
@@ -272,7 +289,9 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                                     >
                                         <Button
                                             sx={{padding: 0, minWidth: 0, width: "min-content"}}
-                                            onClick={() => consolePanelRef.current.collapse()}
+                                            onClick={() => {
+                                                consolePanelRef.current.collapse()
+                                            }}
                                             variant={"contained"}
                                         >
                                             <ChevronLeft sx={{
@@ -299,6 +318,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                                                     return
                                                 }
                                                 consolePanelRef.current.resize("100%")
+                                                setConsoleActive(true)
                                             }}
                                             variant={"contained"}
                                         >

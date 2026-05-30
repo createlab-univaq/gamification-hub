@@ -2,9 +2,9 @@ package it.smartcommunitylab.gamification.gameengineapi.service;
 
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.RuleCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.RuleDTO;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.ValidationMessageDTO;
 
 import java.util.List;
-import java.util.Map;
 
 public interface RuleService {
 
@@ -18,6 +18,6 @@ public interface RuleService {
 
     void delete(String id);
 
-    Map<String, Object> validate(RuleDTO ruleDTO);
+    List<ValidationMessageDTO> validate(RuleDTO ruleDTO);
 
 }

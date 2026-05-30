@@ -26,6 +26,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.annotation.PostConstruct;
 
 @Configuration
 @ComponentScan(
@@ -46,6 +49,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 public class CoreConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(CoreConfig.class);
+
+    @PostConstruct
+    public void setDroolsProperties(){
+        System.setProperty("drools.parallelRulesBuildThreshold", "-1");
+    }
 
     @Bean
     public AppContextProvider appCtxProvider() {

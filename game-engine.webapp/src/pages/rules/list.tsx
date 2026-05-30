@@ -86,7 +86,7 @@ export function RuleListPage() {
                         <Button color={"error"} onClick={(event) => {
                             event.stopPropagation()
                             event.preventDefault()
-                            //setDeleteGame(rule)
+                            setDeleteRule(rule)
                         }}><Delete
                             sx={{fontSize: "2rem", color: (theme) => theme.palette.error.main}}/></Button>
                     </Stack>

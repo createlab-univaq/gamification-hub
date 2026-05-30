@@ -71,7 +71,8 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
             return ruleClient.validateRule(request)
         },
         onSettled: (data) => {
-            if (!Object.keys(data).length) {
+            const entries = Object.entries(data)
+            if (!entries.length) {
                 setNotification({
                     notification: {
                         type: "success",
@@ -82,23 +83,40 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                 })
                 return
             }
-            const errors = Object.entries(data)
-            updateConsoleMessages(errors.map(e => {
-                return {
-                    content: e[1],
+            const warnings = entries.filter(([k]) => k.startsWith("_warning"))
+            const errors = entries.filter(([k]) => !k.startsWith("_warning"))
+            updateConsoleMessages([
+                ...warnings.map(([, v]) => ({
+                    content: v,
+                    type: "warning",
+                    time: new Date()
+                } satisfies ConsoleMessage)),
+                ...errors.map(([, v]) => ({
+                    content: v,
                     type: "error",
                     time: new Date()
-                } satisfies ConsoleMessage
-            }))
-            setNotification({
-                notification: {
-                    type: "error",
-                    content: <Stack>{errors.map((e, index) => <Typography
-                        key={`notification-detail-${index}`}>{e[0]}: {e[1]}</Typography>)}</Stack>,
-                    title: "Rule validation failed",
-                },
-                isSnack: true
-            })
+                } satisfies ConsoleMessage)),
+            ])
+            if (errors.length) {
+                setNotification({
+                    notification: {
+                        type: "error",
+                        content: <Stack>{errors.map((e, index) => <Typography
+                            key={`notification-detail-${index}`}>{e[0]}: {e[1]}</Typography>)}</Stack>,
+                        title: "Rule validation failed",
+                    },
+                    isSnack: true
+                })
+            } else {
+                setNotification({
+                    notification: {
+                        type: "warning",
+                        content: "Rule compiled with warnings — see console for details.",
+                        title: "Partial validation",
+                    },
+                    isSnack: true
+                })
+            }
         },
         onError: handleErrors
     })
@@ -124,8 +142,8 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
     }
 
     function updateConsoleMessages(messages: ConsoleMessage[]) {
-        if (messages.length > 0 && consolePanelRef.current.isCollapsed()) {
-            consolePanelRef.current.resize("40%")
+        if (messages.length > 0 && consolePanelRef.current?.isCollapsed()) {
+            consolePanelRef.current.expand(40)
         }
         setConsoleMessages(messages)
     }
@@ -411,7 +429,7 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
                             validateReset()
                             const tmpRule = {
                                 content: drlContent,
-                                name: initialRule?.name ?? "validation-test-rule",
+                                name: initialRule?.name ?? rule?.name ?? "validation-test-rule",
                                 gameId: gameId
                             } satisfies RuleDto
                             validateMutation(tmpRule)

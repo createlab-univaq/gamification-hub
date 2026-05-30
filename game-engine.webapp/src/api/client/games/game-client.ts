@@ -1,5 +1,5 @@
 import {BaseApiClient} from "../base-client.ts";
-import type {GameDto} from "../../types";
+import type {GameDto, ImportGameDto} from "../../types";
 import type {GetFilter} from "../../types/filters.ts";
 import {buildSearchParams} from "../../filters/filters.ts";
 
@@ -21,6 +21,10 @@ export class GameClient {
 
     public async addGame(game: Omit<GameDto, "id">) {
         return await this.baseClient.post<GameDto>(`/games`, game)
+    }
+
+    public async importGames(games:ImportGameDto[]) {
+        return await this.baseClient.post("/games/import", games)
     }
 
     public async updateGame(gameId: string, game: GameDto) {

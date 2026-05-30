@@ -2,10 +2,12 @@ package it.smartcommunitylab.gamification.gameengineapi.controller.v1.games;
 
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.RuleCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.RuleDTO;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.ValidationMessageDTO;
 import it.smartcommunitylab.gamification.gameengineapi.service.RuleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kie.api.builder.Message;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,7 +71,7 @@ public class RuleController {
 
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @PostMapping("/validate")
-    public ResponseEntity<Map<String, Object>> validateRule(@PathVariable final String gameId, @RequestBody RuleDTO ruleDTO) {
+    public ResponseEntity<List<ValidationMessageDTO>> validateRule(@PathVariable final String gameId, @RequestBody RuleDTO ruleDTO) {
         log.info("Validate rule for game={}", ruleDTO.getGameId());
         ruleDTO.setGameId(gameId);
         return ResponseEntity.ok(ruleService.validate(ruleDTO));

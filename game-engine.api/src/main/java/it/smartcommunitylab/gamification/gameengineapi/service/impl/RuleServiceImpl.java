@@ -9,14 +9,20 @@ import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundE
 import it.smartcommunitylab.gamification.gameengineapi.exception.RuleValidationException;
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.RuleCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.RuleDTO;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.ValidationMessageDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.RuleMapper;
+import it.smartcommunitylab.gamification.gameengineapi.model.mapper.ValidationMessageMapper;
 import it.smartcommunitylab.gamification.gameengineapi.service.RuleService;
 import it.smartcommunitylab.gamification.gameengineapi.utils.KieErrorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.drools.drl.parser.MessageImpl;
 import org.kie.api.builder.Message;
 import org.springframework.stereotype.Service;
 
+import java.io.StringReader;
 import java.util.*;
 
 @Service
@@ -24,15 +30,55 @@ import java.util.*;
 @Slf4j
 public class RuleServiceImpl implements RuleService {
 
+    private static final String CONSTANTS_RULE_NAME = "constants";
+
     private final GameService gameService;
     private final GameEngine gameEngine;
     private final RuleRepo ruleRepo;
     private final RuleMapper ruleMapper;
+    private final ValidationMessageMapper validationMessageMapper;
 
-    private void validateOrThrow(String gameId, String content) {
-        Map<String, Message> errors = gameEngine.validateRule(gameId, content);
-        if (!errors.isEmpty()) {
-            throw new RuleValidationException(KieErrorUtil.parseErrors(errors));
+    private List<ValidationMessageDTO> validateContent(RuleDTO ruleDTO) {
+        if (CONSTANTS_RULE_NAME.equals(ruleDTO.getName())) {
+            return validateProperties(ruleDTO.getContent());
+        }
+        Map<String, Message> errors = KieErrorUtil.parseErrors(
+                gameEngine.validateGame(ruleDTO.getGameId(), ruleDTO.getContent(), ruleDTO.getName())
+        );
+        for(Message m : errors.values()) {
+            log.info("[{}, {}] : {}", m.getLevel(), m.getClass(), m.getText());
+        }
+        return errors.values().stream().map(e->{
+            if(e instanceof MessageImpl eimpl){
+                return eimpl;
+            }
+            return null;
+        }).filter(message -> !Objects.isNull(message)).map(validationMessageMapper::toDTO).toList();
+    }
+
+    private List<ValidationMessageDTO> validateProperties(String content) {
+        List<ValidationMessageDTO> errors = new ArrayList<>();
+        try {
+            PropertiesConfiguration props = new PropertiesConfiguration();
+            props.setListDelimiter(',');
+            props.load(new StringReader(content == null ? "" : content));
+        } catch (ConfigurationException e) {
+            errors.add(
+                    ValidationMessageDTO.builder()
+                            .id(UUID.randomUUID().node())
+                            .level(Message.Level.ERROR)
+                            .text(e.getMessage())
+                            .build()
+            );
+        }
+        return errors;
+    }
+
+    private void validateOrThrow(RuleDTO ruleDTO) {
+        List<ValidationMessageDTO> errors = validateContent(ruleDTO);
+        boolean hasBlockingErrors = errors.stream().anyMatch(e->e.getLevel().equals(Message.Level.ERROR));
+        if (hasBlockingErrors) {
+            throw new RuleValidationException(errors);
         }
     }
 
@@ -63,7 +109,7 @@ public class RuleServiceImpl implements RuleService {
     @Override
     public RuleDTO insert(RuleDTO ruleDTO) {
         log.info("Add rule name={} to game={}", ruleDTO.getName(), ruleDTO.getGameId());
-        validateOrThrow(ruleDTO.getGameId(), ruleDTO.getContent());
+        validateOrThrow(ruleDTO);
         DBRule rule = new DBRule(ruleDTO.getGameId(), ruleDTO.getContent());
         rule.setName(ruleDTO.getName());
         String ruleUrl = gameService.addRule(rule);
@@ -74,7 +120,7 @@ public class RuleServiceImpl implements RuleService {
     @Override
     public RuleDTO update(RuleDTO ruleDTO) {
         log.info("Request to edit rule");
-        validateOrThrow(ruleDTO.getGameId(), ruleDTO.getContent());
+        validateOrThrow(ruleDTO);
         String ruleUrl = gameService.addRule(ruleMapper.toEntity(ruleDTO));
         ruleDTO.setId(ruleUrl);
         return ruleDTO;
@@ -88,11 +134,9 @@ public class RuleServiceImpl implements RuleService {
     }
 
     @Override
-    public Map<String, Object> validate(RuleDTO ruleDTO) {
+    public List<ValidationMessageDTO> validate(RuleDTO ruleDTO) {
         log.info("Request to validate rule for game={}", ruleDTO.getGameId());
-        return KieErrorUtil.parseErrors(
-                gameEngine.validateRule(ruleDTO.getGameId(), ruleDTO.getContent()
-                ));
+        return validateContent(ruleDTO);
     }
 
 }

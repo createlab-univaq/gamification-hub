@@ -1,0 +1,27 @@
+package eu.trentorise.game.model
+import eu.trentorise.game.core.Utility;
+import eu.trentorise.game.notification.MessageNotification;
+
+global Utility utils;
+global Double recommendation_bonus;
+
+rule "recommendation bonus"
+    salience 1
+    no-loop false
+    lock-on-active false
+    when
+        Action(id == "app_sent_recommandation")
+        Game($gameId : id)
+        Player($playerId : id)
+        $pc : PointConcept(name == "green leaves")
+    then
+        double score = 0.0;
+        utils.log("apply \'recommendation bonus\'");
+        score = $pc.getScore() + recommendation_bonus;
+        $pc.setScore(score);
+        update($pc);
+        MessageNotification mn = new MessageNotification($gameId,$playerId,"CityRegistrationBonus");
+        mn.addData("recommenderPlayerId", $playerId);
+        mn.addData("points", recommendation_bonus);
+        insert(mn);
+end

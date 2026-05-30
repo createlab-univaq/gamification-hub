@@ -1,21 +1,22 @@
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
-import {Button, Card, Stack, Typography} from "@mui/material";
+import {Button, Stack, Typography} from "@mui/material";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {gameClient, queryClient} from "../../api";
-import {Add, Delete, Edit, PanoramaFishEye} from "@mui/icons-material"
+import {Add, Delete, Edit, Upload} from "@mui/icons-material"
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useState} from "react";
 import type {GameDto} from "../../api/types";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
-import {navigateTo} from "../../utils/navigation-utils.ts";
 import {LinkCard} from "../../components/LinkCard.tsx";
 import {Loading} from "../../components/Loading.tsx";
+import {ImportGameModal} from "../../components/ImportGameModal.tsx";
 
 export function GamesListPage() {
 
     const {setNotification} = useNotificationContext()
+    const [importModalOpen, setImportModalOpen] = useState(false)
 
     const {isPending, data} = useQuery({
         queryKey: ["get-list"],
@@ -58,9 +59,16 @@ export function GamesListPage() {
         <PageHeader title={"Your games"}
                     buttons={[
                         {
-                            children: <>Add <Add/></>,
+                            children: "Add",
                             href: "/upsert-game",
-                            variant: "contained"
+                            variant: "contained",
+                            endIcon: <Add/>
+                        },
+                        {
+                            children: "Import",
+                            variant: "contained",
+                            endIcon: <Upload/>,
+                            onClick:()=>setImportModalOpen(true)
                         }
                     ]}
         />
@@ -68,6 +76,22 @@ export function GamesListPage() {
                       deleteFn={() => mutate(deleteGame.id)}
                       setElement={setDeleteGame}
                       element={deleteGame}
+        />
+        <ImportGameModal
+            open={importModalOpen}
+            setOpen={setImportModalOpen}
+            onSuccess={(data)=>{
+                setNotification({
+                    notification:{
+                        title:"Import successful!",
+                        content:`${data.length} were successfully saved.`,
+                        type:"success"
+                    },
+                    isSnack:true
+                })
+                queryClient.invalidateQueries({queryKey: ["get-list"]})
+            }}
+            onError={(error)=>setNotification(translateApiErrorToNotification(getApiError(error)))}
         />
         {!data || !data.length && <Typography>No games found.</Typography>}
         {data && <Stack sx={{gap: 2, mt: 2}}>

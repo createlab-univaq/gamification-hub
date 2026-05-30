@@ -82,6 +82,10 @@
 			<groupId>org.drools</groupId>
 			<artifactId>drools-model-compiler</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-mvel</artifactId>
+		</dependency>
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-impact-analysis-model</artifactId>

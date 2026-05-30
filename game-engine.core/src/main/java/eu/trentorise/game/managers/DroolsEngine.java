@@ -45,11 +45,14 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.LogManager;
+import org.drools.compiler.kie.builder.impl.DrlProject;
+import org.drools.drl.parser.MessageImpl;
 import org.drools.model.codegen.ExecutableModelProject;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.Message;
+import org.kie.api.builder.Results;
 import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
 import org.kie.api.event.rule.AfterMatchFiredEvent;
@@ -69,6 +72,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Component
 public class DroolsEngine implements GameEngine {
@@ -96,6 +100,15 @@ public class DroolsEngine implements GameEngine {
 
     @Autowired
     private ChallengeConceptRepo challengeConceptRepo;
+
+    public static final String ARITY_FALLBACK_WARNING_KEY = "_warning_arity_fallback";
+
+    private static final Pattern ARITY_ERROR_PATTERN = Pattern.compile(
+            "ConsequenceBuilder\\._"
+                    + "|LambdaConsequence"
+                    + "|org\\.drools\\.model\\.functions\\.(Block|Predicate)\\d+"
+    );
+
 
     public PlayerState execute(String gameId, PlayerState state, String action,
                                Map<String, Object> data, String executionId, long executionMoment,
@@ -761,26 +774,103 @@ public class DroolsEngine implements GameEngine {
 
     @Override
     public Map<String, Message> validateRule(String gameId, String content) {
-        Map<String, Message> result = new HashMap<>();
-        if (content != null) {
-            KieServices ks = KieServices.get();
-            KieFileSystem kfs = ks.newKieFileSystem();
-            // Load core.drl first to establish the package context and make all
-            // engine fact types (Action, PointConcept, InputData, etc.) resolvable
-            // without explicit imports — same as loadGameRules() does at runtime.
-            kfs.write(ks.getResources()
-                    .newClassPathResource("rules/core.drl")
-                    .setSourcePath("rules/core.drl"));
-            kfs.write(ks.getResources()
-                    .newReaderResource(new java.io.StringReader(content))
-                    .setSourcePath("rules/validate/rule.drl"));
-            KieBuilder kieBuilder = ks.newKieBuilder(kfs);
-            kieBuilder.buildAll(ExecutableModelProject.class);
-            kieBuilder.getResults().getMessages(Message.Level.ERROR)
-                    .forEach(msg -> {
-                        result.put(String.valueOf(msg.getId()), msg);
-                    });
+        if (content == null) {
+            return new HashMap<>();
         }
-        return result;
+        KieServices ks = KieServices.get();
+        KieFileSystem kfs = ks.newKieFileSystem();
+        kfs.write(ks.getResources()
+                .newClassPathResource("rules/core.drl")
+                .setSourcePath("eu/trentorise/game/model/core.drl"));
+        kfs.write(ks.getResources()
+                .newReaderResource(new java.io.StringReader(content))
+                .setSourcePath("eu/trentorise/game/model/current.drl"));
+        return compileResources(kfs);
     }
+
+    @Override
+    public Map<String, Message> validateGame(String gameId, String content, String ruleName) {
+        if (content == null) {
+            return new HashMap<>();
+        }
+        KieServices ks = KieServices.get();
+        KieFileSystem kfs = ks.newKieFileSystem();
+        String packagePath = "eu/trentorise/game/model";
+
+        kfs.write(ks.getResources()
+                .newClassPathResource("rules/core.drl")
+                .setSourcePath(packagePath + "/core.drl"));
+
+        kfs.write(ks.getResources()
+                .newReaderResource(new java.io.StringReader(content))
+                .setSourcePath(packagePath + "/current.drl"));
+
+        Game game = gameSrv.loadGameDefinitionById(gameId);
+        if (game != null && game.getRules() != null) {
+            int idx = 0;
+            for (String ruleUrl : game.getRules()) {
+                Rule peer = gameSrv.loadRule(gameId, ruleUrl);
+                if (peer == null || peer.getName() == null) continue;
+                if (peer.getName().equals("constants")) continue;
+                if (peer.getName().equals(ruleName)) continue;
+                String peerContent;
+                try (InputStream is = peer.getInputStream()) {
+                    peerContent = new String(is.readAllBytes());
+                } catch (IOException e) {
+                    LogHub.info(gameId, logger,
+                            "Skipping peer rule {} during validation: {}",
+                            peer.getName(), e.getMessage());
+                    continue;
+                }
+                kfs.write(ks.getResources()
+                        .newReaderResource(new java.io.StringReader(peerContent))
+                        .setSourcePath(packagePath + "/peer-" + (idx++) + ".drl"));
+            }
+        }
+        return compileResources(kfs);
+    }
+
+    private Map<String, Message> compileResources(KieFileSystem kfs) {
+        KieServices ks = KieServices.get();
+        KieBuilder kieBuilder = ks.newKieBuilder(kfs);
+        kieBuilder.buildAll(ExecutableModelProject.class);
+        return collectErrors(kieBuilder.getResults());
+    }
+
+    private static boolean isArityError(Message msg) {
+        String text = msg.getText();
+        return text != null && ARITY_ERROR_PATTERN.matcher(text).find();
+    }
+
+    private Message getArityFallBackMessage(Message message) {
+        return new MessageImpl(message.getId(),
+                Message.Level.WARNING,
+                message.getPath(),
+                "Rule has exceeded the maximum number of fact types in the consequence block (max is 24)"
+        );
+    }
+
+    private Map<String, Message> collectErrors(Results results) {
+        Map<String, Message> out = new HashMap<>();
+        Set<String> errorSet = new HashSet<>();
+        List<Message> messages = results.getMessages(Message.Level.ERROR);
+        for (Message msg : messages) {
+            if (errorSet.contains(msg.getText())) {
+                continue;
+            }
+            if (isArityError(msg)) {
+                Message arityFallbackMessage = getArityFallBackMessage(msg);
+                if (errorSet.contains(arityFallbackMessage.getText())) {
+                    continue;
+                }
+                out.put(String.valueOf(msg.getId()), arityFallbackMessage);
+                errorSet.add(arityFallbackMessage.getText());
+            } else {
+                out.put(String.valueOf(msg.getId()), msg);
+                errorSet.add(msg.getText());
+            }
+        }
+        return out;
+    }
+
 }

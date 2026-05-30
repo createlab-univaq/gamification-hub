@@ -128,6 +128,12 @@ export type SimulationResultDto = {
     changes?: Array<ConceptChangeDto>;
 };
 
+export type ValidationMessageDto = {
+    id?: number;
+    text?: string;
+    level?: 'ERROR' | 'WARNING' | 'INFO';
+};
+
 export type ChallengeDisclosure = {
     startDate?: string;
     frequency?: TimeInterval;
@@ -143,7 +149,7 @@ export type Config = {
     activeModels?: Array<string>;
 };
 
-export type GamePersistence = {
+export type GamePersistanceDto = {
     id?: string;
     name?: string;
     owner?: string;
@@ -167,7 +173,7 @@ export type GenericObjectPersistence = {
 };
 
 export type ImportGameDto = {
-    game: GamePersistence;
+    game: GamePersistanceDto;
     challengeModels: Array<ChallengeDto>;
     rules: Array<RuleDto>;
 };
@@ -463,9 +469,7 @@ export type ValidateRuleResponses = {
     /**
      * OK
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: Array<ValidationMessageDto>;
 };
 
 export type ValidateRuleResponse = ValidateRuleResponses[keyof ValidateRuleResponses];
@@ -589,7 +593,7 @@ export type ImportGamesResponses = {
     /**
      * OK
      */
-    200: Array<GamePersistence>;
+    200: Array<GamePersistanceDto>;
 };
 
 export type ImportGamesResponse = ImportGamesResponses[keyof ImportGamesResponses];

@@ -16,14 +16,8 @@ interface MessageConsoleProps {
 
 export function MessageConsole({messages}: MessageConsoleProps) {
 
-    const [consoleMessages, setConsoleMessages] = useState(messages)
-
-    useEffect(() => {
-        setConsoleMessages([...consoleMessages, ...messages])
-    }, [messages]);
-
-    return <Stack sx={{height: "100%", width: "100%"}}>
-        <Card sx={{backgroundColor: (theme) => theme.palette.background.paper, borderRadius: 0, padding: "0.4rem"}}>
+    return <Stack sx={{height: "100%", width: "100%", overflow: "hidden"}}>
+        <Card sx={{backgroundColor: (theme) => theme.palette.background.paper, borderRadius: 0, padding: "0.4rem", flexShrink: 0}}>
             <Stack direction={"row"} sx={{justifyContent: "space-between", alignItems: "flex-start"}}>
                 <Typography variant={"h6"}>CONSOLE</Typography>
                 <Stack direction={"row"} sx={{gap: 1}}>
@@ -55,15 +49,17 @@ export function MessageConsole({messages}: MessageConsoleProps) {
         <Card
             component={"pre"}
             sx={{
-                height: "100%",
+                flex: 1,
+                minHeight: 0,
                 width: "100%",
                 m: 0,
                 borderRadius: 0,
                 backgroundColor: (theme) => theme.palette.background.default,
+                overflow: "auto",
             }}>
             <CardContent>
                 <Stack direction={"column-reverse"}>
-                    {consoleMessages.map((error, index) => {
+                    {messages.map((error, index) => {
                         const timestamp = error.time ? `[${error.time.toLocaleTimeString()}]` : ""
                         return <Typography
                             variant={"body1"}

@@ -48,4 +48,17 @@ public interface GameEngine {
 	 *         fine
 	 */
 	public Map<String, Message> validateRule(String gameId, String content);
+
+	/**
+	 * Like {@link #validateRule}, but compiles the candidate rule together with
+	 * the game's other saved rules. The constants file and any peer with the
+	 * same name as ruleName are skipped (so an in-flight edit isn't compiled
+	 * twice). Only errors attributed to the candidate's resource are returned —
+	 * a broken peer doesn't fail the candidate.
+	 *
+	 * @param gameId   gameId
+	 * @param content  the rule content being validated
+	 * @param ruleName the candidate's name — peers with the same name are skipped
+	 */
+	public Map<String, Message> validateGame(String gameId, String content, String ruleName);
 }

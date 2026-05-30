@@ -5,7 +5,7 @@ import java.net.MalformedURLException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
-import org.drools.model.codegen.ExecutableModelProject;
+import org.drools.compiler.kie.builder.impl.DrlProject;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -141,7 +141,7 @@ public class KieContainerFactoryImpl implements KieContainerFactory {
         }
 
         KieBuilder kieBuilder = kieServices.newKieBuilder(kfs);
-        kieBuilder.buildAll(ExecutableModelProject.class);
+        kieBuilder.buildAll(DrlProject.class);
         kieBuilder.getResults().getMessages(Message.Level.ERROR)
                 .forEach(msg -> LogHub.error(gameId, logger, "Rule compilation error: [{}:{}] {}",
                         msg.getPath(), msg.getLine(), msg.getText()));

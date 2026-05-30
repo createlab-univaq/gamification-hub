@@ -1,5 +1,5 @@
 import {BaseApiClient} from "../base-client.ts";
-import type {RuleDto} from "../../types";
+import type {RuleDto, ValidateRuleData, ValidationMessageDto} from "../../types";
 import type {GetFilter} from "../../types/filters.ts";
 import {buildSearchParams} from "../../filters/filters.ts";
 
@@ -32,7 +32,7 @@ export class RuleClient {
     }
 
     public async validateRule(rule: RuleDto) {
-        return await this.baseClient.post<Record<string, string>>(`/games/${rule.gameId}/rules/validate`, rule)
+        return await this.baseClient.post<ValidationMessageDto[]>(`/games/${rule.gameId}/rules/validate`, rule)
     }
 
 }

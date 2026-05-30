@@ -1,7 +1,6 @@
 package it.smartcommunitylab.gamification.gameengineapi.controller.v1.games;
 
 import eu.trentorise.game.model.Game;
-import eu.trentorise.game.repo.GamePersistence;
 import eu.trentorise.game.repo.GameRepo;
 import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.config.security.DomainUserDetails;
@@ -9,6 +8,7 @@ import it.smartcommunitylab.gamification.gameengineapi.exception.EntityCreationE
 import it.smartcommunitylab.gamification.gameengineapi.exception.RequestException;
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.GameCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.GameDTO;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.GamePersistanceDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ImportGameDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.entity.User;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.ChallengeMapper;
@@ -59,7 +59,7 @@ public class GameController extends BaseGameController {
     }
 
     @PostMapping("/import")
-    public ResponseEntity<List<GamePersistence>> importGames(@RequestBody @Valid List<ImportGameDTO> games) {
+    public ResponseEntity<List<GamePersistanceDTO>> importGames(@RequestBody @Valid List<ImportGameDTO> games) {
         log.info("Import {} games", games.size());
         if(games.isEmpty()) {
             throw new RequestException("Import Error", "There should be at least 1 game", HttpStatus.BAD_REQUEST);
