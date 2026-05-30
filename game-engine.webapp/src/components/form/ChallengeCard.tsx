@@ -3,8 +3,11 @@ import {useFieldArray} from "react-hook-form";
 import {Button, Card, CardContent, IconButton, MenuItem, Select, Stack, TextField, Typography} from "@mui/material";
 import {Add, Delete} from "@mui/icons-material";
 
+type ChallengeArrayName = "challenges" | "expectedChallenges"
+
 interface ChallengeCardProps {
     index: number
+    namePrefix: ChallengeArrayName
     control: Control<SimulationFormValues>
     register: UseFormRegister<SimulationFormValues>
     onRemove: () => void
@@ -12,8 +15,8 @@ interface ChallengeCardProps {
 
 const CHALLENGE_STATES = ["PROPOSED", "ASSIGNED", "ACTIVE", "COMPLETED", "FAILED", "REFUSED", "AUTO_DISCARDED", "CANCELED"];
 
-export function ChallengeCard({index, control, register, onRemove}: ChallengeCardProps) {
-    const fields = useFieldArray({control, name: `challenges.${index}.fields` as "challenges.0.fields"})
+export function ChallengeCard({index, namePrefix, control, register, onRemove}: ChallengeCardProps) {
+    const fields = useFieldArray({control, name: `${namePrefix}.${index}.fields` as "challenges.0.fields"})
 
     return (
         <Card variant="outlined">
@@ -21,11 +24,11 @@ export function ChallengeCard({index, control, register, onRemove}: ChallengeCar
                 <Stack sx={{gap: 1}}>
                     <Stack direction="row" sx={{gap: 1, alignItems: "center"}}>
                         <TextField size="small" placeholder="Name" sx={{flex: 2}}
-                                   {...register(`challenges.${index}.name`)}/>
+                                   {...register(`${namePrefix}.${index}.name` as "challenges.0.name")}/>
                         <TextField size="small" placeholder="Model name" sx={{flex: 2}}
-                                   {...register(`challenges.${index}.modelName`)}/>
+                                   {...register(`${namePrefix}.${index}.modelName` as "challenges.0.modelName")}/>
                         <Select size="small" displayEmpty sx={{flex: 1}} defaultValue=""
-                                {...register(`challenges.${index}.state`)}>
+                                {...register(`${namePrefix}.${index}.state` as "challenges.0.state")}>
                             <MenuItem value=""><em>State</em></MenuItem>
                             {CHALLENGE_STATES.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
                         </Select>
@@ -40,9 +43,9 @@ export function ChallengeCard({index, control, register, onRemove}: ChallengeCar
                     {fields.fields.map((field, j) => (
                         <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
                             <TextField size="small" placeholder="key" sx={{flex: 1}}
-                                       {...register(`challenges.${index}.fields.${j}.key`)}/>
+                                       {...register(`${namePrefix}.${index}.fields.${j}.key` as "challenges.0.fields.0.key")}/>
                             <TextField size="small" placeholder="value" sx={{flex: 2}}
-                                       {...register(`challenges.${index}.fields.${j}.value`)}/>
+                                       {...register(`${namePrefix}.${index}.fields.${j}.value` as "challenges.0.fields.0.value")}/>
                             <IconButton size="small" color="error" onClick={() => fields.remove(j)}>
                                 <Delete fontSize="small"/>
                             </IconButton>

@@ -19,7 +19,7 @@ import {
     Typography,
 } from "@mui/material";
 import {Add, Delete, ExpandMore, PlayArrow} from "@mui/icons-material";
-import type {SimulationRequestDto, SimulationResultDto} from "../../api/types";
+import type {PlayerStateDto, SimulationRequestDto, SimulationResultDto} from "../../api/types";
 import {ChallengeCard} from "../../components/form/ChallengeCard.tsx";
 import {parseValue} from "../../utils/builder-utils.ts";
 import {Form} from "../../components/form/Form.tsx";
@@ -39,6 +39,52 @@ type SimulationFormValues = {
     challenges: ChallengeRow[]
     customData: KVRow[]
     data: KVRow[]
+    expectedPointConcepts: PointConceptRow[]
+    expectedBadgeCollections: BadgeCollectionRow[]
+    expectedChallenges: ChallengeRow[]
+}
+
+function matchExpectations(values: SimulationFormValues, finalState?: PlayerStateDto): boolean | null {
+    const pcs = values.expectedPointConcepts.filter(r => r.name)
+    const bcs = values.expectedBadgeCollections.filter(r => r.name)
+    const chs = values.expectedChallenges.filter(r => r.name)
+    if ((!pcs.length && !bcs.length && !chs.length) || !finalState) {
+        return null
+    }
+    for (const pc of pcs) {
+        const actual = finalState.pointConcepts?.find(a => a.name === pc.name)
+        if (!actual || (actual.score ?? 0) !== (parseFloat(pc.score) || 0)) {
+            return false
+        }
+    }
+    for (const bc of bcs) {
+        const actual = finalState.badgeCollections?.find(a => a.name === bc.name)
+        if (!actual) {
+            return false
+        }
+        const expectedBadges = bc.badges ? bc.badges.split(",").map(b => b.trim()).filter(Boolean) : []
+        if (!expectedBadges.every(b => actual.badges?.includes(b))) {
+            return false
+        }
+    }
+    for (const ch of chs) {
+        const actual = finalState.challenges?.find(a => a.name === ch.name)
+        if (!actual) {
+            return false
+        }
+        if (ch.modelName && actual.modelName !== ch.modelName) {
+            return false
+        }
+        if (ch.state && actual.state !== ch.state) {
+            return false
+        }
+        for (const f of ch.fields.filter(r => r.key)) {
+            if (actual.fields?.[f.key] !== parseValue(f.value)) {
+                return false
+            }
+        }
+    }
+    return true
 }
 
 function buildRequest(gameId: string, values: SimulationFormValues): SimulationRequestDto {
@@ -88,20 +134,37 @@ export function SimulationPage() {
             challenges: [],
             customData: [],
             data: [],
+            expectedPointConcepts: [],
+            expectedBadgeCollections: [],
+            expectedChallenges: [],
         }
     })
 
-    const actions = useFieldArray({control:form.control, name: "actionIds"})
-    const pointConcepts = useFieldArray({control:form.control, name: "pointConcepts"})
-    const badgeCollections = useFieldArray({control:form.control, name: "badgeCollections"})
-    const challenges = useFieldArray({control:form.control, name: "challenges"})
-    const customData = useFieldArray({control:form.control, name: "customData"})
-    const inputData = useFieldArray({control:form.control, name: "data"})
+    const actions = useFieldArray({control: form.control, name: "actionIds"})
+    const pointConcepts = useFieldArray({control: form.control, name: "pointConcepts"})
+    const badgeCollections = useFieldArray({control: form.control, name: "badgeCollections"})
+    const challenges = useFieldArray({control: form.control, name: "challenges"})
+    const customData = useFieldArray({control: form.control, name: "customData"})
+    const inputData = useFieldArray({control: form.control, name: "data"})
+    const expectedPointConcepts = useFieldArray({control: form.control, name: "expectedPointConcepts"})
+    const expectedBadgeCollections = useFieldArray({control: form.control, name: "expectedBadgeCollections"})
+    const expectedChallenges = useFieldArray({control: form.control, name: "expectedChallenges"})
 
     const {mutate, data: result, isPending, reset} = useMutation<SimulationResultDto, unknown, SimulationFormValues>({
         mutationFn: (values) => simulationClient.simulate(buildRequest(game.id, values)),
-        onSuccess:(data)=>{
-            console.log(data)
+        onSuccess: (data, variables) => {
+            const testResult = matchExpectations(variables, data.finalState)
+            if(testResult === null) {
+                return
+            }
+            setNotification({
+                notification: {
+                    type: testResult ? "success" : "error",
+                    title: testResult ? "Test passato" : "Test fallito",
+                    content: testResult ? "Il risultato della simulazione corrisponde con i valori aspettati" : "Uno o più valori non corrispondono con quello pensato"
+                },
+                isSnack: true
+            })
         },
         onError: (error) => {
             const apiError = getApiError(error)
@@ -111,189 +174,306 @@ export function SimulationPage() {
 
     return (
         <PageContainer>
-            <Form form={form} onSubmit={(v) => mutate(v)}>
+            <Form form={form} onSubmit={(v) => {
+                mutate(v)
+            }}>
                 <PageHeader
                     title={"Simulate Game"}
                     buttons={[
                         {
                             children: "Simulate",
                             type: "submit",
-                            variant:"contained",
-                            loading:isPending,
-                            endIcon:<PlayArrow/>
+                            variant: "contained",
+                            loading: isPending,
+                            endIcon: <PlayArrow/>
                         },
                         {
-                            children:"Clear",
-                            type:"reset",
-                            onClick:()=>reset(),
-                            variant:"outlined",
-                            loading:isPending,
-                            endIcon:<Delete/>
+                            children: "Clear",
+                            type: "reset",
+                            onClick: () => {
+                                reset();
+                            },
+                            variant: "outlined",
+                            loading: isPending,
+                            endIcon: <Delete/>
                         }
                     ]}
                 />
                 <Stack direction={{xs: "column", md: "row"}} sx={{mt: 2, gap: 3}}>
                     {/* ── Form ── */}
-                    <Stack
-                        sx={{flex: 1, minWidth: 0}}>
-                        {/* Actions */}
-                        <Accordion defaultExpanded>
+                    <Stack sx={{flex: 1, minWidth: 0}}>
+                        <Accordion sx={{borderRadius: 0}}>
                             <AccordionSummary expandIcon={<ExpandMore/>}>
-                                <Typography sx={{fontWeight: 600}}>Actions</Typography>
+                                <Typography sx={{fontWeight: 600}}>Simulation Input</Typography>
                             </AccordionSummary>
-                            <AccordionDetails>
-                                <Stack sx={{gap: 1}}>
-                                    {actions.fields.map((field, i) => (
-                                        <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
-                                            <TextField size="small" fullWidth placeholder="action.id"
-                                                       {...form.register(`actionIds.${i}.value`)}/>
-                                            <IconButton size="small" color="error"
-                                                        onClick={() => actions.remove(i)}>
-                                                <Delete fontSize="small"/>
-                                            </IconButton>
+                            <Stack sx={{flex: 1, minWidth: 0}}>
+                                {/* Actions */}
+                                <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
+                                    <AccordionSummary expandIcon={<ExpandMore/>}>
+                                        <Typography sx={{fontWeight: 600}}>Actions</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Stack sx={{gap: 1}}>
+                                            {actions.fields.map((field, i) => (
+                                                <Stack key={field.id} direction="row"
+                                                       sx={{gap: 1, alignItems: "center"}}>
+                                                    <TextField size="small" fullWidth placeholder="action.id"
+                                                               {...form.register(`actionIds.${i}.value`)}/>
+                                                    <IconButton size="small" color="error"
+                                                                onClick={() => actions.remove(i)}>
+                                                        <Delete fontSize="small"/>
+                                                    </IconButton>
+                                                </Stack>
+                                            ))}
+                                            <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                                    onClick={() => actions.append({value: ""})}>
+                                                Add Action
+                                            </Button>
                                         </Stack>
-                                    ))}
-                                    <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
-                                            onClick={() => actions.append({value: ""})}>
-                                        Add Action
-                                    </Button>
-                                </Stack>
-                            </AccordionDetails>
-                        </Accordion>
+                                    </AccordionDetails>
+                                </Accordion>
 
-                        {/* Point Concepts */}
-                        <Accordion defaultExpanded>
-                            <AccordionSummary expandIcon={<ExpandMore/>}>
-                                <Typography sx={{fontWeight: 600}}>Point Concepts</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Stack sx={{gap: 1}}>
-                                    {pointConcepts.fields.map((field, i) => (
-                                        <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
-                                            <TextField size="small" placeholder="Name" sx={{flex: 2}}
-                                                       {...form.register(`pointConcepts.${i}.name`)}/>
-                                            <TextField size="small" placeholder="Score" type="number"
-                                                       slotProps={{htmlInput: {step: "any"}}}
-                                                       sx={{flex: 1}}
-                                                       {...form.register(`pointConcepts.${i}.score`)}/>
-                                            <IconButton size="small" color="error"
-                                                        onClick={() => pointConcepts.remove(i)}>
-                                                <Delete fontSize="small"/>
-                                            </IconButton>
+                                {/* Point Concepts */}
+                                <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
+                                    <AccordionSummary expandIcon={<ExpandMore/>}>
+                                        <Typography sx={{fontWeight: 600}}>Point Concepts</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Stack sx={{gap: 1}}>
+                                            {pointConcepts.fields.map((field, i) => (
+                                                <Stack key={field.id} direction="row"
+                                                       sx={{gap: 1, alignItems: "center"}}>
+                                                    <TextField size="small" placeholder="Name" sx={{flex: 2}}
+                                                               {...form.register(`pointConcepts.${i}.name`)}/>
+                                                    <TextField size="small" placeholder="Score" type="number"
+                                                               slotProps={{htmlInput: {step: "any"}}}
+                                                               sx={{flex: 1}}
+                                                               {...form.register(`pointConcepts.${i}.score`)}/>
+                                                    <IconButton size="small" color="error"
+                                                                onClick={() => pointConcepts.remove(i)}>
+                                                        <Delete fontSize="small"/>
+                                                    </IconButton>
+                                                </Stack>
+                                            ))}
+                                            <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                                    onClick={() => pointConcepts.append({name: "", score: "0"})}>
+                                                Add Point Concept
+                                            </Button>
                                         </Stack>
-                                    ))}
-                                    <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
-                                            onClick={() => pointConcepts.append({name: "", score: "0"})}>
-                                        Add Point Concept
-                                    </Button>
-                                </Stack>
-                            </AccordionDetails>
-                        </Accordion>
+                                    </AccordionDetails>
+                                </Accordion>
 
-                        {/* Badge Collections */}
+                                {/* Badge Collections */}
+                                <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
+                                    <AccordionSummary expandIcon={<ExpandMore/>}>
+                                        <Typography sx={{fontWeight: 600}}>Badge Collections</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Stack sx={{gap: 1}}>
+                                            {badgeCollections.fields.map((field, i) => (
+                                                <Stack key={field.id} direction="row"
+                                                       sx={{gap: 1, alignItems: "center"}}>
+                                                    <TextField size="small" placeholder="Name" sx={{flex: 1}}
+                                                               {...form.register(`badgeCollections.${i}.name`)}/>
+                                                    <Tooltip title="Comma-separated badge names">
+                                                        <TextField size="small" placeholder="badge1, badge2"
+                                                                   sx={{flex: 2}}
+                                                                   {...form.register(`badgeCollections.${i}.badges`)}/>
+                                                    </Tooltip>
+                                                    <IconButton size="small" color="error"
+                                                                onClick={() => badgeCollections.remove(i)}>
+                                                        <Delete fontSize="small"/>
+                                                    </IconButton>
+                                                </Stack>
+                                            ))}
+                                            <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                                    onClick={() => badgeCollections.append({name: "", badges: ""})}>
+                                                Add Badge Collection
+                                            </Button>
+                                        </Stack>
+                                    </AccordionDetails>
+                                </Accordion>
+
+                                {/* Challenges */}
+                                <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
+                                    <AccordionSummary expandIcon={<ExpandMore/>}>
+                                        <Typography sx={{fontWeight: 600}}>Challenges</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Stack sx={{gap: 2}}>
+                                            {challenges.fields.map((field, i) => (
+                                                <ChallengeCard key={field.id} index={i} namePrefix="challenges"
+                                                               control={form.control}
+                                                               register={form.register}
+                                                               onRemove={() => challenges.remove(i)}/>
+                                            ))}
+                                            <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                                    onClick={() => challenges.append({
+                                                        name: "", modelName: "", state: "", fields: []
+                                                    })}>
+                                                Add Challenge
+                                            </Button>
+                                        </Stack>
+                                    </AccordionDetails>
+                                </Accordion>
+
+                                {/* Custom Data */}
+                                <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
+                                    <AccordionSummary expandIcon={<ExpandMore/>}>
+                                        <Typography sx={{fontWeight: 600}}>Custom Data</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Stack sx={{gap: 1}}>
+                                            {customData.fields.map((field, i) => (
+                                                <Stack key={field.id} direction="row"
+                                                       sx={{gap: 1, alignItems: "center"}}>
+                                                    <TextField size="small" placeholder="key" sx={{flex: 1}}
+                                                               {...form.register(`customData.${i}.key`)}/>
+                                                    <TextField size="small" placeholder="value" sx={{flex: 2}}
+                                                               {...form.register(`customData.${i}.value`)}/>
+                                                    <IconButton size="small" color="error"
+                                                                onClick={() => customData.remove(i)}>
+                                                        <Delete fontSize="small"/>
+                                                    </IconButton>
+                                                </Stack>
+                                            ))}
+                                            <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                                    onClick={() => customData.append({key: "", value: ""})}>
+                                                Add Attribute
+                                            </Button>
+                                        </Stack>
+                                    </AccordionDetails>
+                                </Accordion>
+
+                                {/* Input Data */}
+                                <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
+                                    <AccordionSummary expandIcon={<ExpandMore/>}>
+                                        <Typography sx={{fontWeight: 600}}>Input Data</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Stack sx={{gap: 1}}>
+                                            {inputData.fields.map((field, i) => (
+                                                <Stack key={field.id} direction="row"
+                                                       sx={{gap: 1, alignItems: "center"}}>
+                                                    <TextField size="small" placeholder="key" sx={{flex: 1}}
+                                                               {...form.register(`data.${i}.key`)}/>
+                                                    <TextField size="small" placeholder="value" sx={{flex: 2}}
+                                                               {...form.register(`data.${i}.value`)}/>
+                                                    <IconButton size="small" color="error"
+                                                                onClick={() => inputData.remove(i)}>
+                                                        <Delete fontSize="small"/>
+                                                    </IconButton>
+                                                </Stack>
+                                            ))}
+                                            <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                                    onClick={() => inputData.append({key: "", value: ""})}>
+                                                Add Attribute
+                                            </Button>
+                                        </Stack>
+                                    </AccordionDetails>
+                                </Accordion>
+                            </Stack>
+                        </Accordion>
                         <Accordion>
                             <AccordionSummary expandIcon={<ExpandMore/>}>
-                                <Typography sx={{fontWeight: 600}}>Badge Collections</Typography>
+                                <Typography sx={{fontWeight: 600}}>Expected Output</Typography>
                             </AccordionSummary>
-                            <AccordionDetails>
-                                <Stack sx={{gap: 1}}>
-                                    {badgeCollections.fields.map((field, i) => (
-                                        <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
-                                            <TextField size="small" placeholder="Name" sx={{flex: 1}}
-                                                       {...form.register(`badgeCollections.${i}.name`)}/>
-                                            <Tooltip title="Comma-separated badge names">
-                                                <TextField size="small" placeholder="badge1, badge2"
-                                                           sx={{flex: 2}}
-                                                           {...form.register(`badgeCollections.${i}.badges`)}/>
-                                            </Tooltip>
-                                            <IconButton size="small" color="error"
-                                                        onClick={() => badgeCollections.remove(i)}>
-                                                <Delete fontSize="small"/>
-                                            </IconButton>
-                                        </Stack>
-                                    ))}
-                                    <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
-                                            onClick={() => badgeCollections.append({name: "", badges: ""})}>
-                                        Add Badge Collection
-                                    </Button>
-                                </Stack>
-                            </AccordionDetails>
-                        </Accordion>
+                            <Stack sx={{flex: 1, minWidth: 0}}>
+                                <Typography variant="caption" color="text.secondary" sx={{px: 2, pt: 1}}>
+                                    Only the entries listed here are checked against the simulated final state.
+                                </Typography>
 
-                        {/* Challenges */}
-                        <Accordion>
-                            <AccordionSummary expandIcon={<ExpandMore/>}>
-                                <Typography sx={{fontWeight: 600}}>Challenges</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Stack sx={{gap: 2}}>
-                                    {challenges.fields.map((field, i) => (
-                                        <ChallengeCard key={field.id} index={i} control={form.control}
-                                                       register={form.register}
-                                                       onRemove={() => challenges.remove(i)}/>
-                                    ))}
-                                    <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
-                                            onClick={() => challenges.append({
-                                                name: "", modelName: "", state: "", fields: []
-                                            })}>
-                                        Add Challenge
-                                    </Button>
-                                </Stack>
-                            </AccordionDetails>
-                        </Accordion>
-
-                        {/* Custom Data */}
-                        <Accordion>
-                            <AccordionSummary expandIcon={<ExpandMore/>}>
-                                <Typography sx={{fontWeight: 600}}>Custom Data</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Stack sx={{gap: 1}}>
-                                    {customData.fields.map((field, i) => (
-                                        <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
-                                            <TextField size="small" placeholder="key" sx={{flex: 1}}
-                                                       {...form.register(`customData.${i}.key`)}/>
-                                            <TextField size="small" placeholder="value" sx={{flex: 2}}
-                                                       {...form.register(`customData.${i}.value`)}/>
-                                            <IconButton size="small" color="error"
-                                                        onClick={() => customData.remove(i)}>
-                                                <Delete fontSize="small"/>
-                                            </IconButton>
+                                {/* Expected Point Concepts */}
+                                <Accordion defaultExpanded
+                                           sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
+                                    <AccordionSummary expandIcon={<ExpandMore/>}>
+                                        <Typography sx={{fontWeight: 600}}>Point Concepts</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Stack sx={{gap: 1}}>
+                                            {expectedPointConcepts.fields.map((field, i) => (
+                                                <Stack key={field.id} direction="row"
+                                                       sx={{gap: 1, alignItems: "center"}}>
+                                                    <TextField size="small" placeholder="Name" sx={{flex: 2}}
+                                                               {...form.register(`expectedPointConcepts.${i}.name`)}/>
+                                                    <TextField size="small" placeholder="Score" type="number"
+                                                               slotProps={{htmlInput: {step: "any"}}}
+                                                               sx={{flex: 1}}
+                                                               {...form.register(`expectedPointConcepts.${i}.score`)}/>
+                                                    <IconButton size="small" color="error"
+                                                                onClick={() => expectedPointConcepts.remove(i)}>
+                                                        <Delete fontSize="small"/>
+                                                    </IconButton>
+                                                </Stack>
+                                            ))}
+                                            <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                                    onClick={() => expectedPointConcepts.append({
+                                                        name: "",
+                                                        score: "0"
+                                                    })}>
+                                                Add Point Concept
+                                            </Button>
                                         </Stack>
-                                    ))}
-                                    <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
-                                            onClick={() => customData.append({key: "", value: ""})}>
-                                        Add Attribute
-                                    </Button>
-                                </Stack>
-                            </AccordionDetails>
-                        </Accordion>
+                                    </AccordionDetails>
+                                </Accordion>
 
-                        {/* Input Data */}
-                        <Accordion>
-                            <AccordionSummary expandIcon={<ExpandMore/>}>
-                                <Typography sx={{fontWeight: 600}}>Input Data</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Stack sx={{gap: 1}}>
-                                    {inputData.fields.map((field, i) => (
-                                        <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
-                                            <TextField size="small" placeholder="key" sx={{flex: 1}}
-                                                       {...form.register(`data.${i}.key`)}/>
-                                            <TextField size="small" placeholder="value" sx={{flex: 2}}
-                                                       {...form.register(`data.${i}.value`)}/>
-                                            <IconButton size="small" color="error"
-                                                        onClick={() => inputData.remove(i)}>
-                                                <Delete fontSize="small"/>
-                                            </IconButton>
+                                {/* Expected Badge Collections */}
+                                <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
+                                    <AccordionSummary expandIcon={<ExpandMore/>}>
+                                        <Typography sx={{fontWeight: 600}}>Badge Collections</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Stack sx={{gap: 1}}>
+                                            {expectedBadgeCollections.fields.map((field, i) => (
+                                                <Stack key={field.id} direction="row"
+                                                       sx={{gap: 1, alignItems: "center"}}>
+                                                    <TextField size="small" placeholder="Name" sx={{flex: 1}}
+                                                               {...form.register(`expectedBadgeCollections.${i}.name`)}/>
+                                                    <Tooltip title="Comma-separated badge names">
+                                                        <TextField size="small" placeholder="badge1, badge2"
+                                                                   sx={{flex: 2}}
+                                                                   {...form.register(`expectedBadgeCollections.${i}.badges`)}/>
+                                                    </Tooltip>
+                                                    <IconButton size="small" color="error"
+                                                                onClick={() => expectedBadgeCollections.remove(i)}>
+                                                        <Delete fontSize="small"/>
+                                                    </IconButton>
+                                                </Stack>
+                                            ))}
+                                            <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                                    onClick={() => expectedBadgeCollections.append({
+                                                        name: "",
+                                                        badges: ""
+                                                    })}>
+                                                Add Badge Collection
+                                            </Button>
                                         </Stack>
-                                    ))}
-                                    <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
-                                            onClick={() => inputData.append({key: "", value: ""})}>
-                                        Add Attribute
-                                    </Button>
-                                </Stack>
-                            </AccordionDetails>
+                                    </AccordionDetails>
+                                </Accordion>
+
+                                {/* Expected Challenges */}
+                                <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
+                                    <AccordionSummary expandIcon={<ExpandMore/>}>
+                                        <Typography sx={{fontWeight: 600}}>Challenges</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Stack sx={{gap: 2}}>
+                                            {expectedChallenges.fields.map((field, i) => (
+                                                <ChallengeCard key={field.id} index={i} namePrefix="expectedChallenges"
+                                                               control={form.control}
+                                                               register={form.register}
+                                                               onRemove={() => expectedChallenges.remove(i)}/>
+                                            ))}
+                                            <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                                    onClick={() => expectedChallenges.append({
+                                                        name: "", modelName: "", state: "", fields: []
+                                                    })}>
+                                                Add Challenge
+                                            </Button>
+                                        </Stack>
+                                    </AccordionDetails>
+                                </Accordion>
+                            </Stack>
                         </Accordion>
                     </Stack>
 

@@ -1,84 +1,60 @@
 import type {FiredRuleDto, PlayerStateDto} from "../api/types";
 import type {Edge, Node} from "@xyflow/react";
 import {MarkerType} from "@xyflow/react";
+import ELK from "elkjs/lib/elk.bundled.js";
 
-const LEVEL_HEIGHT = 128 // 8rem somewhat
+const elk = new ELK();
 
-export function computeFlowLayout(rules: FiredRuleDto[], startState, endState): {
-    nodes: Node[];
-    edges: Edge[],
+const NODE_WIDTH = 160   // 10rem
+const NODE_HEIGHT = 88
+
+const ELK_OPTIONS: Record<string, string> = {
+    "elk.algorithm": "layered",
+    "elk.direction": "DOWN",
+    "elk.edgeRouting": "ORTHOGONAL",
+    "elk.layered.spacing.nodeNodeBetweenLayers": "80",
+    "elk.layered.nodePlacement.strategy": "LINEAR_SEGMENTS",
+    "elk.spacing.nodeNode": "40",
+    "elk.layered.considerModelOrder.strategy": "NODES_AND_EDGES",
+}
+
+export async function computeFlowLayout(
+    rules: FiredRuleDto[],
     startState: PlayerStateDto,
     endState: PlayerStateDto
-} {
-    const levels = new Map<string, number>();
-    const sourcesMap = new Map<number, string>(); // cache sources per index
-    const lastSeen = new Map<string, number>();   // ruleName -> last index
+): Promise<{ nodes: Node[]; edges: Edge[] }> {
+    const sourcesMap = new Map<number, string>(); // rule index -> source node id
+    const lastSeen = new Map<string, number>();    // ruleName -> last index
 
-    levels.set("__start__", 0);
-    let maxLvl = 1
-    // Compute sources + levels in ONE pass
     rules.forEach((rule, i) => {
         let src = "__start__";
-
         if (rule.cause && lastSeen.has(rule.cause)) {
             src = `rule-${lastSeen.get(rule.cause)!}`;
         }
-
         sourcesMap.set(i, src);
-        const lvl = (levels.get(src) ?? 0) + 1
-        if (lvl >= maxLvl) {
-            maxLvl = lvl
-        }
-        levels.set(`rule-${i}`, lvl);
-
-        // update last seen
         if (rule.ruleName) {
             lastSeen.set(rule.ruleName, i);
         }
     });
 
-    levels.set("__end__", maxLvl + 1);
-
-    // Build sources set (no recomputation)
     const sources = new Set(sourcesMap.values());
-
     const leafs = rules
         .map((_, i) => `rule-${i}`)
         .filter(id => !sources.has(id));
 
-    // Group by level
-    const byLevel = new Map<number, string[]>();
-    for (const [id, level] of levels.entries()) {
-        if (!byLevel.has(level)) byLevel.set(level, []);
-        byLevel.get(level)!.push(id);
-    }
-
-    // Positions
-    const positions = new Map<string, { x: number; y: number }>();
-    for (const [level, ids] of byLevel.entries()) {
-        ids.forEach((id) => {
-            positions.set(id, {
-                x: 50,
-                y: (level + 1) * LEVEL_HEIGHT
-            });
-        });
-    }
-
-    // Fire counts
     const fireCount = new Map<string, number>();
     for (const r of rules) {
         if (r.ruleName) {
             fireCount.set(r.ruleName, (fireCount.get(r.ruleName) ?? 1) + 1);
         }
     }
-
     const fireSeq = new Map<string, number>();
 
     const nodes: Node[] = [
         {
             id: "__start__",
             type: "stateNode",
-            position: positions.get("__start__") ?? {x: 0, y: 0},
+            position: {x: 0, y: 0},
             data: {state: startState, label: "Start"}
         },
         ...rules.map((rule, i) => {
@@ -90,7 +66,7 @@ export function computeFlowLayout(rules: FiredRuleDto[], startState, endState): 
             return {
                 id: `rule-${i}`,
                 type: "ruleNode",
-                position: positions.get(`rule-${i}`) ?? {x: 0, y: 0},
+                position: {x: 0, y: 0},
                 data: {rule, fireSeq: repeated ? seq : null},
                 style: {
                     padding: 0,
@@ -103,7 +79,7 @@ export function computeFlowLayout(rules: FiredRuleDto[], startState, endState): 
         {
             id: "__end__",
             type: "stateNode",
-            position: positions.get("__end__") ?? {x: 0, y: 0},
+            position: {x: 0, y: 0},
             data: {state: endState, label: "End"}
         }
     ];
@@ -112,6 +88,7 @@ export function computeFlowLayout(rules: FiredRuleDto[], startState, endState): 
         id: `e-${i}`,
         source: sourcesMap.get(i)!,
         target: `rule-${i}`,
+        type: "smoothstep",
         markerEnd: {type: MarkerType.ArrowClosed},
         style: {strokeWidth: 1.5},
     }));
@@ -121,10 +98,24 @@ export function computeFlowLayout(rules: FiredRuleDto[], startState, endState): 
             id: `e-end-${i}`,
             source: id,
             target: "__end__",
+            type: "smoothstep",
             markerEnd: {type: MarkerType.ArrowClosed},
             style: {strokeWidth: 1.5},
         }))
     );
+
+    const layout = await elk.layout({
+        id: "root",
+        layoutOptions: ELK_OPTIONS,
+        children: nodes.map(n => ({id: n.id, width: NODE_WIDTH, height: NODE_HEIGHT})),
+        edges: edges.map(e => ({id: e.id, sources: [e.source], targets: [e.target]})),
+    });
+
+    const positions = new Map<string, { x: number; y: number }>();
+    layout.children?.forEach(c => positions.set(c.id, {x: c.x ?? 0, y: c.y ?? 0}));
+    nodes.forEach(n => {
+        n.position = positions.get(n.id) ?? {x: 0, y: 0};
+    });
 
     return {nodes, edges};
 }

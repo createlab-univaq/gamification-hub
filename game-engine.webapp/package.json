@@ -20,6 +20,7 @@
     "@xyflow/react": "^12.10.2",
     "blockly": "^12.5.1",
     "drools-builder": "file:../../../../../Svago/WebDev/drools-builder",
+    "elkjs": "^0.11.1",
     "js-cookie": "^3.0.5",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
