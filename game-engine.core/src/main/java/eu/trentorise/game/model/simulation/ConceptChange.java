@@ -1,5 +1,7 @@
 package eu.trentorise.game.model.simulation;
 
+import java.util.Objects;
+
 public class ConceptChange {
 
     private String conceptType;  // "PointConcept", "BadgeCollectionConcept", "ChallengeConcept"
@@ -33,4 +35,21 @@ public class ConceptChange {
 
     public Object getAfter() { return after; }
     public void setAfter(Object after) { this.after = after; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ConceptChange)) return false;
+        ConceptChange that = (ConceptChange) o;
+        return Objects.equals(conceptType, that.conceptType)
+                && Objects.equals(conceptName, that.conceptName)
+                && Objects.equals(field, that.field)
+                && Objects.equals(before, that.before)
+                && Objects.equals(after, that.after);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(conceptType, conceptName, field, before, after);
+    }
 }

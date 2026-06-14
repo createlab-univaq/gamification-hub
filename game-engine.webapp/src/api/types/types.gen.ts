@@ -210,8 +210,8 @@ export type ActivationLinkDto = {
 
 export type RuleImpactDto = {
     ruleName?: string;
-    reads?: Array<string>;
-    writes?: Array<string>;
+    reads?: Array<ConceptChangeDto>;
+    writes?: Array<ConceptChangeDto>;
     activates?: Array<ActivationLinkDto>;
 };
 
@@ -616,24 +616,6 @@ export type LoginResponses = {
 
 export type LoginResponse = LoginResponses[keyof LoginResponses];
 
-export type AnalyzeGameData = {
-    body?: never;
-    path: {
-        gameId: string;
-    };
-    query?: never;
-    url: '/api/v1/model/game/{gameId}/impact';
-};
-
-export type AnalyzeGameResponses = {
-    /**
-     * OK
-     */
-    200: Array<RuleImpactDto>;
-};
-
-export type AnalyzeGameResponse = AnalyzeGameResponses[keyof AnalyzeGameResponses];
-
 export type DeletePointData = {
     body?: never;
     path: {
@@ -669,6 +651,24 @@ export type GetPointResponses = {
 };
 
 export type GetPointResponse = GetPointResponses[keyof GetPointResponses];
+
+export type AnalyzeGameData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/impact';
+};
+
+export type AnalyzeGameResponses = {
+    /**
+     * OK
+     */
+    200: Array<RuleImpactDto>;
+};
+
+export type AnalyzeGameResponse = AnalyzeGameResponses[keyof AnalyzeGameResponses];
 
 export type DeleteBadgeCollectionData = {
     body?: never;

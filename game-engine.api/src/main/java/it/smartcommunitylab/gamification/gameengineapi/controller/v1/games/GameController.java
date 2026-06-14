@@ -1,7 +1,8 @@
 package it.smartcommunitylab.gamification.gameengineapi.controller.v1.games;
 
+import eu.trentorise.game.managers.RuleImpactAnalyzer;
 import eu.trentorise.game.model.Game;
-import eu.trentorise.game.repo.GameRepo;
+import eu.trentorise.game.model.impact.GameImpactResult;
 import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.config.security.DomainUserDetails;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityCreationException;
@@ -10,14 +11,12 @@ import it.smartcommunitylab.gamification.gameengineapi.model.criteria.GameCriter
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.GameDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.GamePersistanceDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ImportGameDTO;
-import it.smartcommunitylab.gamification.gameengineapi.model.entity.User;
-import it.smartcommunitylab.gamification.gameengineapi.model.mapper.ChallengeMapper;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.impact.RuleImpactDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
-import it.smartcommunitylab.gamification.gameengineapi.model.mapper.RuleMapper;
+import it.smartcommunitylab.gamification.gameengineapi.model.mapper.RuleImpactMapper;
 import it.smartcommunitylab.gamification.gameengineapi.service.ImportService;
 import it.smartcommunitylab.gamification.gameengineapi.utils.SecurityUtils;
 import jakarta.validation.Valid;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
@@ -37,9 +36,25 @@ public class GameController extends BaseGameController {
 
     private final ImportService importService;
 
-    public GameController(GameService gameService, GameMapper gameMapper, ImportService importService) {
+    private final RuleImpactAnalyzer ruleImpactAnalyzer;
+
+    private final RuleImpactMapper ruleImpactMapper;
+
+    public GameController(GameService gameService, GameMapper gameMapper, ImportService importService, RuleImpactAnalyzer ruleImpactAnalyzer, RuleImpactMapper ruleImpactMapper) {
         super(gameService, gameMapper);
         this.importService = importService;
+        this.ruleImpactAnalyzer = ruleImpactAnalyzer;
+        this.ruleImpactMapper = ruleImpactMapper;
+    }
+
+    @GetMapping("/{gameId}/impact")
+    public ResponseEntity<List<RuleImpactDTO>> analyzeGame(@PathVariable String gameId) {
+        log.info("Impact analysis requested for game={}", gameId);
+        GameImpactResult result = ruleImpactAnalyzer.analyze(gameId);
+        List<RuleImpactDTO> dtos = result.getRules().entrySet().stream()
+                .map(entry -> ruleImpactMapper.toDTO(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     @PostMapping
@@ -61,7 +76,7 @@ public class GameController extends BaseGameController {
     @PostMapping("/import")
     public ResponseEntity<List<GamePersistanceDTO>> importGames(@RequestBody @Valid List<ImportGameDTO> games) {
         log.info("Import {} games", games.size());
-        if(games.isEmpty()) {
+        if (games.isEmpty()) {
             throw new RequestException("Import Error", "There should be at least 1 game", HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok(importService.importGames(games));
@@ -106,5 +121,6 @@ public class GameController extends BaseGameController {
         gameService.deleteGame(game.getId());
         return ResponseEntity.noContent().build();
     }
+
 
 }

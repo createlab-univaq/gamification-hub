@@ -17,6 +17,7 @@ import {BlocklyRuleForm} from "../components/form/BlocklyRuleForm.tsx";
 import {TestPage} from "../pages/TestPage.tsx";
 import {BlocklyRuleUpsertPage} from "../pages/rules/upsert-blockly.tsx";
 import {SimulationPage} from "../pages/simulation/page.tsx";
+import {ImpactAnalysisPage} from "../pages/rules/impact-analysis.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -96,6 +97,10 @@ export const router = createBrowserRouter([
                             {
                                 path: "simulate",
                                 element: <SimulationPage/>
+                            },
+                            {
+                                path: "impact-analysis",
+                                element: <ImpactAnalysisPage/>
                             }
                         ]
                     }

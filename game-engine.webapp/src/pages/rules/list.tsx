@@ -8,16 +8,18 @@ import {Navigate} from "react-router-dom";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {Button, Stack, Typography} from "@mui/material";
 import {LinkCard} from "../../components/LinkCard.tsx";
-import {Add, Delete, Edit, PlayArrow} from "@mui/icons-material";
+import {Add, Delete, Edit, AccountTree} from "@mui/icons-material";
 import {useState} from "react";
 import type {RuleDto} from "../../api/types";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {ImpactAnalysisModal} from "../../components/impact-analysis/ImpactAnalysisModal.tsx";
 
 export function RuleListPage() {
 
     const game = useGame()
     const [deleteRule, setDeleteRule] = useState<RuleDto>()
+    const [impactAnalysisModalOpen, setImpacyAnalysisModalOpen] = useState(false)
     const {setNotification} = useNotificationContext()
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-rules", game.id],
@@ -66,6 +68,12 @@ export function RuleListPage() {
                             href: `/games/${game.id}/upsert-rule`,
                             variant: "contained",
                             endIcon: <Add/>
+                        },
+                        {
+                            children: "Static Analysis",
+                            variant: "contained",
+                            href:`/games/${game.id}/impact-analysis`,
+                            endIcon: <AccountTree/>
                         }
                     ]}
         />

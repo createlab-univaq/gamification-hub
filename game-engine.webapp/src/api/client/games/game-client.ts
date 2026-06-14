@@ -1,5 +1,5 @@
 import {BaseApiClient} from "../base-client.ts";
-import type {GameDto, ImportGameDto} from "../../types";
+import type {GameDto, ImportGameDto, RuleImpactDto} from "../../types";
 import type {GetFilter} from "../../types/filters.ts";
 import {buildSearchParams} from "../../filters/filters.ts";
 
@@ -33,6 +33,10 @@ export class GameClient {
 
     public async deleteGame(gameId: string) {
         return await this.baseClient.delete(`/games/${gameId}`)
+    }
+
+    public async staticAnalysis(gameId:string): Promise<RuleImpactDto[]> {
+        return await this.baseClient.get<RuleImpactDto[]>(`/games/${gameId}/impact`)
     }
 
 }

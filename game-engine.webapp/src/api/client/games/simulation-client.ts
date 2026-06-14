@@ -1,5 +1,5 @@
 import {BaseApiClient} from "../base-client.ts";
-import type {SimulationRequestDto, SimulationResultDto} from "../../types";
+import type {RuleImpactDto, SimulationRequestDto, SimulationResultDto} from "../../types";
 
 export class SimulationClient {
     private client: BaseApiClient;
@@ -11,4 +11,5 @@ export class SimulationClient {
     public async simulate(request: SimulationRequestDto): Promise<SimulationResultDto> {
         return await this.client.post<SimulationResultDto>('/simulate', request);
     }
+
 }
