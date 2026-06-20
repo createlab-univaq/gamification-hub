@@ -89,6 +89,7 @@ export function SidebarLayout() {
                     const basePath = getBaseGamePath()
                     const itemHref = item.relative ? basePath+item.href : item.href
                     return <ListItem key={`sidebar-item-${item.title}`}
+                                     title={item.title}
                                      sx={{
                                          backgroundColor: (theme) => isSelected ? theme.palette.background.default : theme.palette.background.paper,
                                          "&:hover":{

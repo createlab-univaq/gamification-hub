@@ -28,6 +28,13 @@ public class Level {
         this.pointConceptName = pointConceptName;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPointConceptName(String pointConceptName) {
+        this.pointConceptName = pointConceptName;
+    }
 
     public String getPointConceptName() {
         return pointConceptName;

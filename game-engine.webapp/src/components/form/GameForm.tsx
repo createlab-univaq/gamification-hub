@@ -61,12 +61,6 @@ export function GameForm({game}: GameFormProps) {
         }
     })
 
-    useEffect(() => {
-        if (game) {
-            initForm(game)
-        }
-    }, [game]);
-
     const initForm = (game: GameDto) => {
         form.reset({
             ...game
@@ -76,6 +70,12 @@ export function GameForm({game}: GameFormProps) {
     function handleSubmit(fieldValues: FieldValues) {
         mutate(fieldValues)
     }
+
+    useEffect(() => {
+        if (game) {
+            initForm(game)
+        }
+    }, [game]);
 
     return <Form form={form} onSubmit={handleSubmit} readonly={isPending}>
         <Stack sx={{gap: 3}}>

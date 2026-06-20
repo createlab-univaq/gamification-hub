@@ -1,5 +1,7 @@
 package it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation;
 
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.BadgeCollectionDTO;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.PointConceptDTO;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

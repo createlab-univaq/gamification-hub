@@ -55,8 +55,14 @@ export type ChallengeDto = {
     gameId?: string;
 };
 
-export type BadgeCollectionDto = {
+export type ActionDto = {
     name?: string;
+};
+
+export type BadgeCollectionDto = {
+    id?: string;
+    name?: string;
+    hidden?: boolean;
     badges?: Array<string>;
 };
 
@@ -71,9 +77,21 @@ export type ChallengeConceptDto = {
     end?: string;
 };
 
+export type PeriodDto = {
+    identifier?: string;
+    start?: number;
+    end?: number;
+    period?: number;
+    capacity?: number;
+};
+
 export type PointConceptDto = {
+    id?: string;
     name?: string;
     score?: number;
+    periods?: {
+        [key: string]: PeriodDto;
+    };
 };
 
 export type SimulationRequestDto = {
@@ -134,6 +152,25 @@ export type ValidationMessageDto = {
     level?: 'ERROR' | 'WARNING' | 'INFO';
 };
 
+export type Config = {
+    choices?: number;
+    availableModels?: Array<string>;
+    activeModels?: Array<string>;
+};
+
+export type LevelDto = {
+    name?: string;
+    pointConceptName?: string;
+    thresholds?: Array<Threshold>;
+};
+
+export type Threshold = {
+    name?: string;
+    value?: number;
+    index?: number;
+    config?: Config;
+};
+
 export type ChallengeDisclosure = {
     startDate?: string;
     frequency?: TimeInterval;
@@ -141,12 +178,6 @@ export type ChallengeDisclosure = {
 
 export type ChallengeSettings = {
     disclosure?: ChallengeDisclosure;
-};
-
-export type Config = {
-    choices?: number;
-    availableModels?: Array<string>;
-    activeModels?: Array<string>;
 };
 
 export type GamePersistanceDto = {
@@ -189,13 +220,6 @@ export type Settings = {
         [key: string]: string;
     };
     challengeSettings?: ChallengeSettings;
-};
-
-export type Threshold = {
-    name?: string;
-    value?: number;
-    index?: number;
-    config?: Config;
 };
 
 export type LoginRequestDto = {
@@ -364,6 +388,42 @@ export type UpdateGameChallengeResponses = {
 
 export type UpdateGameChallengeResponse = UpdateGameChallengeResponses[keyof UpdateGameChallengeResponses];
 
+export type DeleteActionData = {
+    body?: never;
+    path: {
+        gameId: string;
+        actionId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/actions/{actionId}';
+};
+
+export type DeleteActionResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type UpdateActionData = {
+    body: ActionDto;
+    path: {
+        gameId: string;
+        actionId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/actions/{actionId}';
+};
+
+export type UpdateActionResponses = {
+    /**
+     * OK
+     */
+    200: ActionDto;
+};
+
+export type UpdateActionResponse = UpdateActionResponses[keyof UpdateActionResponses];
+
 export type SimulateData = {
     body: SimulationRequestDto;
     path?: never;
@@ -510,6 +570,42 @@ export type AddPointResponses = {
 
 export type AddPointResponse = AddPointResponses[keyof AddPointResponses];
 
+export type GetLevelsData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/levels';
+};
+
+export type GetLevelsResponses = {
+    /**
+     * OK
+     */
+    200: Array<LevelDto>;
+};
+
+export type GetLevelsResponse = GetLevelsResponses[keyof GetLevelsResponses];
+
+export type UpsertLevelData = {
+    body: LevelDto;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/levels';
+};
+
+export type UpsertLevelResponses = {
+    /**
+     * OK
+     */
+    200: LevelDto;
+};
+
+export type UpsertLevelResponse = UpsertLevelResponses[keyof UpsertLevelResponses];
+
 export type GetGameChallengesData = {
     body?: never;
     path: {
@@ -582,6 +678,42 @@ export type AddBadgeCollectionResponses = {
 
 export type AddBadgeCollectionResponse = AddBadgeCollectionResponses[keyof AddBadgeCollectionResponses];
 
+export type GetActionsData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/actions';
+};
+
+export type GetActionsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ActionDto>;
+};
+
+export type GetActionsResponse = GetActionsResponses[keyof GetActionsResponses];
+
+export type AddActionData = {
+    body: ActionDto;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/actions';
+};
+
+export type AddActionResponses = {
+    /**
+     * OK
+     */
+    200: ActionDto;
+};
+
+export type AddActionResponse = AddActionResponses[keyof AddActionResponses];
+
 export type ImportGamesData = {
     body: Array<ImportGameDto>;
     path?: never;
@@ -652,6 +784,25 @@ export type GetPointResponses = {
 
 export type GetPointResponse = GetPointResponses[keyof GetPointResponses];
 
+export type GetLevelData = {
+    body?: never;
+    path: {
+        gameId: string;
+        levelId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/levels/{levelId}';
+};
+
+export type GetLevelResponses = {
+    /**
+     * OK
+     */
+    200: LevelDto;
+};
+
+export type GetLevelResponse = GetLevelResponses[keyof GetLevelResponses];
+
 export type AnalyzeGameData = {
     body?: never;
     path: {
@@ -721,3 +872,22 @@ export type GetAuthenticatedUserResponses = {
 };
 
 export type GetAuthenticatedUserResponse = GetAuthenticatedUserResponses[keyof GetAuthenticatedUserResponses];
+
+export type UpsertLevel1Data = {
+    body?: never;
+    path: {
+        gameId: string;
+        lvlName: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/levels/{lvlName}';
+};
+
+export type UpsertLevel1Responses = {
+    /**
+     * OK
+     */
+    200: LevelDto;
+};
+
+export type UpsertLevel1Response = UpsertLevel1Responses[keyof UpsertLevel1Responses];

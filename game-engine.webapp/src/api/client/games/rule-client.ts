@@ -1,7 +1,6 @@
 import {BaseApiClient} from "../base-client.ts";
-import type {RuleDto, ValidateRuleData, ValidationMessageDto} from "../../types";
-import type {GetFilter} from "../../types/filters.ts";
-import {buildSearchParams} from "../../filters/filters.ts";
+import type {RuleDto, ValidationMessageDto} from "../../types";
+import {buildSearchParams, type GetFilter} from "../../filters/filters.ts";
 
 export class RuleClient {
 

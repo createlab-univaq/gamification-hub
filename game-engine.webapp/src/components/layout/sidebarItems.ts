@@ -20,7 +20,7 @@ interface SidebarItem {
 
 const dashboardItems = [
     {
-        title: "Games",
+        title: "Giochi",
         icon: Games,
         href: "/dashboard"
     }
@@ -28,42 +28,43 @@ const dashboardItems = [
 
 const gameItems = [
     {
-        title: "Rules",
+        title: "Regole",
         icon: Rule,
         href: "/rules",
         relative: true
     },
     {
-        title: "Actions",
+        title: "Azioni",
         icon: PlayArrow,
         href: "/actions",
         relative: true
     },
     {
-        title: "Point Concepts",
+        title: "Punteggi",
         icon: EmojiEvents,
         href: "/points",
         relative: true
     },
     {
-        title: "Tasks",
+        title: "Attività",
         icon: Checklist,
         href: "/tasks",
         relative: true
     },
     {
-        title: "Badges",
+        title: "Medaglie",
         icon: MilitaryTech,
         href: "/badges",
         relative: true
     },
     {
-        title: "Levels",
+        title: "Livelli",
+        href:"/levels",
         icon: Layers,
         relative: true
     },
     {
-        title: "Challenges",
+        title: "Sfide",
         icon: FormatListNumbered,
         relative: true
     },

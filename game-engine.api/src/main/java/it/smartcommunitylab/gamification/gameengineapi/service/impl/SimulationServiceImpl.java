@@ -7,6 +7,8 @@ import eu.trentorise.game.model.PointConcept;
 import eu.trentorise.game.model.simulation.SimulationResult;
 import eu.trentorise.game.services.Workflow;
 import it.smartcommunitylab.gamification.gameengineapi.exception.RequestException;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.BadgeCollectionDTO;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.PointConceptDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.*;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.SimulationResultMapper;
 import it.smartcommunitylab.gamification.gameengineapi.service.SimulationService;

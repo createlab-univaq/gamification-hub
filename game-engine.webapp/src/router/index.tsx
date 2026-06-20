@@ -6,23 +6,27 @@ import {PublicRoutes} from "./PublicRoutes.tsx";
 import {AppLayout} from "../components/layout/AppLayout.tsx";
 import {GamesListPage} from "../pages/dashboard/list.tsx";
 import {GameUpsertPage} from "../pages/dashboard/upsert.tsx";
-import {RulesPage} from "../pages/rules/page.tsx";
 import {GameRoutes} from "./GameRoutes.tsx";
-import {Stack} from "@mui/material";
 import {GamePage} from "../pages/games/page.tsx";
 import {ErrorPage} from "../pages/error/page.tsx";
 import {RuleListPage} from "../pages/rules/list.tsx";
 import {RuleUpsertPage} from "../pages/rules/upsert.tsx";
-import {BlocklyRuleForm} from "../components/form/BlocklyRuleForm.tsx";
 import {TestPage} from "../pages/TestPage.tsx";
 import {BlocklyRuleUpsertPage} from "../pages/rules/upsert-blockly.tsx";
 import {SimulationPage} from "../pages/simulation/page.tsx";
 import {ImpactAnalysisPage} from "../pages/rules/impact-analysis.tsx";
+import {LevelListPage} from "../pages/levels/list.tsx";
+import {UpsertLevelPage} from "../pages/levels/upsert.tsx";
+import {ActionListPage} from "../pages/actions/list.tsx";
+import {ActionUpsertPage} from "../pages/actions/upsert.tsx";
+import {PointConceptListPage} from "../pages/point-concept/list.tsx";
+import {PointConceptUpsertPage} from "../pages/point-concept/upsert.tsx";
+import {PointConceptDetailsPage} from "../pages/point-concept/details.tsx";
 
 export const router = createBrowserRouter([
     {
-      path:"*",
-      element: <ErrorPage/>
+        path: "*",
+        element: <ErrorPage/>
     },
     {
         path: "/",
@@ -31,7 +35,7 @@ export const router = createBrowserRouter([
     {
         path: "/testing",
         element: <TestPage/>,
-        errorElement:<ErrorPage/>
+        errorElement: <ErrorPage/>
     },
     {
         element: <PublicRoutes/>,
@@ -48,7 +52,7 @@ export const router = createBrowserRouter([
     },
     {
         element: <AuthRoutes/>,
-        errorElement:<ErrorPage/>,
+        errorElement: <ErrorPage/>,
         children: [
             {
                 element: <AppLayout/>,
@@ -74,6 +78,7 @@ export const router = createBrowserRouter([
                                 path: "",
                                 element: <GamePage/>
                             },
+                            // RULE PAGES
                             {
                                 path: "rules",
                                 element: <RuleListPage/>
@@ -94,6 +99,7 @@ export const router = createBrowserRouter([
                                 path: "upsert-rule/:ruleId",
                                 element: <BlocklyRuleUpsertPage/>
                             },
+                            // SIMULATIONS AND STATIC ANALYSIS
                             {
                                 path: "simulate",
                                 element: <SimulationPage/>
@@ -101,6 +107,49 @@ export const router = createBrowserRouter([
                             {
                                 path: "impact-analysis",
                                 element: <ImpactAnalysisPage/>
+                            },
+                            // LEVEL PAGES
+                            {
+                                path: "levels",
+                                element: <LevelListPage/>
+                            },
+                            {
+                                path: "levels/upsert/:levelName",
+                                element: <UpsertLevelPage/>
+                            },
+                            {
+                                path: "levels/upsert",
+                                element: <UpsertLevelPage/>
+                            },
+                            // ACTION PAGES
+                            {
+                                path: "actions",
+                                element: <ActionListPage/>
+                            },
+                            {
+                                path: "actions/upsert/:actionName",
+                                element: <ActionUpsertPage/>
+                            },
+                            {
+                                path: "actions/upsert",
+                                element: <ActionUpsertPage/>
+                            },
+                            // POINT CONCEPTS
+                            {
+                                path: "points",
+                                element: <PointConceptListPage/>
+                            },
+                            {
+                                path: "points/:pcId",
+                                element: <PointConceptDetailsPage/>
+                            },
+                            {
+                                path: "points/upsert",
+                                element: <PointConceptUpsertPage/>
+                            },
+                            {
+                                path: "points/upsert/:pcId",
+                                element: <PointConceptUpsertPage/>
                             }
                         ]
                     }

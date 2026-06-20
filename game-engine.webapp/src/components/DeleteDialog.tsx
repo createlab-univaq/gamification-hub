@@ -32,10 +32,10 @@ export function DeleteDialog({deleteFn, message, element, setElement}: DeleteDia
             alignItems: "center",
             justifyContent: "center"
         }}>
-            <Typography variant={"h4"}>Are you sure?</Typography>
+            <Typography variant={"h4"}>Sei sicuro?</Typography>
             <Typography variant={"body1"}>{message}</Typography>
             <ButtonGroup direction={"row"} sx={{justifyContent: "space-between"}}>
-                <Button color={"error"} variant={"contained"} onClick={deleteFn}>Confirm</Button>
+                <Button color={"error"} variant={"contained"} onClick={deleteFn}>Conferma</Button>
             </ButtonGroup>
         </Stack>
     </Dialog>

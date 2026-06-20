@@ -4,7 +4,6 @@ import {gameClient} from "../../api";
 import {GameForm} from "../../components/form/GameForm.tsx";
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {Stack} from "@mui/material";

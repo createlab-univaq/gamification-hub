@@ -15,7 +15,7 @@ interface NavigateOption extends Omit<RouterNavigateOptions, "state"> {
 }
 
 
-export function navigateTo(url: string | URL, option: NavigateOption) {
+export function navigateTo(url: string | URL, option?: NavigateOption) {
     router.navigate(url, option)
 }
 

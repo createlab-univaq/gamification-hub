@@ -1,10 +1,10 @@
 export type GetFilter<T> = {
-    name: keyof T,
-    value: keyof typeof T
+    name: keyof T & string,
+    value: string
 }
 
-export function buildSearchParams<T>(filters: GetFilter<T>[]) {
-    if(!filters) {
+export function buildSearchParams<T>(filters?: GetFilter<T>[]) {
+    if (!filters) {
         return ""
     }
     const params = new URLSearchParams()

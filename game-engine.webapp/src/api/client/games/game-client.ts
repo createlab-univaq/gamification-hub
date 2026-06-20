@@ -1,7 +1,6 @@
 import {BaseApiClient} from "../base-client.ts";
 import type {GameDto, ImportGameDto, RuleImpactDto} from "../../types";
-import type {GetFilter} from "../../types/filters.ts";
-import {buildSearchParams} from "../../filters/filters.ts";
+import {buildSearchParams, type GetFilter} from "../../filters/filters.ts";
 
 export class GameClient {
 
