@@ -4,7 +4,7 @@ import {useGame} from "../../components/GameContext.tsx";
 import type {GridSize} from "@mui/material";
 import {Grid, Stack, Typography} from "@mui/material";
 import {LinkCard} from "../../components/LinkCard.tsx";
-import {Delete, Edit, PlayArrow} from "@mui/icons-material";
+import {Delete, Download, Edit, PlayArrow} from "@mui/icons-material";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useMutation} from "@tanstack/react-query";
 import {gameClient} from "../../api";
@@ -12,6 +12,7 @@ import {getApiError, translateApiErrorToNotification} from "../../utils/error-ut
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
 import {GAME_STORAGE_KEY} from "../../utils/storage-utils.ts";
+import {downloadJson} from "../../utils/download-utils.ts";
 import {useState} from "react";
 import type {GameDto} from "../../api/types";
 import {getCurrentUser} from "../../utils/auth-utils.ts";
@@ -38,6 +39,22 @@ export function GamePage() {
     const user = getCurrentUser()
     const {setNotification} = useNotificationContext()
     const [deleteElement, setDeleteElement] = useState<GameDto>()
+
+    const {mutate: exportGame, isPending: isExporting} = useMutation({
+        mutationKey: ["export-game", game.id],
+        mutationFn: () => gameClient.exportGame(game.id),
+        onSuccess: (data) => {
+            downloadJson(`${game.name ?? game.id}.json`, [data])
+        },
+        onError: (error) => {
+            console.error(error)
+            const apiError = getApiError(error)
+            setNotification({
+                notification: translateApiErrorToNotification(apiError),
+                isSnack: true
+            })
+        }
+    })
 
     const {mutate} = useMutation({
         mutationKey: ["delete-game"],
@@ -83,6 +100,13 @@ export function GamePage() {
                     children: "Update",
                     href: `/upsert-game/${game.id}`,
                     variant: "contained"
+                },
+                {
+                    endIcon: <Download/>,
+                    children: "Esporta",
+                    variant: "outlined",
+                    loading: isExporting,
+                    onClick: () => exportGame()
                 },
                 {
                     endIcon: <Delete/>,

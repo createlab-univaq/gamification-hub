@@ -16,10 +16,10 @@
 
 package eu.trentorise.game.repo;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface NotificationRepo extends CrudRepository<NotificationPersistence, String>, ExtendedNotificationRepo {
+public interface NotificationRepo extends MongoRepository<NotificationPersistence, String>, ExtendedNotificationRepo {
 
 }

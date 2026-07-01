@@ -16,17 +16,18 @@
 
 package eu.trentorise.game.repo;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PlayerRepo extends
-		PagingAndSortingRepository<StatePersistence, String>, ExtendPlayerRepo {
+		MongoRepository<StatePersistence, String>, ExtendPlayerRepo {
 
 	public List<StatePersistence> findByGameId(String gameId);
 
@@ -55,5 +56,9 @@ public interface PlayerRepo extends
 	@Query("{'gameId':?0, 'metadata.team-members':?1}")
 	public List<StatePersistence> findTeamByMemberId(String gameId,
 			String memberId);
+
+	@Query(value = "{'gameId':?0, 'playerId':{$in:?1}}", fields = "{'playerId':1}")
+	public List<StatePersistence> findByGameIdAndPlayerIdIn(String gameId,
+			Collection<String> playerIds);
 
 }

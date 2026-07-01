@@ -1,7 +1,14 @@
 import Cookies from "js-cookie";
 import type {LoginRequestDto, UserDto} from "../../types";
 import type {BaseApiClient} from "../base-client.ts";
-import {TOKEN_KEY, USER_KEY} from "../../../utils/storage-utils.ts";
+import {USER_KEY} from "../../../utils/storage-utils.ts";
+
+const USER_COOKIE_OPTIONS = {
+    path: "/",
+    expires: 1,
+    sameSite: "strict",
+    secure: true,
+} as const
 
 export class AuthClient {
 
@@ -12,27 +19,20 @@ export class AuthClient {
     }
 
     public async login(request: LoginRequestDto) {
-        const response = await this.baseClient.post<{ token: string }>(`/auth`, request, false)
-        const token = response.token
-        Cookies.set(TOKEN_KEY, token, {
-            path: "/",
-            expires: 1,
-            sameSite: "strict",
-            secure: true,
-        })
-        await this.loadAuthUser()
-        return Promise.resolve()
+        const user = await this.baseClient.post<UserDto>(`/auth`, request)
+        Cookies.set(USER_KEY, JSON.stringify(user), USER_COOKIE_OPTIONS)
+        return user
     }
 
     public async loadAuthUser() {
-        const userResponse = await this.baseClient.get<UserDto>(`/auth/user`)
-        Cookies.set(USER_KEY, JSON.stringify(userResponse), {
-            path: "/",
-            expires: 1,
-            sameSite: "strict",
-            secure: true,
-        })
-        return userResponse
+        const user = await this.baseClient.get<UserDto>(`/auth/user`)
+        Cookies.set(USER_KEY, JSON.stringify(user), USER_COOKIE_OPTIONS)
+        return user
+    }
+
+    public async logout() {
+        await this.baseClient.post(`/auth/logout`, {})
+        Cookies.remove(USER_KEY, {path: "/"})
     }
 
 }

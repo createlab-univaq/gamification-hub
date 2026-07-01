@@ -1,7 +1,5 @@
 package it.smartcommunitylab.gamification.gameengineapi.model.dto;
 
-import eu.trentorise.game.model.Level;
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -14,6 +12,6 @@ public class LevelDTO {
 
     private String pointConceptName;
 
-    private List<Level.Threshold> thresholds = new ArrayList<>();
+    private List<ThresholdDTO> thresholds = new ArrayList<>();
 
 }

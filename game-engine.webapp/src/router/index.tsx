@@ -14,6 +14,14 @@ import {RuleUpsertPage} from "../pages/rules/upsert.tsx";
 import {TestPage} from "../pages/TestPage.tsx";
 import {BlocklyRuleUpsertPage} from "../pages/rules/upsert-blockly.tsx";
 import {SimulationPage} from "../pages/simulation/page.tsx";
+import {ScenarioListPage} from "../pages/scenarios/list.tsx";
+import {ChallengeListPage} from "../pages/challenges/list.tsx";
+import {ChallengeUpsertPage} from "../pages/challenges/upsert.tsx";
+import {TeamListPage} from "../pages/teams/list.tsx";
+import {TeamUpsertPage} from "../pages/teams/upsert.tsx";
+import {BadgeListPage} from "../pages/badges/list.tsx";
+import {BadgeUpsertPage} from "../pages/badges/upsert.tsx";
+import {BadgeDetailsPage} from "../pages/badges/details.tsx";
 import {ImpactAnalysisPage} from "../pages/rules/impact-analysis.tsx";
 import {LevelListPage} from "../pages/levels/list.tsx";
 import {UpsertLevelPage} from "../pages/levels/upsert.tsx";
@@ -22,6 +30,9 @@ import {ActionUpsertPage} from "../pages/actions/upsert.tsx";
 import {PointConceptListPage} from "../pages/point-concept/list.tsx";
 import {PointConceptUpsertPage} from "../pages/point-concept/upsert.tsx";
 import {PointConceptDetailsPage} from "../pages/point-concept/details.tsx";
+import {PlayerListPage} from "../pages/players/list.tsx";
+import {PlayerUpsertPage} from "../pages/players/upsert.tsx";
+import {PlayerDetailsPage} from "../pages/players/details.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -104,9 +115,65 @@ export const router = createBrowserRouter([
                                 path: "simulate",
                                 element: <SimulationPage/>
                             },
+                            // SCENARIOS (the simulation page is the scenario upsert)
+                            {
+                                path: "scenarios",
+                                element: <ScenarioListPage/>
+                            },
+                            {
+                                path: "scenarios/upsert",
+                                element: <SimulationPage/>
+                            },
+                            {
+                                path: "scenarios/upsert/:scenarioId",
+                                element: <SimulationPage/>
+                            },
                             {
                                 path: "impact-analysis",
                                 element: <ImpactAnalysisPage/>
+                            },
+                            // BADGES
+                            {
+                                path: "badges",
+                                element: <BadgeListPage/>
+                            },
+                            {
+                                path: "badges/upsert",
+                                element: <BadgeUpsertPage/>
+                            },
+                            {
+                                path: "badges/upsert/:badgeId",
+                                element: <BadgeUpsertPage/>
+                            },
+                            {
+                                path: "badges/:badgeId",
+                                element: <BadgeDetailsPage/>
+                            },
+                            // TEAMS
+                            {
+                                path: "teams",
+                                element: <TeamListPage/>
+                            },
+                            {
+                                path: "teams/upsert",
+                                element: <TeamUpsertPage/>
+                            },
+                            {
+                                path: "teams/upsert/:teamId",
+                                element: <TeamUpsertPage/>
+                            },
+                            // CHALLENGE MODELS
+                            {
+                                path: "challenges",
+                                element: <ChallengeListPage/>
+                            },
+                            {
+                                path: "challenges/upsert",
+                                element: <ChallengeUpsertPage/>
+                            },
+                            {
+                                path: "challenges/upsert/:challengeId",
+                                element: <ChallengeUpsertPage/>
                             },
                             // LEVEL PAGES
                             {
@@ -150,7 +217,20 @@ export const router = createBrowserRouter([
                             {
                                 path: "points/upsert/:pcId",
                                 element: <PointConceptUpsertPage/>
-                            }
+                            },
+                            // PLAYERS
+                            {
+                                path: "players",
+                                element: <PlayerListPage/>
+                            },
+                            {
+                                path: "players/upsert",
+                                element: <PlayerUpsertPage/>
+                            },
+                            {
+                                path: "players/:playerId",
+                                element: <PlayerDetailsPage/>
+                            },
                         ]
                     }
                 ]

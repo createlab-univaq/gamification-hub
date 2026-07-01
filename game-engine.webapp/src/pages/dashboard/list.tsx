@@ -1,22 +1,28 @@
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
-import {Button, Stack, Typography} from "@mui/material";
+import {Stack, Typography} from "@mui/material";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {gameClient, queryClient} from "../../api";
-import {Add, Delete, Edit, Upload} from "@mui/icons-material"
+import {Add, Download, Upload} from "@mui/icons-material"
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useState} from "react";
 import type {GameDto} from "../../api/types";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
-import {LinkCard} from "../../components/LinkCard.tsx";
 import {Loading} from "../../components/Loading.tsx";
 import {ImportGameModal} from "../../components/ImportGameModal.tsx";
+import {PageList} from "../../components/PageList.tsx";
+import {useDebounced} from "../../hooks/use-debounced.ts";
+import {navigateTo} from "../../utils/navigation-utils.ts";
+import {downloadJson} from "../../utils/download-utils.ts";
 
 export function GamesListPage() {
 
     const {setNotification} = useNotificationContext()
     const [importModalOpen, setImportModalOpen] = useState(false)
+    const [deleteGame, setDeleteGame] = useState<GameDto>()
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+    const [search, setSearch] = useState<string>("")
 
     const {isPending, data} = useQuery({
         queryKey: ["get-list"],
@@ -48,12 +54,39 @@ export function GamesListPage() {
         }
     })
 
-    const [deleteGame, setDeleteGame] = useState<GameDto>()
+    const {mutate: exportSelected, isPending: isExporting} = useMutation({
+        mutationKey: ["export-games"],
+        mutationFn: (ids: string[]) => gameClient.exportGames(ids),
+        onSuccess: (games) => {
+            downloadJson("games-export.json", games)
+            setSelectedIds(new Set())
+        },
+        onError: (error) => {
+            console.error(error)
+            const apiError = getApiError(error)
+            setNotification({
+                notification: translateApiErrorToNotification(apiError),
+                isSnack: true
+            })
+        }
+    })
+
+    const toggleSelect = (game: GameDto) => setSelectedIds(prev => {
+        const next = new Set(prev)
+        if (next.has(game.id)) next.delete(game.id)
+        else next.add(game.id)
+        return next
+    })
+
+    const filter = useDebounced((value: string = "") => {
+        setSearch(value)
+    }, 200)
 
     if (isPending) {
         return <Loading fullScreen={true}/>
     }
 
+    const games = (data ?? []).filter(g => (g.name ?? "").toLowerCase().includes(search.toLowerCase()))
 
     return <PageContainer>
         <PageHeader title={"Your games"}
@@ -68,7 +101,15 @@ export function GamesListPage() {
                             children: "Import",
                             variant: "contained",
                             endIcon: <Upload/>,
-                            onClick:()=>setImportModalOpen(true)
+                            onClick: () => setImportModalOpen(true)
+                        },
+                        {
+                            children: `Esporta selezionati (${selectedIds.size})`,
+                            variant: "outlined",
+                            endIcon: <Download/>,
+                            disabled: selectedIds.size === 0 || isExporting,
+                            loading: isExporting,
+                            onClick: () => exportSelected([...selectedIds])
                         }
                     ]}
         />
@@ -80,42 +121,49 @@ export function GamesListPage() {
         <ImportGameModal
             open={importModalOpen}
             setOpen={setImportModalOpen}
-            onSuccess={(data)=>{
+            onSuccess={(data) => {
                 setNotification({
-                    notification:{
-                        title:"Import successful!",
-                        content:`${data.length} were successfully saved.`,
-                        type:"success"
+                    notification: {
+                        title: "Import successful!",
+                        content: `${data.length} were successfully saved.`,
+                        type: "success"
                     },
-                    isSnack:true
+                    isSnack: true
                 })
                 queryClient.invalidateQueries({queryKey: ["get-list"]})
             }}
-            onError={(error)=>setNotification(translateApiErrorToNotification(getApiError(error)))}
+            onError={(error) => setNotification(translateApiErrorToNotification(getApiError(error)))}
         />
-        {!data || !data.length && <Typography>No games found.</Typography>}
-        {data && <Stack sx={{gap: 2, mt: 2}}>
-            {data.map((game) => {
-                return <LinkCard key={`game-card-${game.id}`} href={`/games/${game.id}`}>
-                    <Stack direction={"row"} sx={{justifyContent: "space-between"}}>
-                        <Stack>
-                            <Typography variant={"h5"}>{game.name}</Typography>
-                            <Typography variant={"body1"}>{game.domain}</Typography>
-                        </Stack>
-                        <Stack direction={"row"}>
-                            <Button href={`/upsert-game/${game.id}`}><Edit sx={{fontSize: "2rem"}}/></Button>
-                            <Button color={"error"} onClick={(event) => {
-                                event.stopPropagation()
-                                event.preventDefault()
-                                setDeleteGame(game)
-                            }}><Delete
-                                sx={{fontSize: "2rem", color: (theme) => theme.palette.error.main}}/></Button>
-                        </Stack>
-                    </Stack>
-                </LinkCard>
-            })}
-        </Stack>
-        }
+        <PageList
+            items={games}
+            itemHref={(game) => `/games/${game.id}`}
+            renderItem={(game) => {
+                return <Stack>
+                    <Typography variant={"h5"}>{game.name}</Typography>
+                    <Typography variant={"body1"}>{game.domain}</Typography>
+                </Stack>
+            }}
+            onItemUpdate={(game, event) => {
+                event.stopPropagation()
+                event.preventDefault()
+                navigateTo(`/upsert-game/${game.id}`)
+            }}
+            onItemDelete={(game) => {
+                setDeleteGame(game)
+            }}
+            selection={{
+                isSelected: (game) => selectedIds.has(game.id),
+                onToggle: toggleSelect
+            }}
+            emptyListMessage={<Typography>No games found.</Typography>}
+            search={{
+                label: "Cerca",
+                placeholder: "Nome...",
+                onSearch: (value) => {
+                    filter(value)
+                }
+            }}
+        />
     </PageContainer>
 
 }

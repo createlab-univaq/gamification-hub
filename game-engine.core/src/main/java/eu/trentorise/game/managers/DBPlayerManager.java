@@ -34,15 +34,13 @@ import org.perf4j.log4j.Log4JStopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -100,7 +98,7 @@ public class DBPlayerManager implements PlayerService {
     private MongoTemplate mongoTemplate;
 
     @Autowired
-    private GameService gameSrv;
+    private GameManager gameSrv;
 
     @Autowired
 	private ChallengeConceptRepo challengeConceptRepo;
@@ -1072,8 +1070,8 @@ public class DBPlayerManager implements PlayerService {
                     .format("state for player %s in game %s doesn't exist", playerId, gameId));
         }
     }
-    
-	private Map<String, Map<String, GenericObjectPersistence>> persistChallengeConcept(
+
+    private Map<String, Map<String, GenericObjectPersistence>> persistChallengeConcept(
 			Map<String, Map<String, GenericObjectPersistence>> concepts, String gameId, String playerId) {
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Map<String, GenericObjectPersistence>> challengeConcepts = concepts.entrySet().stream()

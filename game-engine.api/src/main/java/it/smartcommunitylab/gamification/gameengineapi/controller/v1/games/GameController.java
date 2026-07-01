@@ -82,6 +82,19 @@ public class GameController extends BaseGameController {
         return ResponseEntity.ok(importService.importGames(games));
     }
 
+    @GetMapping("/{gameId}/export")
+    @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
+    public ResponseEntity<ImportGameDTO> exportGame(@PathVariable String gameId) {
+        log.info("Export game={}", gameId);
+        return ResponseEntity.ok(importService.exportGame(gameId));
+    }
+
+    @PostMapping("/export")
+    public ResponseEntity<List<ImportGameDTO>> exportGames(@RequestBody List<String> ids) {
+        log.info("Export {} games", ids.size());
+        return ResponseEntity.ok(importService.exportGames(ids));
+    }
+
     @GetMapping("/{gameId}")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     public ResponseEntity<GameDTO> getGame(@PathVariable String gameId) {

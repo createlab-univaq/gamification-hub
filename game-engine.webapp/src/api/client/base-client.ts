@@ -1,7 +1,3 @@
-import Cookies from "js-cookie";
-import {TOKEN_KEY} from "../../utils/storage-utils.ts";
-
-
 interface BaseApiClientProps {
     baseUrl: string
 }
@@ -14,18 +10,14 @@ export class BaseApiClient {
         this.baseUrl = baseUrl
     }
 
-    private getHeaders(authenticated = true) {
+    private getHeaders() {
         const headers = new Headers()
-        if (authenticated) {
-            const token = Cookies.get(TOKEN_KEY)
-            headers.set("Authorization", `Bearer ${token}`)
-        }
         headers.set("Content-Type", "application/json")
         return headers
     }
 
     private async sendRequest(url: RequestInfo | URL, options?: RequestInit) {
-        const result = await fetch(url, options)
+        const result = await fetch(url, {credentials: "include", ...options})
         try {
             if (result.status === 204) {
                 return Promise.resolve()
@@ -42,45 +34,39 @@ export class BaseApiClient {
         }
     }
 
-    public async get<T>(resource: string, authenticated = true): Promise<T> {
-        const headers = this.getHeaders(authenticated)
-        return this.sendRequest(`${this.baseUrl}${resource}`, {headers})
+    public async get<T>(resource: string): Promise<T> {
+        return this.sendRequest(`${this.baseUrl}${resource}`, {headers: this.getHeaders()})
     }
 
-    public async post<T>(resource: string, body: object, authenticated = true): Promise<T> {
-        const headers = this.getHeaders(authenticated)
+    public async post<T>(resource: string, body: object): Promise<T> {
         return this.sendRequest(`${this.baseUrl}${resource}`, {
-            headers,
+            headers: this.getHeaders(),
             method: "POST",
             body: JSON.stringify(body)
         })
     }
 
-    public async put<T>(resource: string, body: object, authenticated = true): Promise<T> {
-        const headers = this.getHeaders(authenticated)
+    public async put<T>(resource: string, body: object): Promise<T> {
         return this.sendRequest(`${this.baseUrl}${resource}`, {
-            headers,
+            headers: this.getHeaders(),
             method: "PUT",
             body: JSON.stringify(body)
         })
     }
 
-    public async patch<T>(resource: string, body: object, authenticated = true): Promise<T> {
-        const headers = this.getHeaders(authenticated)
+    public async patch<T>(resource: string, body: object): Promise<T> {
         return this.sendRequest(`${this.baseUrl}${resource}`, {
-            headers,
+            headers: this.getHeaders(),
             method: "PATCH",
             body: JSON.stringify(body)
         })
     }
 
-    public async delete<T>(resource: string, authenticated = true): Promise<T> {
-        const headers = this.getHeaders(authenticated)
+    public async delete<T>(resource: string): Promise<T> {
         return this.sendRequest(`${this.baseUrl}${resource}`, {
-            headers,
+            headers: this.getHeaders(),
             method: "DELETE"
         })
     }
-
 
 }

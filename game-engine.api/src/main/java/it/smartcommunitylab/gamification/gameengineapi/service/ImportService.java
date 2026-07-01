@@ -9,4 +9,8 @@ public interface ImportService {
 
     List<GamePersistanceDTO> importGames(List<ImportGameDTO> games);
 
+    ImportGameDTO exportGame(String gameId);
+
+    List<ImportGameDTO> exportGames(List<String> gameIds);
+
 }

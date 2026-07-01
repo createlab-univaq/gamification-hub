@@ -27,6 +27,8 @@ export function PageContainer({children}: PropsWithChildren) {
     return <Stack sx={{
         width: "100%",
         padding: 2,
+        flex: 1,
+        minHeight: 0,
         overflow: "auto",
     }}
     >

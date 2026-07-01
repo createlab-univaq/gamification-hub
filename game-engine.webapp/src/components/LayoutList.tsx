@@ -1,9 +1,14 @@
-import {Button, Divider, Stack} from "@mui/material";
+import {Box, Button, Checkbox, Divider, Stack} from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import type {ReactElement} from "react";
 import {LinkCard} from "./LinkCard.tsx";
 
 type LayoutType = "grid" | "list"
+
+export interface ListSelection<T> {
+    isSelected: (i: T) => boolean
+    onToggle: (i: T) => void
+}
 
 export interface LayoutListProps<T> {
     items: T[],
@@ -13,23 +18,34 @@ export interface LayoutListProps<T> {
     onItemDelete?: (i: T, event: Event) => void
     renderItem: (i: T) => ReactElement,
     emptyListMessage?:ReactElement
+    selection?: ListSelection<T>
 }
 
-export function LayoutList<T>({layout, items, onItemDelete, renderItem, itemHref, onItemUpdate, emptyListMessage}: LayoutListProps<T>) {
+export function LayoutList<T>({layout, items, onItemDelete, renderItem, itemHref, onItemUpdate, emptyListMessage, selection}: LayoutListProps<T>) {
 
     const hasUpdateButton = !!onItemUpdate
     const hasDeleteButton = !!onItemDelete
     const hasButtons = hasUpdateButton || hasDeleteButton
     const hasEmptyListMessage = !!emptyListMessage
 
-    return <Stack sx={{gap: 2, py: 2}} direction={layout === "list" ? "column" : "row"}>
+    return <Box sx={{
+        display: layout === "list" ? "flex" : "grid",
+        flexDirection: "column",
+        gridTemplateColumns: layout === "grid"
+            ? {xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)"}
+            : undefined,
+        alignItems: "stretch",
+        gap: 2,
+        py: 2
+    }}>
         {items.map((item, i) => {
             const itemElement = renderItem(item)
             return <LinkCard
                 key={`list-item-${i}`}
                 href={itemHref(item)}
                 sx={{
-                    width: layout === "list" ? "100%" : "fit-content"
+                    width: "100%",
+                    height: "100%"
                 }}
             >
                 <Stack
@@ -40,7 +56,19 @@ export function LayoutList<T>({layout, items, onItemDelete, renderItem, itemHref
                         justifyContent: layout === "list" ? "space-between" : "center",
                     }}
                 >
-                    {itemElement}
+                    <Stack direction={"row"} sx={{alignItems: "center", gap: 1}}>
+                        {selection &&
+                            <Checkbox
+                                checked={selection.isSelected(item)}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    selection.onToggle(item)
+                                }}
+                            />
+                        }
+                        {itemElement}
+                    </Stack>
                     {hasButtons &&
                         <Stack
                             direction={"row"}
@@ -76,6 +104,6 @@ export function LayoutList<T>({layout, items, onItemDelete, renderItem, itemHref
             </LinkCard>
         })}
         {(hasEmptyListMessage && !items.length) && emptyListMessage}
-    </Stack>
+    </Box>
 
 }

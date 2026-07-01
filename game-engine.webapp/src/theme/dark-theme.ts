@@ -1,5 +1,5 @@
 import {alpha, createTheme} from "@mui/material/styles";
-import {commonShape, commonTypography} from "./common";
+import {commonComponents, commonShape, commonTypography} from "./common";
 
 export const darkTheme = createTheme({
     palette: {
@@ -41,6 +41,7 @@ export const darkTheme = createTheme({
     typography: commonTypography,
     shape: commonShape,
     components: {
+        ...commonComponents,
         MuiAppBar: {
             styleOverrides: {
                 root: {

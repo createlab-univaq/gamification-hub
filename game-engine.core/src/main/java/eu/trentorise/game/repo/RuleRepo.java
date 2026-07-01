@@ -16,13 +16,13 @@
 
 package eu.trentorise.game.repo;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import eu.trentorise.game.model.core.DBRule;
 
 @Repository
-public interface RuleRepo extends CrudRepository<DBRule, String> {
+public interface RuleRepo extends MongoRepository<DBRule, String> {
 
 	public DBRule findByGameIdAndName(String gameId, String name);
 

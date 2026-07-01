@@ -16,12 +16,12 @@ package eu.trentorise.game.repo;
 
 import java.util.List;
 
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface GameRepo extends CrudRepository<GamePersistence, String> {
+public interface GameRepo extends MongoRepository<GamePersistence, String> {
 
     public GamePersistence findByActions(String action);
 

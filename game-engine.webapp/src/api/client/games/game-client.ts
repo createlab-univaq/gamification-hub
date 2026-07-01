@@ -26,6 +26,14 @@ export class GameClient {
         return await this.baseClient.post("/games/import", games)
     }
 
+    public async exportGame(gameId: string) {
+        return await this.baseClient.get<ImportGameDto>(`/games/${gameId}/export`)
+    }
+
+    public async exportGames(ids: string[]) {
+        return await this.baseClient.post<ImportGameDto[]>(`/games/export`, ids)
+    }
+
     public async updateGame(gameId: string, game: GameDto) {
         return await this.baseClient.put<GameDto>(`/games/${gameId}`, game)
     }

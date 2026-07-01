@@ -8,7 +8,10 @@ import {
     MilitaryTech,
     Monitor,
     PlayArrow,
-    Rule
+    Rule,
+    Groups,
+    Diversity3,
+    Science
 } from "@mui/icons-material"
 
 interface SidebarItem {
@@ -46,6 +49,18 @@ const gameItems = [
         relative: true
     },
     {
+        title: "Giocatori",
+        icon: Groups,
+        href: "/players",
+        relative: true
+    },
+    {
+        title: "Squadre",
+        icon: Diversity3,
+        href: "/teams",
+        relative: true
+    },
+    {
         title: "Attività",
         icon: Checklist,
         href: "/tasks",
@@ -64,7 +79,14 @@ const gameItems = [
         relative: true
     },
     {
+        title: "Scenari",
+        href: "/scenarios",
+        icon: Science,
+        relative: true
+    },
+    {
         title: "Sfide",
+        href: "/challenges",
         icon: FormatListNumbered,
         relative: true
     },

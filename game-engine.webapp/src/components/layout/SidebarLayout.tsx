@@ -1,17 +1,8 @@
-import {
-    createContext,
-    Dispatch,
-    PropsWithChildren,
-    SetStateAction,
-    useContext,
-    useEffect,
-    useMemo,
-    useState
-} from "react";
+import {createContext, Dispatch, PropsWithChildren, SetStateAction, useContext, useMemo, useState} from "react";
 import {Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, Toolbar, Typography} from "@mui/material";
 import {useWindowSize} from "../../hooks/use-window-size.ts";
 import {getSidebarItems} from "./sidebarItems.ts";
-import {href, useLocation} from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import {SIDEBAR_OPEN_KEY} from "../../utils/storage-utils.ts";
 import {getBaseGamePath} from "../../utils/navigation-utils.ts";
 
@@ -59,7 +50,7 @@ export function SidebarLayout() {
         if (isOpen) {
             return "15%"
         }
-        return "5%"
+        return "4rem"
     }, [isOpen, width])
 
     return <Drawer
@@ -87,19 +78,19 @@ export function SidebarLayout() {
                     const Icon = item.icon
                     const isSelected = location.pathname.endsWith(item.href?.replace(".", ""))
                     const basePath = getBaseGamePath()
-                    const itemHref = item.relative ? basePath+item.href : item.href
+                    const itemHref = item.relative ? basePath + item.href : item.href
                     return <ListItem key={`sidebar-item-${item.title}`}
                                      title={item.title}
                                      sx={{
                                          backgroundColor: (theme) => isSelected ? theme.palette.background.default : theme.palette.background.paper,
-                                         "&:hover":{
+                                         "&:hover": {
                                              backgroundColor: (theme) => theme.palette.background.default
                                          }
                                      }}
                     >
                         <ListItemButton href={itemHref} sx={{margin: 0, padding: 0}}>
                             <ListItemIcon>
-                                <Icon color={isSelected ? "primary" : "background.paper"} sx={{fontSize:"2rem"}}/>
+                                <Icon color={isSelected ? "primary" : "background.paper"} sx={{fontSize: "2rem"}}/>
                             </ListItemIcon>
                             <Typography hidden={!isOpen}
                                         sx={{fontWeight: isSelected ? "bold" : "normal"}}>{item.title}</Typography>

@@ -1,6 +1,6 @@
 import type {LayoutListProps} from "./LayoutList.tsx";
 import {LayoutList} from "./LayoutList.tsx";
-import {Divider, IconButton, Stack, TextField} from "@mui/material";
+import {Box, Divider, IconButton, Stack, TextField} from "@mui/material";
 import {GridOn, List} from "@mui/icons-material";
 import {useState} from "react";
 
@@ -18,7 +18,7 @@ export function PageList<T>({search, ...props}: PageListProps<T>) {
 
     const [layout, setLayout] = useState("list")
 
-    return <Stack sx={{py:2}}>
+    return <Stack sx={{py:2, flex: 1, minHeight: 0}}>
         <Stack
             direction={"row"}
             sx={{
@@ -63,6 +63,8 @@ export function PageList<T>({search, ...props}: PageListProps<T>) {
                 </IconButton>
             </Stack>
         </Stack>
-        <LayoutList {...props} layout={layout}/>
+        <Box sx={{flex: 1, minHeight: 0, overflow: "auto"}}>
+            <LayoutList {...props} layout={layout}/>
+        </Box>
     </Stack>
 }

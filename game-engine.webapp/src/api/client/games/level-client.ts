@@ -18,7 +18,7 @@ export class LevelClient {
         return await this.baseClient.get<LevelDto>(`/games/${gameId}/levels/${levelName}`)
     }
 
-    public async upsertLevel(gameId, level: Omit<LevelDto>) {
+    public async upsertLevel(gameId: string, level: LevelDto) {
         return await this.baseClient.post<LevelDto>(`/games/${gameId}/levels`, level)
     }
 

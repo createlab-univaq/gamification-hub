@@ -101,7 +101,6 @@ export function LevelForm({level, gameId}: LevelFormProps) {
     }
 
     function handleSubmit(formValues: FieldValues) {
-        console.log(formValues)
         mutate({
             gameId: gameId,
             lvl: formValues

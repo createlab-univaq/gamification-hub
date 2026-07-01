@@ -9,7 +9,7 @@ export class SimulationClient {
     }
 
     public async simulate(request: SimulationRequestDto): Promise<SimulationResultDto> {
-        return await this.client.post<SimulationResultDto>('/simulate', request);
+        return await this.client.post<SimulationResultDto>('/executions/simulations', request);
     }
 
 }

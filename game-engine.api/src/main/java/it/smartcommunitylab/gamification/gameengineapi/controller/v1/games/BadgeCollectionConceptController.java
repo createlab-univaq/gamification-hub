@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -67,8 +68,34 @@ public class BadgeCollectionConceptController extends BaseGameController {
         }
         Game game = findGameByIdOrThrow(gameId);
         BadgeCollectionConcept badge = badgeCollectionMapper.toEntity(dto);
+        badge.setId(UUID.randomUUID().toString().replaceAll("-", "").strip());
         gameService.addConceptInstance(game.getId(), badge);
         return ResponseEntity.status(HttpStatus.CREATED).body(badgeCollectionMapper.toDTO(badge));
+    }
+
+    @PutMapping("/{collectionId}")
+    public ResponseEntity<BadgeCollectionDTO> updateBadgeCollection(
+            @PathVariable String gameId, @PathVariable String collectionId, @RequestBody BadgeCollectionDTO dto) {
+        log.info("Update badge collection={} of game={}", collectionId, gameId);
+        Game game = findGameByIdOrThrow(gameId);
+        Set<GameConcept> concepts = gameService.readConceptInstances(game.getId());
+        BadgeCollectionConcept badge = concepts.stream()
+                .filter(gc -> gc instanceof BadgeCollectionConcept && collectionId.equals(gc.getId()))
+                .map(gc -> (BadgeCollectionConcept) gc)
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("BadgeCollectionConcept", collectionId));
+
+        dto.setId(collectionId);
+        badgeCollectionMapper.updateEntity(badge, dto);
+
+        Set<GameConcept> filteredConcepts = concepts.stream()
+                .filter(gc -> !collectionId.equals(gc.getId()))
+                .collect(Collectors.toSet());
+        filteredConcepts.add(badge);
+        game.setConcepts(filteredConcepts);
+        gameService.saveGameDefinition(game);
+
+        return ResponseEntity.ok(badgeCollectionMapper.toDTO(badge));
     }
 
     @DeleteMapping("/{collectionId}")

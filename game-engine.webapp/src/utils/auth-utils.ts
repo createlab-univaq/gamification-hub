@@ -1,9 +1,10 @@
 import Cookies from "js-cookie";
 import type {User} from "../api/types/types.ts";
-import {TOKEN_KEY, USER_KEY} from "./storage-utils.ts";
+import {USER_KEY} from "./storage-utils.ts";
+import {authClient} from "../api";
 
 export function isAuthenticated() {
-    return !!Cookies.get(TOKEN_KEY)
+    return !!Cookies.get(USER_KEY)
 }
 
 export function getCurrentUser() {
@@ -14,11 +15,12 @@ export function getCurrentUser() {
     return undefined
 }
 
-export function logout(){
-    Cookies.remove(TOKEN_KEY, {
-        path:"/"
-    })
-    Cookies.remove(USER_KEY, {
-        path:"/"
-    })
+export async function logout(){
+    try {
+        await authClient.logout()
+    } finally {
+        Cookies.remove(USER_KEY, {
+            path:"/"
+        })
+    }
 }

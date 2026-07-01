@@ -1,5 +1,6 @@
 package it.smartcommunitylab.gamification.gameengineapi.config;
 
+import it.smartcommunitylab.gamification.gameengineapi.config.security.CookieTokenResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,11 +38,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(getCors()))
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                .oauth2ResourceServer(oauth2 -> {
+                    oauth2.jwt(Customizer.withDefaults())
+                            .bearerTokenResolver(new CookieTokenResolver());
+                })
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/auth", "/api/v1/auth/logout").permitAll()
                                 .anyRequest().authenticated()
                 )
         ;
