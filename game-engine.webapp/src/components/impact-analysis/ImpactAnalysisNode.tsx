@@ -2,10 +2,12 @@ import type {NodeProps} from "@xyflow/react";
 import {Handle, Position} from "@xyflow/react";
 import {Chip, Divider, Stack, Typography} from "@mui/material";
 import type {RuleImpactDto} from "../../api/types";
+import {useTranslation} from "react-i18next";
 
 export function ImpactAnalysisNode({data, selected, width}: NodeProps) {
 
     const rule = data.rule as RuleImpactDto;
+    const [t] = useTranslation()
 
     return <>
         <Handle type="target" position={Position.Top} style={{opacity: 0}}/>
@@ -45,10 +47,10 @@ export function ImpactAnalysisNode({data, selected, width}: NodeProps) {
                 }}
             >
                 {!!rule.writes?.length && (
-                    <Chip label={`writes ${rule.writes.length}`} size="small" variant="outlined"/>
+                    <Chip label={`${t("rules.writes")} ${rule.writes.length}`} size="small" variant="outlined"/>
                 )}
                 {!!rule.reads?.length && (
-                    <Chip label={`reads ${rule.reads.length}`} size="small" variant="outlined"/>
+                    <Chip label={`${t("rules.reads")} ${rule.reads.length}`} size="small" variant="outlined"/>
                 )}
             </Stack>
         </Stack>

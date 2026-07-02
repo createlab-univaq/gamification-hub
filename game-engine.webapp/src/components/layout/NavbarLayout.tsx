@@ -6,12 +6,15 @@ import {PopoverButton} from "../PopoverButton.tsx";
 import {ThemeSwitch} from "../ThemeSwitch.tsx";
 import {useWindowSize} from "../../hooks/use-window-size.ts";
 import {useSidebarContext} from "./SidebarLayout.tsx";
+import {LanguageSelector} from "../LanguageSelector.tsx";
+import {useTranslation} from "react-i18next";
 
 export function NavbarLayout() {
 
     const user = getCurrentUser()
     const {width} = useWindowSize()
     const {setOpen, isOpen} = useSidebarContext()
+    const {t} = useTranslation()
 
     return <AppBar
         position="fixed"
@@ -28,6 +31,7 @@ export function NavbarLayout() {
                }}
         >
             <Stack direction={"row"}>
+                <LanguageSelector defaultLanguage={"en"}/>
                 <ThemeSwitch/>
                 <PopoverButton id={"account-popover"}
                                buttonLabel={<AccountCircle sx={{fontSize: "2.5rem", cursor: "pointer"}}/>}
@@ -46,7 +50,7 @@ export function NavbarLayout() {
                                    },
                                    children: <Stack sx={{zIndex: "10"}}>
                                        <Stack sx={{padding: "0.5rem"}}>
-                                           <Typography>Bentornato {user.username}</Typography>
+                                           <Typography>{t("welcome", {name:user.username})}</Typography>
                                        </Stack>
                                        <Stack divider={<Divider orientation={"horizontal"}/>}>
                                            <Button variant={"contained"}

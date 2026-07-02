@@ -5,6 +5,7 @@ import {getSidebarItems} from "./sidebarItems.ts";
 import {useLocation} from "react-router-dom";
 import {SIDEBAR_OPEN_KEY} from "../../utils/storage-utils.ts";
 import {getBaseGamePath} from "../../utils/navigation-utils.ts";
+import {useTranslation} from "react-i18next";
 
 interface SidebarContextProps {
     isOpen: boolean
@@ -39,6 +40,7 @@ export function SidebarLayout() {
     const {isOpen, setOpen} = useSidebarContext()
     const {width} = useWindowSize()
     const location = useLocation()
+    const {t} = useTranslation()
 
     const sidebarWidth = useMemo(() => {
         if (width < 800) {
@@ -80,7 +82,7 @@ export function SidebarLayout() {
                     const basePath = getBaseGamePath()
                     const itemHref = item.relative ? basePath + item.href : item.href
                     return <ListItem key={`sidebar-item-${item.title}`}
-                                     title={item.title}
+                                     title={t(item.title)}
                                      sx={{
                                          backgroundColor: (theme) => isSelected ? theme.palette.background.default : theme.palette.background.paper,
                                          "&:hover": {
@@ -93,7 +95,7 @@ export function SidebarLayout() {
                                 <Icon color={isSelected ? "primary" : "background.paper"} sx={{fontSize: "2rem"}}/>
                             </ListItemIcon>
                             <Typography hidden={!isOpen}
-                                        sx={{fontWeight: isSelected ? "bold" : "normal"}}>{item.title}</Typography>
+                                        sx={{fontWeight: isSelected ? "bold" : "normal"}}>{t(item.title)}</Typography>
                         </ListItemButton>
                     </ListItem>
                 })}

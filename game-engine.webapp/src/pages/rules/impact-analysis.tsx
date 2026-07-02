@@ -8,11 +8,13 @@ import {useNotificationContext} from "../../components/notification/Notification
 import {useEffect} from "react";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {Loading} from "../../components/Loading.tsx";
-import {Typography} from "@mui/material";
+import {Stack, Typography} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 export function ImpactAnalysisPage(){
 
     const {gameId} = useParams()
+    const [t] = useTranslation()
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["impact-analysis", gameId],
@@ -38,8 +40,10 @@ export function ImpactAnalysisPage(){
     }
 
     return <PageContainer>
-        <PageHeader title={"Analisi delle regole"} subTitle={<Typography>ATTENZIONE! Questa feature è attualmente in fase di sperimentazione.</Typography>}/>
-        <ImpactAnalysisGraph impactAnalysis={data}/>
+        <PageHeader title={t("impact_analysis.title")} subTitle={<Typography>{t("impact_analysis.subtitle_warning")}</Typography>}/>
+        <Stack sx={{my:3}}>
+            <ImpactAnalysisGraph impactAnalysis={data}/>
+        </Stack>
     </PageContainer>
 
 }

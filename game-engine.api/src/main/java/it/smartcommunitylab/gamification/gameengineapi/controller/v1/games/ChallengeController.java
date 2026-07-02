@@ -5,6 +5,7 @@ import eu.trentorise.game.model.Game;
 import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityCreationException;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
+import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ChallengeDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.ChallengeMapper;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
@@ -45,7 +46,7 @@ public class ChallengeController extends BaseGameController {
     public ResponseEntity<ChallengeDTO> addGameChallenge(@PathVariable final String gameId, @RequestBody @Valid ChallengeDTO challengeDTO) {
         log.info("Add new challenge={} to game={}", challengeDTO, gameId);
         if (!Objects.isNull(challengeDTO.getId())) {
-            throw new EntityCreationException("Challenge", "A new game challenge cannot already have an ID");
+            throw new EntityCreationException("Challenge", "A new game challenge cannot already have an ID", ErrorCodes.CHALLENGE_CREATION);
         }
         Game game = findGameByIdOrThrow(gameId);
         challengeDTO.setGameId(game.getId());
@@ -60,7 +61,7 @@ public class ChallengeController extends BaseGameController {
         ChallengeModel challengeModel = Objects.requireNonNullElseGet(
                 gameService.readChallengeModel(game.getId(), challengeId),
                 () -> {
-                    throw new EntityNotFoundException("Challenge", challengeId);
+                    throw new EntityNotFoundException("Challenge", challengeId, ErrorCodes.CHALLENGE_NOT_FOUND);
                 }
         );
         challengeDTO.setGameId(game.getId());

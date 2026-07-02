@@ -1,0 +1,16 @@
+{
+  "add": "Aggiungi",
+  "delete": "Elimina",
+  "update": "Modifica",
+  "sign_in": "Accedi",
+  "import": "Importa",
+  "export": "Esporta",
+  "confirm": "Conferma",
+  "simulate": "Simula",
+  "static_analysis": "Analisi statica",
+  "turn_back": "Torna indietro",
+  "save": "Salva",
+  "reset": "Ripristina",
+  "validate": "Valida",
+  "console": "Terminale"
+}

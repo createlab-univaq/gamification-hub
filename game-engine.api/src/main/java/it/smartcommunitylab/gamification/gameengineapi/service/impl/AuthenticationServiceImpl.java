@@ -3,6 +3,7 @@ package it.smartcommunitylab.gamification.gameengineapi.service.impl;
 import it.smartcommunitylab.gamification.gameengineapi.config.security.DomainUserDetails;
 import it.smartcommunitylab.gamification.gameengineapi.config.security.JwtConfig;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
+import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.exception.RequestException;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.UserDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.UserMapper;
@@ -69,7 +70,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public UserDTO getAuthUser() {
         DomainUserDetails userDetails = SecurityUtils.getCurrentUser();
         if(Objects.isNull(userDetails)) {
-            throw new RequestException("User not authenticated", "User is currently not authenticated", HttpStatus.UNAUTHORIZED);
+            throw new RequestException("User not authenticated", "User is currently not authenticated", ErrorCodes.USER_NOT_AUTHENTICATED, HttpStatus.UNAUTHORIZED);
         }
         String id = userDetails.getId();
         return userMapper.toDTO(userRepository.findById(id).orElseThrow(()->new UsernameNotFoundException("User not found.")));

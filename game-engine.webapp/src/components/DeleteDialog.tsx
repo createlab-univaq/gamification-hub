@@ -1,5 +1,6 @@
 import {Button, ButtonGroup, Dialog, Stack, Typography} from "@mui/material";
 import {Close} from "@mui/icons-material"
+import {useTranslation} from "react-i18next";
 
 interface DeleteDialogProps<T> {
     message: string
@@ -9,6 +10,8 @@ interface DeleteDialogProps<T> {
 }
 
 export function DeleteDialog({deleteFn, message, element, setElement}: DeleteDialogProps) {
+
+    const {t} = useTranslation()
 
     if (!element) {
         return <></>
@@ -20,22 +23,22 @@ export function DeleteDialog({deleteFn, message, element, setElement}: DeleteDia
         <Stack direction={"row-reverse"}
                sx={{
                    width: "100%",
-                   padding:1
+                   padding: 1
                }}
         >
-            <Close sx={{cursor:"pointer"}} onClick={()=>setElement(undefined)}/>
+            <Close sx={{cursor: "pointer"}} onClick={() => setElement(undefined)}/>
         </Stack>
         <Stack sx={{
             padding: 4,
-            paddingTop:0,
+            paddingTop: 0,
             gap: 2,
             alignItems: "center",
             justifyContent: "center"
         }}>
-            <Typography variant={"h4"}>Sei sicuro?</Typography>
+            <Typography variant={"h4"}>{t("delete_title")}</Typography>
             <Typography variant={"body1"}>{message}</Typography>
             <ButtonGroup direction={"row"} sx={{justifyContent: "space-between"}}>
-                <Button color={"error"} variant={"contained"} onClick={deleteFn}>Conferma</Button>
+                <Button color={"error"} variant={"contained"} onClick={deleteFn}>{t("buttons:confirm")}</Button>
             </ButtonGroup>
         </Stack>
     </Dialog>

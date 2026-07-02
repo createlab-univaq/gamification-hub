@@ -4,6 +4,7 @@ import eu.trentorise.game.model.Game;
 import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityCreationException;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
+import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.ActionCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ActionDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
@@ -41,7 +42,7 @@ public class ActionController extends BaseGameController {
         log.info("REST request to add Action {} to game {}", action, gameId);
         Game game = findGameByIdOrThrow(gameId);
         if (game.getActions().contains(action.getName())) {
-            throw new EntityCreationException("Action", "Action %s already exists".formatted(action.getName()));
+            throw new EntityCreationException("Action", "Action %s already exists".formatted(action.getName()), ErrorCodes.ACTION_CREATION);
         }
         game.getActions().add(action.getName());
         gameService.saveGameDefinition(game);
@@ -54,7 +55,7 @@ public class ActionController extends BaseGameController {
         log.info("REST request to update Action {} to {} in game {}", actionId, action, gameId);
         Game game = findGameByIdOrThrow(gameId);
         if (!game.getActions().contains(actionId)) {
-            throw new EntityNotFoundException("Action", actionId);
+            throw new EntityNotFoundException("Action", actionId, ErrorCodes.ACTION_NOT_FOUND);
         }
         game.getActions().remove(actionId);
         game.getActions().add(action.getName());

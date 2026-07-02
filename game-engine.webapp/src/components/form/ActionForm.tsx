@@ -8,6 +8,7 @@ import {useNotificationContext} from "../notification/NotificationProvider.tsx";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {Button, Stack, TextField} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 interface ActionFormProps {
     gameId: string
@@ -17,6 +18,7 @@ interface ActionFormProps {
 export function ActionForm({action, gameId}: ActionFormProps) {
 
     const {setNotification} = useNotificationContext()
+    const [t] = useTranslation()
     const form = useForm({
         defaultValues: {
             name: ""
@@ -35,8 +37,8 @@ export function ActionForm({action, gameId}: ActionFormProps) {
             navigateTo(`/games/${gameId}/actions`, {
                 state: {
                     type: "success",
-                    title: `Azione Salvata!`,
-                    content: `L'azione ${data.name} è stata salvata con successo`
+                    title: t("actions.save_title"),
+                    content: t("actions.save_message", {name: data.name})
                 }
             })
         },
@@ -70,10 +72,10 @@ export function ActionForm({action, gameId}: ActionFormProps) {
             <FormInput
                 name={"name"}
                 rules={{
-                    required: "Campo obbligatorio!"
+                    required: t("required_field")
                 }}
             >
-                <TextField required={true} type={"text"} fullWidth={true} label={"Nome"}/>
+                <TextField required={true} type={"text"} fullWidth={true} label={t("name")}/>
             </FormInput>
             <Stack direction={"row"}
                    sx={{
@@ -81,10 +83,10 @@ export function ActionForm({action, gameId}: ActionFormProps) {
                        alignItems: "center"
                    }}
             >
-                <Button href={`/games/${gameId}/actions`} variant={"contained"}>Indietro</Button>
+                <Button href={`/games/${gameId}/actions`} variant={"contained"}>{t("buttons:turn_back")}</Button>
                 <Stack direction={"row"} sx={{gap: 2}}>
-                    <Button type={"submit"} variant={"contained"}>Salva</Button>
-                    <Button type={"reset"} onClick={() => initForm(action)} variant={"outlined"}>Reset</Button>
+                    <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
+                    <Button type={"reset"} onClick={() => initForm(action)} variant={"outlined"}>{t("buttons:reset")}</Button>
                 </Stack>
             </Stack>
         </Stack>

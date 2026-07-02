@@ -1,4 +1,4 @@
-import {Button, Card, CardActions, CardContent, CardHeader, Stack, TextField, Typography} from "@mui/material";
+import {Button, Card, CardActions, CardContent, Stack, TextField, Typography} from "@mui/material";
 import type {LoginRequest} from "../../api/types/types.ts";
 import {useMutation} from "@tanstack/react-query";
 import {authClient} from "../../api";
@@ -10,10 +10,12 @@ import {useForm} from "react-hook-form";
 import {PasswordField} from "../../components/form/PasswordField.tsx";
 import {router} from "../../router";
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
+import {useTranslation} from "react-i18next";
 
 export function LoginPage() {
 
     const {setNotification} = useNotificationContext()
+    const {t} = useTranslation()
     const form = useForm<LoginRequest>({
         defaultValues: {
             username: "",
@@ -22,8 +24,8 @@ export function LoginPage() {
     })
     const {mutate} = useMutation({
         mutationFn: (request) => authClient.login(request),
-        onSuccess:()=>{
-            router.navigate("/dashboard", {replace:true})
+        onSuccess: () => {
+            router.navigate("/dashboard", {replace: true})
         },
         onError: (error) => {
             console.error(error)
@@ -49,7 +51,7 @@ export function LoginPage() {
                             gap: "2rem",
                             justifyContent: "center"
                         }}>
-                            <Typography sx={{textAlign: "center"}} variant={"h4"}>Sign in</Typography>
+                            <Typography sx={{textAlign: "center", textTransform:"uppercase"}} variant={"h4"}>{t("login_title")}</Typography>
                             <Stack sx={{
                                 gap: "1rem"
                             }}>
@@ -80,7 +82,7 @@ export function LoginPage() {
                                 justifyContent: "center",
                                 gap: "1rem"
                             }}>
-                                <Button fullWidth={true} type={"submit"} variant={"contained"}>Accedi</Button>
+                                <Button fullWidth={true} type={"submit"} variant={"contained"}>{t("buttons:sign_in")}</Button>
                             </CardActions>
                         </Stack>
                     </Form>

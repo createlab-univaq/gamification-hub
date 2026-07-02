@@ -5,6 +5,7 @@ import eu.trentorise.game.repo.GameRepo;
 import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.config.security.DomainUserDetails;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
+import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.exception.RequestException;
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.RuleCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.GamePersistanceDTO;
@@ -58,9 +59,9 @@ public class ImportServiceImpl implements ImportService {
             throw new UsernameNotFoundException("Cannot export game if user is not authenticated");
         }
         GamePersistence game = gameRepo.findById(gameId)
-                .orElseThrow(() -> new EntityNotFoundException("Game", gameId));
+                .orElseThrow(() -> new EntityNotFoundException("Game", gameId, ErrorCodes.GAME_NOT_FOUND));
         if (!Objects.equals(user.getId(), game.getOwner())) {
-            throw new RequestException("Forbidden", "You cannot export this game", HttpStatus.FORBIDDEN);
+            throw new RequestException("Forbidden", "You cannot export this game", ErrorCodes.EXPORT_FORBIDDEN, HttpStatus.FORBIDDEN);
         }
 
         ImportGameDTO export = new ImportGameDTO();
@@ -108,7 +109,7 @@ public class ImportServiceImpl implements ImportService {
             log.error(e.getMessage());
             // Rollback for every game that was saved.
             savedIds.forEach(gameService::deleteGame);
-            throw new RequestException("Import Error", e.getLocalizedMessage(), HttpStatus.BAD_REQUEST);
+            throw new RequestException("Import Error", e.getLocalizedMessage(), ErrorCodes.IMPORT_ERROR, HttpStatus.BAD_REQUEST);
         }
     }
 }

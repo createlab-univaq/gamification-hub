@@ -1,0 +1,94 @@
+{
+  "generic": "Something went wrong. Please try again.",
+  "generic_title": "Error!",
+
+  "data_access": "A data access error occurred.",
+  "data_access_title": "Data error!",
+
+  "duplicate_key": "A record with the same value already exists.",
+  "duplicate_key_title": "Duplicate value!",
+
+  "authentication_failed": "Username or password incorrect.",
+  "authentication_failed_title": "Authentication error!",
+
+  "user_not_authenticated": "User is not authenticated.",
+  "user_not_authenticated_title": "Authentication error!",
+
+  "user_not_authorized": "User is not authorized to access this resource",
+  "user_not_authorized_title": "Access denied!",
+
+  "user_not_active": "Your account is not active. Please contact an administrator.",
+  "user_not_active_title": "Account not active!",
+
+  "validation": "One or more values are not valid.",
+  "validation_title": "Validation error!",
+
+  "rule_validation": "The rule contains one or more errors.",
+  "rule_validation_title": "Invalid rule!",
+
+  "game_not_found": "The requested game was not found.",
+  "game_not_found_title": "Not found!",
+
+  "rule_not_found": "The requested rule was not found.",
+  "rule_not_found_title": "Not found!",
+
+  "action_not_found": "The requested action was not found.",
+  "action_not_found_title": "Not found!",
+
+  "point_concept_not_found": "The requested point concept was not found.",
+  "point_concept_not_found_title": "Not found!",
+
+  "badge_not_found": "The requested badge collection was not found.",
+  "badge_not_found_title": "Not found!",
+
+  "challenge_not_found": "The requested challenge model was not found.",
+  "challenge_not_found_title": "Not found!",
+
+  "player_not_found": "The requested player was not found.",
+  "player_not_found_title": "Not found!",
+
+  "team_not_found": "The requested team was not found.",
+  "team_not_found_title": "Not found!",
+
+  "scenario_not_found": "The requested scenario was not found.",
+  "scenario_not_found_title": "Not found!",
+
+  "game_creation": "The game could not be created.",
+  "game_creation_title": "Creation failed!",
+
+  "action_creation": "The action could not be created. It may already exist.",
+  "action_creation_title": "Creation failed!",
+
+  "point_concept_creation": "The point concept could not be created.",
+  "point_concept_creation_title": "Creation failed!",
+
+  "badge_creation": "The badge collection could not be created.",
+  "badge_creation_title": "Creation failed!",
+
+  "challenge_creation": "The challenge model could not be created.",
+  "challenge_creation_title": "Creation failed!",
+
+  "team_creation": "The team could not be created. It may already exist.",
+  "team_creation_title": "Creation failed!",
+
+  "scenario_creation": "A scenario with this name already exists in the game.",
+  "scenario_creation_title": "Creation failed!",
+
+  "game_execution_failed": "The game action could not be executed.",
+  "game_execution_failed_title": "Execution failed!",
+
+  "rule_simulation": "The simulation could not be completed.",
+  "rule_simulation_title": "Simulation error!",
+
+  "import_error": "The import could not be completed.",
+  "import_error_title": "Import error!",
+
+  "import_empty": "You must provide at least one game to import.",
+  "import_empty_title": "Import error!",
+
+  "export_forbidden": "You are not allowed to export this game.",
+  "export_forbidden_title": "Access denied!",
+
+  "invalid_team_members": "One or more selected players do not exist.",
+  "invalid_team_members_title": "Invalid members!"
+}

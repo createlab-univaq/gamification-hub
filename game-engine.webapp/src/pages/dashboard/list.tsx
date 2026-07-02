@@ -15,6 +15,7 @@ import {PageList} from "../../components/PageList.tsx";
 import {useDebounced} from "../../hooks/use-debounced.ts";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {downloadJson} from "../../utils/download-utils.ts";
+import {useTranslation} from "react-i18next";
 
 export function GamesListPage() {
 
@@ -23,6 +24,7 @@ export function GamesListPage() {
     const [deleteGame, setDeleteGame] = useState<GameDto>()
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
     const [search, setSearch] = useState<string>("")
+    const {t} = useTranslation()
 
     const {isPending, data} = useQuery({
         queryKey: ["get-list"],
@@ -89,22 +91,22 @@ export function GamesListPage() {
     const games = (data ?? []).filter(g => (g.name ?? "").toLowerCase().includes(search.toLowerCase()))
 
     return <PageContainer>
-        <PageHeader title={"Your games"}
+        <PageHeader title={t("game_list_title")}
                     buttons={[
                         {
-                            children: "Add",
+                            children: t("buttons:add"),
                             href: "/upsert-game",
                             variant: "contained",
                             endIcon: <Add/>
                         },
                         {
-                            children: "Import",
+                            children: t("buttons:import"),
                             variant: "contained",
                             endIcon: <Upload/>,
                             onClick: () => setImportModalOpen(true)
                         },
                         {
-                            children: `Esporta selezionati (${selectedIds.size})`,
+                            children: `${t("buttons:export")} (${selectedIds.size})`,
                             variant: "outlined",
                             endIcon: <Download/>,
                             disabled: selectedIds.size === 0 || isExporting,
@@ -113,7 +115,7 @@ export function GamesListPage() {
                         }
                     ]}
         />
-        <DeleteDialog message={`Do you want to delete the game "${deleteGame?.name}" forever?`}
+        <DeleteDialog message={t("delete_message", {entity:deleteGame?.name})}
                       deleteFn={() => mutate(deleteGame.id)}
                       setElement={setDeleteGame}
                       element={deleteGame}
@@ -157,7 +159,7 @@ export function GamesListPage() {
             }}
             emptyListMessage={<Typography>No games found.</Typography>}
             search={{
-                label: "Cerca",
+                label: t("search_placeholder"),
                 placeholder: "Nome...",
                 onSearch: (value) => {
                     filter(value)

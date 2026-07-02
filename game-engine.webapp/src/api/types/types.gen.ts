@@ -146,7 +146,9 @@ export type PlayerDto = {
             [key: string]: unknown;
         };
         empty?: boolean;
-        [key: string]: unknown;
+        [key: string]: unknown | {
+            [key: string]: unknown;
+        } | boolean | undefined;
     };
     inventory?: Inventory;
 };
@@ -265,7 +267,9 @@ export type PlayerState = {
             [key: string]: unknown;
         };
         empty?: boolean;
-        [key: string]: unknown;
+        [key: string]: unknown | {
+            [key: string]: unknown;
+        } | boolean | undefined;
     };
     inventory?: Inventory;
 };
@@ -347,8 +351,8 @@ export type PageableObject = {
 
 export type SortObject = {
     empty?: boolean;
-    unsorted?: boolean;
     sorted?: boolean;
+    unsorted?: boolean;
 };
 
 export type NotificationDto = {
@@ -1165,6 +1169,22 @@ export type ImportGamesResponses = {
 
 export type ImportGamesResponse = ImportGamesResponses[keyof ImportGamesResponses];
 
+export type ExportGamesData = {
+    body: Array<string>;
+    path?: never;
+    query?: never;
+    url: '/api/v1/games/export';
+};
+
+export type ExportGamesResponses = {
+    /**
+     * OK
+     */
+    200: Array<ImportGameDto>;
+};
+
+export type ExportGamesResponse = ExportGamesResponses[keyof ExportGamesResponses];
+
 export type ExecuteGameData = {
     body: ExecutionDto;
     path?: never;
@@ -1389,6 +1409,24 @@ export type AnalyzeGameResponses = {
 };
 
 export type AnalyzeGameResponse = AnalyzeGameResponses[keyof AnalyzeGameResponses];
+
+export type ExportGameData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/export';
+};
+
+export type ExportGameResponses = {
+    /**
+     * OK
+     */
+    200: ImportGameDto;
+};
+
+export type ExportGameResponse = ExportGameResponses[keyof ExportGameResponses];
 
 export type GetAuthenticatedUserData = {
     body?: never;

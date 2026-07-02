@@ -6,6 +6,7 @@ import eu.trentorise.game.model.core.GameConcept;
 import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityCreationException;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
+import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.PointConceptCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.PointConceptDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.*;
@@ -56,7 +57,7 @@ public class PointConceptController extends BaseGameController {
                 .filter(gc -> gc instanceof PointConcept && pointId.equals(gc.getId()))
                 .map(gc -> ResponseEntity.ok(pointConceptMapper.toDTO((PointConcept) gc)))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("PointConcept", pointId));
+                .orElseThrow(() -> new EntityNotFoundException("PointConcept", pointId, ErrorCodes.POINT_CONCEPT_NOT_FOUND));
     }
 
     @PostMapping
@@ -64,7 +65,7 @@ public class PointConceptController extends BaseGameController {
                                                     @RequestBody PointConceptDTO dto) {
         log.info("REST request to add point={} to game={}", dto, gameId);
         if(!Objects.isNull(dto.getId())) {
-            throw new EntityCreationException("Point Concept", "A new point concept cannot already have an ID");
+            throw new EntityCreationException("Point Concept", "A new point concept cannot already have an ID", ErrorCodes.POINT_CONCEPT_CREATION);
         }
         Game game = findGameByIdOrThrow(gameId);
         PointConcept point = pointConceptMapper.toEntity(dto);
@@ -85,7 +86,7 @@ public class PointConceptController extends BaseGameController {
                 .filter(gc -> gc instanceof PointConcept && pointId.equals(gc.getId()))
                 .findFirst()
                 .map(gc -> (PointConcept) gc)
-                .orElseThrow(() -> new EntityNotFoundException("PointConcept", pointId));
+                .orElseThrow(() -> new EntityNotFoundException("PointConcept", pointId, ErrorCodes.POINT_CONCEPT_NOT_FOUND));
 
         // Update the point-concept
         pointConceptDTO.setId(pointId);

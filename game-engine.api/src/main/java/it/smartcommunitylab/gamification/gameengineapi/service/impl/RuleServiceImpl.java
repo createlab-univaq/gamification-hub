@@ -6,6 +6,7 @@ import eu.trentorise.game.repo.RuleRepo;
 import eu.trentorise.game.services.GameEngine;
 import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
+import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.exception.RuleValidationException;
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.RuleCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.RuleDTO;
@@ -85,7 +86,7 @@ public class RuleServiceImpl implements RuleService {
     @Override
     public RuleDTO get(String id) {
         log.info("Request to get rule={}", id);
-        DBRule rule = ruleRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Rule", id));
+        DBRule rule = ruleRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Rule", id, ErrorCodes.RULE_NOT_FOUND));
         return ruleMapper.toDTO(rule);
     }
 
@@ -94,7 +95,7 @@ public class RuleServiceImpl implements RuleService {
         log.info("Request to get rules by criteria: {}", ruleCriteria);
         Game game = gameService.loadGameDefinitionById(ruleCriteria.getGameId());
         if (Objects.isNull(game)) {
-            throw new EntityNotFoundException("Game", ruleCriteria.getGameId());
+            throw new EntityNotFoundException("Game", ruleCriteria.getGameId(), ErrorCodes.GAME_NOT_FOUND);
         }
         List<RuleDTO> rules = new ArrayList<>();
         for (String ruleUrl : game.getRules()) {

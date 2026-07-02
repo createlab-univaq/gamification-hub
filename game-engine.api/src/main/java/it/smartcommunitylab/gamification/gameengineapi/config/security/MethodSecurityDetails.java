@@ -3,6 +3,7 @@ package it.smartcommunitylab.gamification.gameengineapi.config.security;
 import eu.trentorise.game.model.Game;
 import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
+import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.exception.UserNotAuthorizedException;
 import it.smartcommunitylab.gamification.gameengineapi.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class MethodSecurityDetails {
     public boolean canAccessGame(String gameId) {
         Game game = gameService.loadGameDefinitionById(gameId);
         if (Objects.isNull(game)) {
-            throw new EntityNotFoundException("Game", gameId);
+            throw new EntityNotFoundException("Game", gameId, ErrorCodes.GAME_NOT_FOUND);
         }
         DomainUserDetails user = SecurityUtils.getCurrentUser();
         if (Objects.isNull(user)) {

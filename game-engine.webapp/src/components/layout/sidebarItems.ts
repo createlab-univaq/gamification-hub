@@ -1,16 +1,16 @@
 import type {ReactElement} from "react";
 import {
     Checklist,
+    Diversity3,
     EmojiEvents,
     FormatListNumbered,
     Games,
+    Groups,
     Layers,
     MilitaryTech,
     Monitor,
     PlayArrow,
     Rule,
-    Groups,
-    Diversity3,
     Science
 } from "@mui/icons-material"
 
@@ -23,7 +23,7 @@ interface SidebarItem {
 
 const dashboardItems = [
     {
-        title: "Giochi",
+        title: "sidebar.games",
         icon: Games,
         href: "/dashboard"
     }
@@ -31,67 +31,67 @@ const dashboardItems = [
 
 const gameItems = [
     {
-        title: "Regole",
+        title: "sidebar.rules",
         icon: Rule,
         href: "/rules",
         relative: true
     },
     {
-        title: "Azioni",
+        title: "sidebar.actions",
         icon: PlayArrow,
         href: "/actions",
         relative: true
     },
     {
-        title: "Punteggi",
+        title: "sidebar.points",
         icon: EmojiEvents,
         href: "/points",
         relative: true
     },
     {
-        title: "Giocatori",
+        title: "sidebar.players",
         icon: Groups,
         href: "/players",
         relative: true
     },
     {
-        title: "Squadre",
+        title: "sidebar.teams",
         icon: Diversity3,
         href: "/teams",
         relative: true
     },
     {
-        title: "Attività",
+        title: "sidebar.activities",
         icon: Checklist,
         href: "/tasks",
         relative: true
     },
     {
-        title: "Medaglie",
+        title: "sidebar.badges",
         icon: MilitaryTech,
         href: "/badges",
         relative: true
     },
     {
-        title: "Livelli",
-        href:"/levels",
+        title: "sidebar.levels",
+        href: "/levels",
         icon: Layers,
         relative: true
     },
     {
-        title: "Scenari",
+        title: "sidebar.scenarios",
         href: "/scenarios",
         icon: Science,
         relative: true
     },
     {
-        title: "Sfide",
+        title: "sidebar.challenges",
         href: "/challenges",
         icon: FormatListNumbered,
         relative: true
     },
     {
-        title: "Monitors",
+        title: "sidebar.monitors",
         icon: Monitor,
         relative: true
     }

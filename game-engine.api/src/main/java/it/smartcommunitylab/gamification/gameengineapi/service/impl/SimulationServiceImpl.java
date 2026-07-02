@@ -6,6 +6,7 @@ import eu.trentorise.game.model.PlayerState;
 import eu.trentorise.game.model.PointConcept;
 import eu.trentorise.game.model.simulation.SimulationResult;
 import eu.trentorise.game.services.Workflow;
+import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.exception.RequestException;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.BadgeCollectionDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.PointConceptDTO;
@@ -97,7 +98,7 @@ public class SimulationServiceImpl implements SimulationService {
                     simulationRequestDTO.isShowDetailedChanges());
             return simulationResultMapper.toDTO(result);
         } catch (Exception e) {
-            throw new RequestException("Rule Simulation Error", e.getLocalizedMessage(), HttpStatus.BAD_REQUEST);
+            throw new RequestException("Rule Simulation Error", e.getLocalizedMessage(), ErrorCodes.RULE_SIMULATION, HttpStatus.BAD_REQUEST);
         }
     }
 

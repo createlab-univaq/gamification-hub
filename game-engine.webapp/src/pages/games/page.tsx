@@ -17,6 +17,8 @@ import {useState} from "react";
 import type {GameDto} from "../../api/types";
 import {getCurrentUser} from "../../utils/auth-utils.ts";
 import {StatusDot} from "../../components/StatusDot.tsx";
+import {useTranslation} from "react-i18next";
+import {formatDate} from "../../utils/date-utils.ts";
 
 interface GameConceptGridElementProps {
     href: string,
@@ -39,6 +41,7 @@ export function GamePage() {
     const user = getCurrentUser()
     const {setNotification} = useNotificationContext()
     const [deleteElement, setDeleteElement] = useState<GameDto>()
+    const [t] = useTranslation()
 
     const {mutate: exportGame, isPending: isExporting} = useMutation({
         mutationKey: ["export-game", game.id],
@@ -83,49 +86,51 @@ export function GamePage() {
     return <PageContainer>
         <PageHeader
             title={
-                <Stack direction={"row"} sx={{alignItems:"center", gap:2}}>
+                <Stack direction={"row"} sx={{alignItems: "center", gap: 2}}>
                     <Typography variant={"h4"}>{game.name}</Typography>
-                    <StatusDot size={"1.5rem"} title={!game.terminated ? "Game has not terminated" : "Game is terminated"} type={game.terminated ? "success" : "error"}/>
+                    <StatusDot size={"1.5rem"}
+                               title={!game.terminated ? t("game.is_not_expired_label") : t("game.is_expired_label")}
+                               type={game.terminated ? "success" : "error"}/>
                 </Stack>
             }
             buttons={[
                 {
                     endIcon: <PlayArrow/>,
-                    children: "Simulate",
+                    children: t("buttons:simulate"),
                     href: `/games/${game.id}/simulate`,
                     variant: "contained"
                 },
                 {
                     endIcon: <Edit/>,
-                    children: "Update",
+                    children: t("buttons:update"),
                     href: `/upsert-game/${game.id}`,
                     variant: "contained"
                 },
                 {
                     endIcon: <Download/>,
-                    children: "Esporta",
+                    children: t("buttons:export"),
                     variant: "outlined",
                     loading: isExporting,
                     onClick: () => exportGame()
                 },
                 {
                     endIcon: <Delete/>,
-                    children: "Delete",
+                    children: t("buttons:delete"),
                     variant: "contained",
                     color: "error",
                     onClick: () => setDeleteElement(game)
                 }
             ]}
         />
-        <DeleteDialog message={`Do you want to delete the game "${deleteElement?.name}" forever?`}
+        <DeleteDialog message={t("delete_message", {entity:deleteElement?.name})}
                       deleteFn={() => mutate(deleteElement?.id)}
                       setElement={setDeleteElement}
                       element={deleteElement}
         />
         <Stack sx={{marginY: 2}}>
-            {user.id === game.owner && <Typography>Owner: {user.username}</Typography>}
-            <Typography>Domain: {game.domain}</Typography>
-            <Typography>Expiration: {game.expiration}</Typography>
+            {user.id === game.owner && <Typography>{t("game.owner")}: {user.username}</Typography>}
+            <Typography>{t("game.domain")}: {game.domain}</Typography>
+            {!!game.expiration && <Typography>{t("game.expiration")}: {formatDate(game.expiration)}</Typography>}
         </Stack>
         <Grid container={true} columns={{
             md: "3",
@@ -134,16 +139,34 @@ export function GamePage() {
             xs: "1"
         }} spacing={"2rem"}
         >
-            <GameConceptGridElement size={1.5} href={`/games/${game.id}/rules`} title={"Rules"}
-                                    content={`Total rules: ${game.rules?.length ?? 0}`}/>
-            <GameConceptGridElement size={1.5} href={`/games/${game.id}/actions`} title={"Actions"}
-                                    content={`Total actions: ${game.actions?.length ?? 0}`}/>
-            <GameConceptGridElement href={`/games/${game.id}/point-concepts`} title={"Point Concepts"}
-                                    content={`Total point concepts: ${game.concepts?.filter(concept => "score" in concept).length ?? 0}`}/>
-            <GameConceptGridElement href={`/games/${game.id}/badges`} title={"Badges"}
-                                    content={`Total badges: ${game.concepts?.filter(concept => "icon" in concept || "badgeEarned" in concept).length ?? 0}`}/>
-            <GameConceptGridElement href={`/games/${game.id}/challenges`} title={"Challenges"}
-                                    content={`Total challenges: ${game.concepts?.filter(concept => "modelName" in concept).length ?? 0}`}/>
+            <GameConceptGridElement size={1.5} href={`/games/${game.id}/rules`} title={t("sidebar.rules")}
+                                    content={t("total_amount", {
+                                        entity: t("sidebar.rules"),
+                                        number: game.rules?.length ?? 0
+                                    })}/>
+            <GameConceptGridElement size={1.5} href={`/games/${game.id}/actions`} title={t("sidebar.actions")}
+                                    content={t("total_amount", {
+                                        entity: t("sidebar.actions"),
+                                        number: game.actions?.length ?? 0
+                                    })}/>
+            <GameConceptGridElement href={`/games/${game.id}/point-concepts`} title={t("sidebar.points")}
+                                    content={t("total_amount", {
+                                        entity: t("sidebar.points"),
+                                        number: game.concepts?.filter(concept => "score" in concept).length ?? 0
+                                    })}
+            />
+            <GameConceptGridElement href={`/games/${game.id}/badges`} title={t("sidebar.badges")}
+                                    content={t("total_amount", {
+                                        entity: t("sidebar.badges"),
+                                        number: game.concepts?.filter(concept => "icon" in concept || "badgeEarned" in concept).length ?? 0
+                                    })}
+            />
+            <GameConceptGridElement href={`/games/${game.id}/challenges`} title={t("sidebar.challenges")}
+                                    content={t("total_amount", {
+                                        entity: t("sidebar.challenges"),
+                                        number: game.concepts?.filter(concept => "modelName" in concept).length ?? 0
+                                    })}
+            />
         </Grid>
     </PageContainer>
 

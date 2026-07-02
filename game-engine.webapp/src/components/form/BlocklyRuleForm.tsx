@@ -24,6 +24,7 @@ import {useNotificationContext} from "../notification/NotificationProvider.tsx";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {Loading} from "../Loading.tsx";
 import {getRuleNameFromBlock, isUpdateEvent} from "../../utils/builder-utils.ts";
+import {useTranslation} from "react-i18next";
 
 interface BlocklyRuleFormProps {
     rule?: RuleDto
@@ -40,13 +41,14 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
     const {setNotification} = useNotificationContext()
     const [consoleActive, setConsoleActive] = useState(false)
     const [ruleName, setRuleName] = useState(rule?.name ?? "")
+    const [t] = useTranslation()
 
     const {mutate: upsertRuleMutate, isPending: upsertRulePending} = useMutation({
         mutationFn: (request) => {
             pushMessage([{
                 time: new Date(),
                 type: "text",
-                content: rule ? "Updating rule..." : "Creating rule...."
+                content: t("console.saving")
             }])
             if (rule) {
 
@@ -58,8 +60,8 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
             navigateTo(`/games/${gameId}/rules`, {
                 state: {
                     type: "success",
-                    title: `Rule saved`,
-                    content: `The rule ${data.name} has been saved successfully.`
+                    title: t("rules.save_title"),
+                    content: t("rules.save_message", {name:data.name})
                 }
             })
         },
@@ -69,7 +71,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
     const {mutate: validateMutation, isPending: validateIsPending, reset: validateReset} = useMutation<ValidationMessageDto[], unknown, RuleDto>({
         mutationFn: (request) => {
             pushMessage([{
-                content: "Started validation...",
+                content: t("console.validation.start"),
                 time: new Date()
             }])
             return ruleClient.validateRule(request)
@@ -84,13 +86,13 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                 setNotification({
                     notification: {
                         type: "success",
-                        content: "Rule was compiled successfully",
-                        title: "Rule validation complete"
+                        content: t("console.validation.success"),
+                        title: t("console.validation.title")
                     },
                     isSnack: true
                 })
                 pushMessage([{
-                    content: "Validation completed successfully. No errors found.",
+                    content: t("console.validation.success"),
                     time: new Date(),
                     type: "info"
                 }])
@@ -100,8 +102,8 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                 setNotification({
                     notification: {
                         type: "warning",
-                        content: "Rule was compiled successfully but with warnings",
-                        title: "Rule validation complete"
+                        content: t("console.validation.warning"),
+                        title: t("console.validation.title")
                     },
                     isSnack: true
                 })
@@ -221,14 +223,14 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                 buttons={
                     [
                         {
-                            children: "Save",
+                            children: t("buttons:save"),
                             variant: "contained",
                             disabled: validateIsPending || !drl.length || upsertRulePending,
                             endIcon: <Save/>,
                             onClick: handleSave
                         },
                         {
-                            children: "Validate",
+                            children: t("buttons:validate"),
                             variant: "contained",
                             disabled: validateIsPending || !drl.length || upsertRulePending,
                             endIcon: <FactCheck/>,
@@ -243,7 +245,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                             }
                         },
                         {
-                            children: "Console",
+                            children: t("buttons:console"),
                             variant: consoleActive ? "contained" : "outlined",
                             endIcon: <Terminal/>,
                             onClick: () => {

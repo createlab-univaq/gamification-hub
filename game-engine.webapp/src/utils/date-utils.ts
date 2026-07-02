@@ -1,9 +1,12 @@
+import i18n from "../../i18n.ts";
+
+
 export function formatDate(date:string | number | Date) {
-    return new Date(date).toLocaleDateString("it-IT")
+    return new Date(date).toLocaleDateString(i18n.language)
 }
 
 export function formatTime(date:string | number | Date) {
-    return new Date(date).toLocaleTimeString("it-IT")
+    return new Date(date).toLocaleTimeString(i18n.language)
 }
 
 type TimeFormat = "seconds" | "minutes" | "hours" | "days"

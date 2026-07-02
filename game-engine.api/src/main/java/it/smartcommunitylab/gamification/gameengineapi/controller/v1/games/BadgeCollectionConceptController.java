@@ -6,6 +6,7 @@ import eu.trentorise.game.model.core.GameConcept;
 import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityCreationException;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
+import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.BadgeCollectionDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.*;
 import lombok.Builder;
@@ -56,7 +57,7 @@ public class BadgeCollectionConceptController extends BaseGameController {
                 .filter(gc -> gc instanceof BadgeCollectionConcept && collectionId.equals(gc.getId()))
                 .map(gc -> ResponseEntity.ok(badgeCollectionMapper.toDTO((BadgeCollectionConcept) gc)))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("BadgeCollectionConcept", collectionId));
+                .orElseThrow(() -> new EntityNotFoundException("BadgeCollectionConcept", collectionId, ErrorCodes.BADGE_NOT_FOUND));
     }
 
     @PostMapping
@@ -64,7 +65,7 @@ public class BadgeCollectionConceptController extends BaseGameController {
             @PathVariable String gameId, @RequestBody BadgeCollectionDTO dto) {
         log.info("Add badge collection name={} to game={}", dto.getName(), gameId);
         if (!Objects.isNull(dto.getId())) {
-            throw new EntityCreationException("Badge Collection", "New badge collections cannot already have an ID");
+            throw new EntityCreationException("Badge Collection", "New badge collections cannot already have an ID", ErrorCodes.BADGE_CREATION);
         }
         Game game = findGameByIdOrThrow(gameId);
         BadgeCollectionConcept badge = badgeCollectionMapper.toEntity(dto);
@@ -83,7 +84,7 @@ public class BadgeCollectionConceptController extends BaseGameController {
                 .filter(gc -> gc instanceof BadgeCollectionConcept && collectionId.equals(gc.getId()))
                 .map(gc -> (BadgeCollectionConcept) gc)
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("BadgeCollectionConcept", collectionId));
+                .orElseThrow(() -> new EntityNotFoundException("BadgeCollectionConcept", collectionId, ErrorCodes.BADGE_NOT_FOUND));
 
         dto.setId(collectionId);
         badgeCollectionMapper.updateEntity(badge, dto);

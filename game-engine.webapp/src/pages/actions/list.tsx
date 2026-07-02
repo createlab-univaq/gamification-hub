@@ -15,10 +15,12 @@ import {PageList} from "../../components/PageList.tsx";
 import {useDebounced} from "../../hooks/use-debounced.ts";
 import type {ActionDto} from "../../api/types";
 import type {GetFilter} from "../../api/filters/filters.ts";
+import {useTranslation} from "react-i18next";
 
 export function ActionListPage() {
     const game = useGame()
     const {setNotification} = useNotificationContext()
+    const [t] = useTranslation()
     const [deleteAction, setDeleteAction] = useState<string>()
     const [filters, setFilters] = useState<GetFilter<ActionDto>[]>([])
     const {isLoading, data, error} = useQuery({
@@ -36,8 +38,8 @@ export function ActionListPage() {
             setNotification({
                 notification: {
                     type: "success",
-                    title: "Azione Eliminata",
-                    content: `L'azione è stata eliminata con successo`
+                    title: t("actions.deleted_title"),
+                    content: t("actions.deleted_message")
                 },
                 isSnack: true
             })
@@ -69,17 +71,17 @@ export function ActionListPage() {
 
     return <PageContainer>
         <PageHeader
-            title={"Azioni"}
+            title={t("actions.list_title")}
             buttons={[
                 {
-                    children: "Aggiungi",
+                    children: t("buttons:add"),
                     variant: "contained",
                     endIcon: <Add/>,
                     href:`/games/${game.id}/actions/upsert`
                 }
             ]}
         />
-        <DeleteDialog message={`Vuoi davvero eliminare l'azione "${deleteAction}" per sempre?`}
+        <DeleteDialog message={t("delete_message", {entity: deleteAction})}
                       deleteFn={() => mutate({gameId: game.id, actionId: deleteAction})}
                       setElement={setDeleteAction}
                       element={deleteAction}
@@ -98,10 +100,10 @@ export function ActionListPage() {
             onItemDelete={(action)=>{
                 setDeleteAction(action.name)
             }}
-            emptyListMessage={"Nessun'azione trovata."}
+            emptyListMessage={t("actions.empty_list")}
             search={{
-                label:"Cerca",
-                placeholder:"Azione...",
+                label: t("search_placeholder"),
+                placeholder: t("actions.search_placeholder"),
                 onSearch:(value)=>{
                     filter(value)
                 }

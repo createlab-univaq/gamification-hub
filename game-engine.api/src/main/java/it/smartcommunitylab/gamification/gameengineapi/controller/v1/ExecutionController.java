@@ -7,6 +7,7 @@ import eu.trentorise.game.services.PlayerService;
 import eu.trentorise.game.services.Workflow;
 import it.smartcommunitylab.gamification.gameengineapi.controller.v1.games.BaseGameController;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
+import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.exception.RequestException;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ExecutionDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.SimulationRequestDTO;
@@ -45,7 +46,7 @@ public class ExecutionController extends BaseGameController {
         log.info("REST request to execute game action {}", executionDTO);
         Game game = findGameByIdOrThrow(executionDTO.getGameId());
         if (!game.getActions().contains(executionDTO.getActionId())) {
-            throw new EntityNotFoundException("Action", executionDTO.getActionId());
+            throw new EntityNotFoundException("Action", executionDTO.getActionId(), ErrorCodes.ACTION_NOT_FOUND);
         }
         try {
             workflow.apply(executionDTO.getGameId(),
@@ -64,7 +65,7 @@ public class ExecutionController extends BaseGameController {
             return ResponseEntity.ok(state);
         } catch (Exception e) {
             log.error("Game execution interrupted by unexpected error {}", e.getLocalizedMessage());
-            throw new RequestException("Game execution failed", "Could not advance game state due to an error", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RequestException("Game execution failed", "Could not advance game state due to an error", ErrorCodes.GAME_EXECUTION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

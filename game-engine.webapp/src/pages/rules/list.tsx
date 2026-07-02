@@ -15,6 +15,7 @@ import {useNotificationContext} from "../../components/notification/Notification
 import {PageList} from "../../components/PageList.tsx";
 import type {GetFilter} from "../../api/filters/filters.ts";
 import {useDebounced} from "../../hooks/use-debounced.ts";
+import {useTranslation} from "react-i18next";
 
 export function RuleListPage() {
 
@@ -22,6 +23,7 @@ export function RuleListPage() {
     const [deleteRule, setDeleteRule] = useState<RuleDto>()
     const {setNotification} = useNotificationContext()
     const [filters, setFilters] = useState<GetFilter<Omit<RuleDto, "content">>[]>([])
+    const [t] = useTranslation()
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-rules", game.id, filters],
         queryFn: () => {
@@ -38,8 +40,8 @@ export function RuleListPage() {
             setNotification({
                 notification: {
                     type: "success",
-                    title: "Rule deleted",
-                    content: `The rule has been successfully deleted`
+                    title: t("rules.deleted_title"),
+                    content: t("rules.deleted_message")
                 },
                 isSnack: true
             })
@@ -69,23 +71,23 @@ export function RuleListPage() {
     }
 
     return <PageContainer>
-        <PageHeader title={"Available Rules"}
+        <PageHeader title={t("rules.list_title")}
                     buttons={[
                         {
-                            children: "Add",
-                            href: `/games/${game.id}/upsert-rule`,
+                            children: t("buttons:add"),
+                            href: `/games/${game.id}/rules/upsert`,
                             variant: "contained",
                             endIcon: <Add/>
                         },
                         {
-                            children: "Static Analysis",
+                            children: t("buttons:static_analysis"),
                             variant: "contained",
                             href: `/games/${game.id}/impact-analysis`,
                             endIcon: <AccountTree/>
                         }
                     ]}
         />
-        <DeleteDialog message={`Do you want to delete the rule "${deleteRule?.name}" forever?`}
+        <DeleteDialog message={t("delete_message", {entity:deleteRule?.name})}
                       deleteFn={() => mutate({gameId: game.id, ruleId: deleteRule.id})}
                       setElement={setDeleteRule}
                       element={deleteRule}
@@ -93,7 +95,7 @@ export function RuleListPage() {
         <PageList
             items={data ?? []}
             itemHref={(rule) => {
-                return `/games/${rule.gameId}/upsert-rule/${rule.id}`
+                return `/games/${rule.gameId}/rules/upsert/${rule.id}`
             }}
             renderItem={(rule) => {
                 return <Typography variant={"h5"}>{rule.name}</Typography>
@@ -103,10 +105,10 @@ export function RuleListPage() {
             onItemDelete={(rule) => {
                 setDeleteRule(rule)
             }}
-            emptyListMessage={"Nessuna regola trovata"}
+            emptyListMessage={t("rules.empty_list")}
             search={{
-                label: "Cerca",
-                placeholder: "Regola...",
+                label: t("search_placeholder"),
+                placeholder: t("rules.search_placeholder"),
                 onSearch: (value) => {
                     filter(value)
                 }

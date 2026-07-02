@@ -1,0 +1,84 @@
+{
+  "login_title": "Sign in",
+  "game_list_title": "My games",
+  "search_placeholder": "Search...",
+  "delete_title": "Are you sure?",
+  "delete_message": "Once you delete \"{{entity}}\" you won't be able to restore it forever",
+  "welcome": "Welcome {{name}}",
+  "name": "Name",
+  "required_field": "Required field!",
+  "sidebar": {
+    "rules": "Rules",
+    "games": "Games",
+    "actions": "Actions",
+    "points": "Point Concepts",
+    "players": "Players",
+    "teams": "Teams",
+    "activities": "Activities",
+    "badges": "Badges",
+    "levels": "Levels",
+    "scenarios": "Scenarios",
+    "challenges": "Challenges",
+    "monitors": "Monitors"
+  },
+  "total_amount": "Total {{entity, lowercase}}: {{number}}",
+  "game": {
+    "owner": "Owner",
+    "domain": "Domain",
+    "expiration": "Expiration",
+    "is_expired_label": "The game is not terminated",
+    "is_not_expired_label": "The game is terminated"
+  },
+  "rules": {
+    "list_title": "Available rules",
+    "search_placeholder": "Rule...",
+    "empty_list": "No rules found",
+    "deleted_message": "The rule has been deleted succesfully",
+    "deleted_title": "Rule deleted",
+    "reads": "Reads",
+    "writes": "Writes",
+    "save_title": "Rule saved",
+    "save_message": "Rule \"{{name}}\" saved succesfully"
+  },
+  "actions": {
+    "list_title": "Actions",
+    "search_placeholder": "Action...",
+    "empty_list": "No actions found",
+    "deleted_title": "Action deleted",
+    "deleted_message": "The action has been deleted successfully",
+    "save_title": "Action saved",
+    "save_message": "Action \"{{name}}\" saved successfully",
+    "upsert_title": "Add action",
+    "update_title": "Update action"
+  },
+  "impact_analysis": {
+    "title": "Rules static analysis",
+    "subtitle_warning": "WARNING! this is still an experimental feature and may be unstable.",
+    "links": {
+      "title": "Link types",
+      "types": {
+        "positive": {
+          "label": "Positive",
+          "desc": "The source causes the activation of the destination"
+        },
+        "negative": {
+          "label": "Negative",
+          "desc": "The source stops the activation of the destination"
+        },
+        "neutral": {
+          "label": "Ambiguous",
+          "desc": "It's not possible to assert the impact on the destination node"
+        }
+      }
+    }
+  },
+  "console": {
+    "saving": "Saving rule...",
+    "validation": {
+      "start":"Validating rule...",
+      "title": "Rule validation complete",
+      "success": "Validation completed successfully. No errors found",
+      "warning": "Rule compiled with warnings"
+    }
+  }
+}

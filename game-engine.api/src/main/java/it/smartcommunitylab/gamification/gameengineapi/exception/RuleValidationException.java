@@ -15,7 +15,7 @@ public class RuleValidationException extends RequestException {
     private Map<String, ValidationMessageDTO> errors = new HashMap<>();
 
     public RuleValidationException(String title, String message, List<ValidationMessageDTO> errorList) {
-        super(title, message, HttpStatus.BAD_REQUEST);
+        super(title, message, ErrorCodes.RULE_VALIDATION, HttpStatus.BAD_REQUEST);
         errorList.forEach(e->{
             errors.put(e.getId().toString(), e);
         });

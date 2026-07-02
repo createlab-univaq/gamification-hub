@@ -6,6 +6,7 @@ import eu.trentorise.game.model.impact.GameImpactResult;
 import eu.trentorise.game.services.GameService;
 import it.smartcommunitylab.gamification.gameengineapi.config.security.DomainUserDetails;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityCreationException;
+import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.exception.RequestException;
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.GameCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.GameDTO;
@@ -61,7 +62,7 @@ public class GameController extends BaseGameController {
     public ResponseEntity<GameDTO> createGame(@RequestBody GameDTO gameDTO) {
         log.info("Create game name={}", gameDTO.getName());
         if (!Objects.isNull(gameDTO.getId())) {
-            throw new EntityCreationException("Game", "A new game cannot already have an ID");
+            throw new EntityCreationException("Game", "A new game cannot already have an ID", ErrorCodes.GAME_CREATION);
         }
         DomainUserDetails user = SecurityUtils.getCurrentUser();
         if (Objects.isNull(user)) {
@@ -77,7 +78,7 @@ public class GameController extends BaseGameController {
     public ResponseEntity<List<GamePersistanceDTO>> importGames(@RequestBody @Valid List<ImportGameDTO> games) {
         log.info("Import {} games", games.size());
         if (games.isEmpty()) {
-            throw new RequestException("Import Error", "There should be at least 1 game", HttpStatus.BAD_REQUEST);
+            throw new RequestException("Import Error", "There should be at least 1 game", ErrorCodes.IMPORT_EMPTY, HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok(importService.importGames(games));
     }

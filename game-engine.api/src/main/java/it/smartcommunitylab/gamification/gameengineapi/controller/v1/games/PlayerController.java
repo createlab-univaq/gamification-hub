@@ -4,6 +4,7 @@ import eu.trentorise.game.model.PlayerState;
 import eu.trentorise.game.services.GameService;
 import eu.trentorise.game.services.PlayerService;
 import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
+import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.PlayerDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.PlayerStateDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
@@ -57,7 +58,7 @@ public class PlayerController extends BaseGameController {
         findGameByIdOrThrow(gameId);
         PlayerState state = playerService.loadState(gameId, playerId, false, false);
         if (state == null) {
-            throw new EntityNotFoundException("Player", playerId);
+            throw new EntityNotFoundException("Player", playerId, ErrorCodes.PLAYER_NOT_FOUND);
         }
         return ResponseEntity.ok(playerStateMapper.toDTO(state));
     }

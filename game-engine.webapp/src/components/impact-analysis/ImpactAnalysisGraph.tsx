@@ -1,4 +1,4 @@
-import type {FiredRuleDto, RuleImpactDto} from "../../api/types";
+import type {RuleImpactDto} from "../../api/types";
 import type {Edge, EdgeProps, Node} from "@xyflow/react";
 import {Background, BaseEdge, Controls, ReactFlow, useEdgesState, useInternalNode, useNodesState} from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -7,6 +7,7 @@ import {useCallback, useEffect, useState} from "react";
 import {ImpactAnalysisNode} from "./ImpactAnalysisNode.tsx";
 import {computeImpactLayout, getEdgeParams, REACTIVITY_TYPES} from "../../utils/react-flow-utils.ts";
 import {useGame} from "../GameContext.tsx";
+import {useTranslation} from "react-i18next";
 
 interface ImpactAnalysisGraphProps {
     impactAnalysis: RuleImpactDto[]
@@ -24,20 +25,20 @@ const REACTIVITY_META: Record<string, {
     POSITIVE: {
         color: "#2e7d32",
         line: "solid",
-        label: "Positiva",
-        desc: "La sorgente causa l'attivazione del nodo di arrivo"
+        label: "impact_analysis.links.types.positive.label",
+        desc: "impact_analysis.links.types.positive.desc"
     },
     NEGATIVE: {
         color: "#c62828",
         line: "dashed",
-        label: "Negativa",
-        desc: "La sorgente evita l'attivazione del nodo di arrivo"
+        label: "impact_analysis.links.types.negative.label",
+        desc: "impact_analysis.links.types.negative.desc"
     },
     UNKNOWN: {
         color: "#9e9e9e",
         line: "dotted",
-        label: "Ambigua",
-        desc: "Non è possibile definire l'impatto sul nodo di arrivo"
+        label: "impact_analysis.links.types.neutral.label",
+        desc: "impact_analysis.links.types.neutral.desc"
     },
 };
 
@@ -89,6 +90,7 @@ export function ImpactAnalysisGraph({impactAnalysis}: ImpactAnalysisGraphProps) 
     const [active, setActive] = useState<Set<string>>(() => new Set(["POSITIVE", "NEGATIVE"]));
     const game = useGame()
     const [selectedNode, setSelectedNode] = useState<RuleImpactDto>()
+    const [t] = useTranslation()
 
     useEffect(() => {
         let cancelled = false;
@@ -116,8 +118,8 @@ export function ImpactAnalysisGraph({impactAnalysis}: ImpactAnalysisGraphProps) 
 
     if (nodes.length === 0) {
         return <Stack sx={{alignItems: "center", justifyContent: "center", height: "70dvh"}}>
-            <Typography>Nessuna regola presente nel gioco.</Typography>
-            <Button href={`/games/${game.id}/rules`}>Torna indietro</Button>
+            <Typography>{t("rules.empty_list")}</Typography>
+            <Button href={`/games/${game.id}/rules`}>{t("buttons:turn_back")}</Button>
         </Stack>;
     }
 
@@ -145,20 +147,21 @@ export function ImpactAnalysisGraph({impactAnalysis}: ImpactAnalysisGraphProps) 
                 <Controls/>
             </ReactFlow>
         </Box>
-        <Stack sx={{gap:1}}>
+        <Stack sx={{gap: 1}}>
             <Card variant="outlined" sx={{width: "15rem", flexShrink: 0, alignSelf: "flex-start"}}>
                 <CardContent>
-                    <Typography variant="subtitle2" sx={{fontWeight: 700}}>Tipologia di link</Typography>
+                    <Typography variant="subtitle2"
+                                sx={{fontWeight: 700}}>{t("impact_analysis.links.title")}</Typography>
                     <Divider sx={{my: 1}}/>
                     <Stack sx={{gap: 0.5}}>
-                        {REACTIVITY_TYPES.map(t => {
-                            const meta = REACTIVITY_META[t];
-                            const on = active.has(t);
+                        {REACTIVITY_TYPES.map(type => {
+                            const meta = REACTIVITY_META[type];
+                            const on = active.has(type);
                             return (
                                 <Stack
-                                    key={t}
+                                    key={type}
                                     direction="row"
-                                    onClick={() => toggle(t)}
+                                    onClick={() => toggle(type)}
                                     sx={{
                                         alignItems: "center",
                                         gap: 1,
@@ -181,9 +184,10 @@ export function ImpactAnalysisGraph({impactAnalysis}: ImpactAnalysisGraphProps) 
                                                 flexShrink: 0,
                                                 borderTop: `3px ${meta.line} ${meta.color}`
                                             }}/>
-                                            <Typography variant="body2" sx={{fontWeight: 600}}>{meta.label}</Typography>
+                                            <Typography variant="body2"
+                                                        sx={{fontWeight: 600}}>{t(meta.label)}</Typography>
                                         </Stack>
-                                        <Typography variant="caption" color="text.secondary">{meta.desc}</Typography>
+                                        <Typography variant="caption" color="text.secondary">{t(meta.desc)}</Typography>
                                     </Stack>
                                 </Stack>
                             );
@@ -196,16 +200,18 @@ export function ImpactAnalysisGraph({impactAnalysis}: ImpactAnalysisGraphProps) 
                     <CardContent>
                         <Typography variant="subtitle2" sx={{fontWeight: 700}}>{selectedNode.ruleName}</Typography>
                         <Divider sx={{my: 1}}/>
-                        <Stack sx={{display:selectedNode.reads.length ? "flex" : "none"}}>
-                            <Typography sx={{fontWeight:"bold"}}>Legge:</Typography>
-                            {selectedNode.reads.map((r, index)=>{
-                                return <Typography key={`impact-read-${index}`}>{r.conceptType} {r.conceptName} {r.field ?? "name"}</Typography>
+                        <Stack sx={{display: selectedNode.reads.length ? "flex" : "none"}}>
+                            <Typography sx={{fontWeight: "bold"}}>{t("rules.reads")}:</Typography>
+                            {selectedNode.reads.map((r, index) => {
+                                return <Typography
+                                    key={`impact-read-${index}`}>{r.conceptType} {r.conceptName} {r.field ?? "name"}</Typography>
                             })}
                         </Stack>
-                        <Stack sx={{display:selectedNode.writes.length ? "flex" : "none"}}>
-                            <Typography sx={{fontWeight:"bold"}}>Scrive:</Typography>
-                            {selectedNode.writes.map((r, index)=>{
-                                return <Typography key={`impact-write-${index}`}>{r.conceptType} {r.field} {r.conceptName}</Typography>
+                        <Stack sx={{display: selectedNode.writes.length ? "flex" : "none"}}>
+                            <Typography sx={{fontWeight: "bold"}}>{t("rules.writes")}:</Typography>
+                            {selectedNode.writes.map((r, index) => {
+                                return <Typography
+                                    key={`impact-write-${index}`}>{r.conceptType} {r.field} {r.conceptName}</Typography>
                             })}
                         </Stack>
                     </CardContent>
