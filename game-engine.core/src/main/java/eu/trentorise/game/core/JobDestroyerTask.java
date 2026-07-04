@@ -39,7 +39,7 @@ public class JobDestroyerTask extends EngineTask {
         for (Game game : games) {
             if (game.getExpiration() > 0 && game.getExpiration() < deadline) {
                 for (GameTask task : game.getTasks()) {
-                    if (taskSrv.destroyTask(task, game.getId())) {
+                    if (taskSrv.destroyTask(task, game)) {
                         LogHub.info(null, logger, "Destroy task - {} - of game {}",
                                 task.getName(), game.getId());
                     }

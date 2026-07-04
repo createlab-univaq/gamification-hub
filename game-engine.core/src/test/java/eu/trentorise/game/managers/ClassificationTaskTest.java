@@ -89,8 +89,8 @@ public class ClassificationTaskTest {
         // runs using dirty
         // data present in game collection
         // cleaning MUST be improved
-        taskSrv.destroyTask(incClass, g.getId());
-        taskSrv.createTask(incClass, g.getId());
+        taskSrv.destroyTask(incClass, g);
+        taskSrv.createTask(incClass, g);
     }
 
     @Test
@@ -114,8 +114,8 @@ public class ClassificationTaskTest {
         // runs using dirty
         // data present in game collection
         // cleaning MUST be improved
-        taskSrv.destroyTask(incClass, g.getId());
-        taskSrv.createTask(incClass, g.getId());
+        taskSrv.destroyTask(incClass, g);
+        taskSrv.createTask(incClass, g);
     }
 
     @Test

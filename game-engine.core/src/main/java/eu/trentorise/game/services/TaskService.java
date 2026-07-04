@@ -18,21 +18,19 @@ package eu.trentorise.game.services;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
+import eu.trentorise.game.model.Game;
 import eu.trentorise.game.model.core.EngineTask;
 import eu.trentorise.game.model.core.GameTask;
 
-@Service
 public interface TaskService {
 
     void createEngineTask(EngineTask engineTask);
 
-	public void createTask(GameTask task, String gameId);
+	public void createTask(GameTask task, Game game);
 
-	public boolean destroyTask(GameTask task, String gameId);
+	public boolean destroyTask(GameTask task, Game game);
 
-	public void updateTask(GameTask task, String gameId);
+	public void updateTask(GameTask task, Game game);
 
 	public String saveData(String gameId, String taskName, Object data);
 

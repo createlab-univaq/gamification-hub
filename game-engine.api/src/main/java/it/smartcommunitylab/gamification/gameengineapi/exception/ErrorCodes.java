@@ -30,6 +30,7 @@ public final class ErrorCodes {
     public static final String PLAYER_NOT_FOUND = "player_not_found";
     public static final String TEAM_NOT_FOUND = "team_not_found";
     public static final String SCENARIO_NOT_FOUND = "scenario_not_found";
+    public static final String CLASSIFICATION_NOT_FOUND = "classification_not_found";
 
     // Creation / already exists
     public static final String GAME_CREATION = "game_creation";
@@ -39,6 +40,7 @@ public final class ErrorCodes {
     public static final String CHALLENGE_CREATION = "challenge_creation";
     public static final String TEAM_CREATION = "team_creation";
     public static final String SCENARIO_CREATION = "scenario_creation";
+    public static final String CLASSIFICATION_CREATION = "classification_creation";
 
     // Execution / simulation
     public static final String GAME_EXECUTION_FAILED = "game_execution_failed";

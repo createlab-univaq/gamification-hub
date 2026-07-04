@@ -16,6 +16,7 @@ package eu.trentorise.game.repo;
 
 import java.util.List;
 
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -35,5 +36,11 @@ public interface GameRepo extends MongoRepository<GamePersistence, String> {
     
     @Query("{'name': {'$regex': ?0, '$options': 'i'}, 'owner': ?1}")
 	public List<GamePersistence> findBySearchName(String title, String user);
+
+    @Aggregation(pipeline = {
+            "{ $match: { _id: ?0 } }",
+            "{ $project: { tasks: { $filter: { input: { $ifNull: ['$tasks', []] }, as: 'task', cond: { $regexMatch: { input: { $ifNull: ['$$task.obj.name', ''] }, regex: ?1, options: 'i' } } } } } }"
+    })
+    public GamePersistence findTasksByGameIdAndName(String gameId, String nameRegex);
 
 }

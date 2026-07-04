@@ -13,6 +13,6 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Gamification Engine API")
-                        .version("1.0.0"));
+                        .version("3.0.0"));
     }
 }

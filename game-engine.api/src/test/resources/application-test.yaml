@@ -1,0 +1,6 @@
+engine:
+  task:
+    persistence:
+      activate: false
+    dashboard:
+      enabled: false

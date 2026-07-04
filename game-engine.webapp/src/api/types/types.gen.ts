@@ -109,6 +109,17 @@ export type RuleDto = {
     content: string;
 };
 
+export type ClassificationDto = {
+    id?: string;
+    gameId?: string;
+    name?: string;
+    type?: 'GENERAL' | 'INCREMENTAL';
+    pointConceptName?: string;
+    itemsToNotificate?: number;
+    cronExpression?: string;
+    periodName?: string;
+};
+
 export type ChallengeDto = {
     id?: string;
     name?: string;
@@ -343,9 +354,9 @@ export type PagePlayerDto = {
 export type PageableObject = {
     offset?: number;
     sort?: SortObject;
-    paged?: boolean;
-    pageNumber?: number;
     pageSize?: number;
+    pageNumber?: number;
+    paged?: boolean;
     unpaged?: boolean;
 };
 
@@ -400,6 +411,19 @@ export type RuleImpactDto = {
     reads?: Array<ConceptChangeDto>;
     writes?: Array<ConceptChangeDto>;
     activates?: Array<ActivationLinkDto>;
+};
+
+export type ClassificationBoardDto = {
+    classificationName?: string;
+    pointConceptName?: string;
+    type?: 'GENERAL' | 'INCREMENTAL';
+    board?: Array<ClassificationPositionDto>;
+};
+
+export type ClassificationPositionDto = {
+    position?: number;
+    playerId?: string;
+    score?: number;
 };
 
 export type DeleteGameData = {
@@ -618,6 +642,61 @@ export type EditRuleResponses = {
 };
 
 export type EditRuleResponse = EditRuleResponses[keyof EditRuleResponses];
+
+export type DeleteClassificationData = {
+    body?: never;
+    path: {
+        gameId: string;
+        classificationId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/classifications/{classificationId}';
+};
+
+export type DeleteClassificationResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetClassificationData = {
+    body?: never;
+    path: {
+        gameId: string;
+        classificationId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/classifications/{classificationId}';
+};
+
+export type GetClassificationResponses = {
+    /**
+     * OK
+     */
+    200: ClassificationDto;
+};
+
+export type GetClassificationResponse = GetClassificationResponses[keyof GetClassificationResponses];
+
+export type UpdateClassificationData = {
+    body: ClassificationDto;
+    path: {
+        gameId: string;
+        classificationId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/classifications/{classificationId}';
+};
+
+export type UpdateClassificationResponses = {
+    /**
+     * OK
+     */
+    200: ClassificationDto;
+};
+
+export type UpdateClassificationResponse = UpdateClassificationResponses[keyof UpdateClassificationResponses];
 
 export type DeleteGameChallengeData = {
     body?: never;
@@ -1043,6 +1122,44 @@ export type UpsertLevelResponses = {
 
 export type UpsertLevelResponse = UpsertLevelResponses[keyof UpsertLevelResponses];
 
+export type GetClassificationsData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: {
+        name?: string;
+    };
+    url: '/api/v1/games/{gameId}/classifications';
+};
+
+export type GetClassificationsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ClassificationDto>;
+};
+
+export type GetClassificationsResponse = GetClassificationsResponses[keyof GetClassificationsResponses];
+
+export type CreateClassificationData = {
+    body: ClassificationDto;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/classifications';
+};
+
+export type CreateClassificationResponses = {
+    /**
+     * OK
+     */
+    200: ClassificationDto;
+};
+
+export type CreateClassificationResponse = CreateClassificationResponses[keyof CreateClassificationResponses];
+
 export type GetGameChallengesData = {
     body?: never;
     path: {
@@ -1427,6 +1544,40 @@ export type ExportGameResponses = {
 };
 
 export type ExportGameResponse = ExportGameResponses[keyof ExportGameResponses];
+
+export type GetClassificationBoardData = {
+    body?: never;
+    path: {
+        gameId: string;
+        classificationId: string;
+    };
+    query?: {
+        timestamp?: number;
+        periodInstanceIndex?: number;
+        /**
+         * Zero-based page index (0..N)
+         */
+        page?: number;
+        /**
+         * The size of the page to be returned
+         */
+        size?: number;
+        /**
+         * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         */
+        sort?: Array<string>;
+    };
+    url: '/api/v1/games/{gameId}/classifications/{classificationId}/board';
+};
+
+export type GetClassificationBoardResponses = {
+    /**
+     * OK
+     */
+    200: ClassificationBoardDto;
+};
+
+export type GetClassificationBoardResponse = GetClassificationBoardResponses[keyof GetClassificationBoardResponses];
 
 export type GetAuthenticatedUserData = {
     body?: never;

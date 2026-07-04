@@ -36,7 +36,6 @@ import eu.trentorise.game.model.core.ComplexSearchQuery;
 import eu.trentorise.game.model.core.RawSearchQuery;
 import eu.trentorise.game.model.core.StringSearchQuery;
 
-@Service
 public interface PlayerService {
 
 	public PlayerState loadState(String gameId, String playerId, boolean upsert, boolean mergeChallenges);

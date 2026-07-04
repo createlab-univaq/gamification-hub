@@ -6,9 +6,9 @@
       <list>
         <option value="$PROJECT_DIR$/game-engine.api/pom.xml" />
         <option value="$PROJECT_DIR$/game-engine.core/pom.xml" />
+        <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
-    <option name="workspaceImportForciblyTurnedOn" value="true" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="openjdk-23" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />

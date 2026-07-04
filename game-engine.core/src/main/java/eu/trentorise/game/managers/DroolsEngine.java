@@ -17,8 +17,12 @@ package eu.trentorise.game.managers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import eu.trentorise.game.core.EngineMetrics;
+import eu.trentorise.game.core.ExecutionGuard;
 import eu.trentorise.game.core.LogHub;
 import eu.trentorise.game.core.LoggingRuleListener;
+import eu.trentorise.game.core.PerfMonitor;
+import eu.trentorise.game.core.RuleExecutionLimitException;
 import eu.trentorise.game.core.StatsLogger;
 import eu.trentorise.game.core.Utility;
 import eu.trentorise.game.core.listener.BaseSimulationEventListener;
@@ -47,7 +51,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.LogManager;
 import org.drools.compiler.kie.builder.impl.DrlProject;
 import org.drools.drl.parser.MessageImpl;
 import org.drools.model.codegen.ExecutableModelProject;
@@ -63,11 +66,10 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.StatelessKieSession;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
-import org.perf4j.StopWatch;
-import org.perf4j.log4j.Log4JStopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -102,6 +104,12 @@ public class DroolsEngine implements GameEngine {
     @Autowired
     private ChallengeConceptRepo challengeConceptRepo;
 
+    @Value("${engine.execution.max-rule-firings:4000}")
+    private long maxRuleFirings;
+
+    @Value("${engine.execution.timeout:120000}")
+    private long executionTimeoutMs;
+
     public static final String ARITY_FALLBACK_WARNING_KEY = "_warning_arity_fallback";
 
     private static final Pattern ARITY_ERROR_PATTERN = Pattern.compile(
@@ -115,12 +123,7 @@ public class DroolsEngine implements GameEngine {
                                Map<String, Object> data, String executionId, long executionMoment,
                                List<Object> factObjects) {
 
-        StopWatch stopWatch =
-                LogManager.getLogger(StopWatch.DEFAULT_LOGGER_NAME).getAppender("perf-file") != null
-                        ? new Log4JStopWatch() : null;
-        if (stopWatch != null) {
-            stopWatch.start("game execution");
-        }
+        PerfMonitor perfMonitor = PerfMonitor.start();
 
         List<ChallengeConceptPersistence> listCcs = challengeConceptRepo.findByGameIdAndPlayerId(gameId, state.getPlayerId());
         state.loadChallengeConcepts(listCcs);
@@ -138,6 +141,8 @@ public class DroolsEngine implements GameEngine {
         StatelessKieSession kSession = kieContainer.newStatelessKieSession();
         kSession.addEventListener(new LoggingRuleListener(game.getDomain(), gameId,
                 state.getPlayerId(), stateBeforePlay, executionId, executionMoment));
+        ExecutionGuard guard = new ExecutionGuard(maxRuleFirings, executionTimeoutMs);
+        kSession.addEventListener(guard);
 
         KieCommands commands = KieServices.get().getCommands();
         List<Command> cmds = new ArrayList<Command>();
@@ -203,6 +208,13 @@ public class DroolsEngine implements GameEngine {
         kSession = loadGameConstants(kSession, gameId);
 
         ExecutionResults results = kSession.execute(commands.newBatchExecution(cmds));
+
+        if (guard.isTripped()) {
+            EngineMetrics.emitAbortedExecution(guard.getReasonTag(), "execution");
+            throw new RuleExecutionLimitException(String.format(
+                    "execution aborted for game %s player %s: %s", gameId, state.getPlayerId(),
+                    guard.getReason()));
+        }
 
         // new state contains archived challenges and all GameConcept
         // loaded in engine session
@@ -317,10 +329,8 @@ public class DroolsEngine implements GameEngine {
         // fix for dataset prior than 0.9 version
         state.setCustomData(customData.isEmpty() ? new CustomData() : customData.get(0));
 
-        if (stopWatch != null) {
-            stopWatch.stop("game execution", String.format("execution for game %s of player %s",
-                    gameId, state.getPlayerId()));
-        }
+        perfMonitor.stop(EngineMetrics.EXECUTIONS, "game", "%s (%s)".formatted(game.getName(), gameId),
+                String.format("execution for game %s of player %s", gameId, state.getPlayerId()));
 
         boolean result = playerSrv.saveState(state) != null;
 
@@ -421,11 +431,20 @@ public class DroolsEngine implements GameEngine {
         }
 
         kSession.addEventListener(simulationChangesListener);
+        ExecutionGuard guard = new ExecutionGuard(maxRuleFirings, executionTimeoutMs);
+        kSession.addEventListener(guard);
 
         kSession.setGlobal("utils", new Utility(gameId));
         kSession = loadGameConstants(kSession, gameId);
 
         ExecutionResults results = kSession.execute(commands.newBatchExecution(cmds));
+
+        if (guard.isTripped()) {
+            EngineMetrics.emitAbortedExecution(guard.getReasonTag(), "simulation");
+            throw new RuleExecutionLimitException(String.format(
+                    "simulation aborted for game %s: %s", gameId, guard.getReason()));
+        }
+
         firedRules = simulationChangesListener.getFiredRule();
 
         // Build final state from query results — no persistence, no notifications

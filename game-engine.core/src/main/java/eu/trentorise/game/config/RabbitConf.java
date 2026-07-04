@@ -12,12 +12,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@ConditionalOnProperty("rabbitmq.enabled")
+@ConditionalOnProperty("engine.rabbitmq.enabled")
 @PropertySource("classpath:engine.core.properties")
 public class RabbitConf {
 
-    @Value("${rabbitmq.pngExchangeName}")
-    private String geExchangeName;    
+    @Value("${engine.rabbitmq.png-exchange-name:ge-notifications}")
+    private String geExchangeName;
     
     @Value("${spring.rabbitmq.host}")
     private String host;    

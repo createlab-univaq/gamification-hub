@@ -31,7 +31,6 @@ import eu.trentorise.game.model.PlayerState;
 import eu.trentorise.game.model.core.GameConcept;
 import eu.trentorise.game.model.core.Rule;
 
-@Service
 public interface GameService {
 
     public String getGameIdByAction(String actionId);

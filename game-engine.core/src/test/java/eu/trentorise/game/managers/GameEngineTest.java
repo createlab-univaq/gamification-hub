@@ -14,7 +14,6 @@
 
 package eu.trentorise.game.managers;
 
-import com.mchange.io.FileUtils;
 import eu.trentorise.game.config.AppConfig;
 import eu.trentorise.game.config.MongoConfig;
 import eu.trentorise.game.config.RabbitConf;
@@ -43,8 +42,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -107,6 +107,13 @@ public class GameEngineTest {
         gameManager.addRule(new ClasspathRule(GAME, "rules/" + GAME + "/finalClassificationBadges.drl"));
     }
 
+    private String readRule(String resourcePath) throws IOException {
+        try (InputStream in =
+                Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath)) {
+            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
+
     private void initDBRuleGame() {
         mongo.getDb().drop();
         gameManager.saveGameDefinition(defineGame().toGame());
@@ -114,44 +121,44 @@ public class GameEngineTest {
         // add rules
         try {
 
-            String c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/constants").getFile()));
+            String c = readRule("rules/" + GAME + "/constants");
             DBRule rule = new DBRule(GAME, c);
             rule.setName("constants");
             gameManager.addRule(rule);
 
-            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/greenBadges.drl").getFile()));
+            c = readRule("rules/" + GAME + "/greenBadges.drl");
             rule = new DBRule(GAME, c);
             rule.setName("greenBadges");
             gameManager.addRule(rule);
-            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/greenPoints.drl").getFile()));
+            c = readRule("rules/" + GAME + "/greenPoints.drl");
             rule = new DBRule(GAME, c);
             rule.setName("greenPoints");
             gameManager.addRule(rule);
-            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/healthPoints.drl").getFile()));
+            c = readRule("rules/" + GAME + "/healthPoints.drl");
             rule = new DBRule(GAME, c);
             rule.setName("healthPoints");
             gameManager.addRule(rule);
-            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/healthBadges.drl").getFile()));
+            c = readRule("rules/" + GAME + "/healthBadges.drl");
             rule = new DBRule(GAME, c);
             rule.setName("healthBadges");
             gameManager.addRule(rule);
-            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/prPoints.drl").getFile()));
+            c = readRule("rules/" + GAME + "/prPoints.drl");
             rule = new DBRule(GAME, c);
             rule.setName("prPoints");
             gameManager.addRule(rule);
-            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/prBadges.drl").getFile()));
+            c = readRule("rules/" + GAME + "/prBadges.drl");
             rule = new DBRule(GAME, c);
             rule.setName("prBadges");
             gameManager.addRule(rule);
-            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/specialBadges.drl").getFile()));
+            c = readRule("rules/" + GAME + "/specialBadges.drl");
             rule = new DBRule(GAME, c);
             rule.setName("specialBadges");
             gameManager.addRule(rule);
-            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/weekClassificationBadges.drl").getFile()));
+            c = readRule("rules/" + GAME + "/weekClassificationBadges.drl");
             rule = new DBRule(GAME, c);
             rule.setName("weekClassificationBadges");
             gameManager.addRule(rule);
-            c = FileUtils.getContentsAsString(new File(Thread.currentThread().getContextClassLoader().getResource("rules/" + GAME + "/finalClassificationBadges.drl").getFile()));
+            c = readRule("rules/" + GAME + "/finalClassificationBadges.drl");
             rule = new DBRule(GAME, c);
             rule.setName("finalClassificationBadges");
             gameManager.addRule(rule);

@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 import eu.trentorise.game.core.LogHub;
 import eu.trentorise.game.core.StatsLogger;
@@ -44,7 +43,6 @@ import eu.trentorise.game.services.TraceService;
 import eu.trentorise.game.services.Workflow;
 import eu.trentorise.game.utils.Utils;
 
-@Component
 public class GameWorkflow implements Workflow {
 
     private final Logger logger = org.slf4j.LoggerFactory.getLogger(GameWorkflow.class);
@@ -165,7 +163,7 @@ public class GameWorkflow implements Workflow {
         });
 
         
-        if (env.getProperty("trace.playerMove", Boolean.class, false)) {
+        if (env.getProperty("engine.trace-player-move", Boolean.class, false)) {
             traceSrv.tracePlayerMove(oldState, newState, data, executionMoment);
             LogHub.info(gameId, logger, "Traced player {} move", userId);
         }
@@ -220,6 +218,13 @@ public class GameWorkflow implements Workflow {
 
     @Override
     public void apply(String gameId, String actionId, String playerId, long executionMoment,
+            Map<String, Object> data, List<Object> factObjects) {
+        String executionId = generateExecutionId();
+        workflowExec(gameId, actionId, playerId, executionId, executionMoment, data, factObjects);
+    }
+
+    @Override
+    public void applySync(String gameId, String actionId, String playerId, long executionMoment,
             Map<String, Object> data, List<Object> factObjects) {
         String executionId = generateExecutionId();
         workflowExec(gameId, actionId, playerId, executionId, executionMoment, data, factObjects);

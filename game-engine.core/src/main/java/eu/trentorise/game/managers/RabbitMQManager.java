@@ -20,10 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.trentorise.game.repo.NotificationPersistence;
 
 @Component
-@ConditionalOnProperty("rabbitmq.enabled")
+@ConditionalOnProperty("engine.rabbitmq.enabled")
 public class RabbitMQManager {
 
-	@Value("${rabbitmq.enabled}")
+	@Value("${engine.rabbitmq.enabled:false}")
 	private Boolean rabbitMQEnabled;
 
 //	private String rabbitMQHost;
@@ -36,10 +36,10 @@ public class RabbitMQManager {
 
 //	private String rabbitMQPassword;
 
-	@Value("${rabbitmq.pngExchangeName}")
+	@Value("${engine.rabbitmq.png-exchange-name:ge-notifications}")
 	private String rabbitMQExchangeName;
 
-	@Value("${rabbitmq.pngRoutingKeyPrefix}")
+	@Value("${engine.rabbitmq.png-routing-key-prefix:game}")
 	private String rabbitMQroutingKeyPrefix;
 
 //	@Autowired

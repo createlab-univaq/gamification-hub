@@ -29,13 +29,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
-
-import org.apache.log4j.LogManager;
-import org.perf4j.StopWatch;
-import org.perf4j.log4j.Log4JStopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -54,7 +50,9 @@ import eu.trentorise.game.core.ChallengeFailureTask;
 import eu.trentorise.game.core.CheckPerformanceGroupChallengeTask;
 import eu.trentorise.game.core.GameStatsTask;
 import eu.trentorise.game.core.JobDestroyerTask;
+import eu.trentorise.game.core.EngineMetrics;
 import eu.trentorise.game.core.LogHub;
+import eu.trentorise.game.core.PerfMonitor;
 import eu.trentorise.game.core.StatsLogger;
 import eu.trentorise.game.core.TaskSchedule;
 import eu.trentorise.game.managers.drools.KieContainerFactory;
@@ -90,7 +88,7 @@ import eu.trentorise.game.services.Workflow;
 import eu.trentorise.game.task.AutoChallengeChoiceTask;
 
 @Component
-public class GameManager implements GameService {
+public class GameManager implements GameService, InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(GameManager.class);
 
@@ -98,16 +96,16 @@ public class GameManager implements GameService {
 
     private static final long ONE_SECOND_IN_MILLIS = 1000;
 
-    @Value("${schedule.task.job-destroyer}")
+    @Value("${engine.schedule.job-destroyer:0 0 0 * * *}")
     private String jobDestroyerCronExpression;
 
-    @Value("${schedule.task.check-performance-group-challenge}")
+    @Value("${engine.schedule.check-performance-group-challenge:0 0 1 * * *}")
     private String checkPerformanceGroupChallengeCronExpression;
 
-    @Value("${schedule.task.challenge-failure}")
+    @Value("${engine.schedule.challenge-failure:0 0 8 * * *}")
     private String failureChallengeCronExpression;
 
-    @Value("${schedule.task.game-stats}")
+    @Value("${engine.schedule.game-stats:0 0 2 * * *}")
     private String gameStatsCronExpression;
 
     @Autowired
@@ -143,13 +141,17 @@ public class GameManager implements GameService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    @PostConstruct
-    private void startup() {
-        for (Game game : loadGames(true)) {
-            startupTasks(game.getId());
-        }
+    @Override
+    public void afterPropertiesSet() {
+        try {
+            for (Game game : loadGames(true)) {
+                startupTasks(game.getId());
+            }
 
-        startEngineTasks();
+            startEngineTasks();
+        } catch (Exception e) {
+            LogHub.error(null, logger, "Error registering scheduled tasks at startup: {}", e.getMessage());
+        }
     }
 
     private void startEngineTasks() {
@@ -194,7 +196,7 @@ public class GameManager implements GameService {
         Game game = loadGameDefinitionById(gameId);
         if (game != null) {
             for (GameTask task : game.getTasks()) {
-                    taskSrv.createTask(task, gameId);
+                    taskSrv.createTask(task, game);
             }
         }
     }
@@ -281,9 +283,9 @@ public class GameManager implements GameService {
                     .filter(task -> task.getClass() == AutoChallengeChoiceTask.class)
                     .forEach(task -> {
                         if (isTaskExistent) {
-                            taskSrv.updateTask(task, game.getId());
+                            taskSrv.updateTask(task, game);
                         } else {
-                            taskSrv.createTask(task, game.getId());
+                            taskSrv.createTask(task, game);
                         }
                     });
         }
@@ -306,11 +308,7 @@ public class GameManager implements GameService {
         String ruleUrl = null;
         boolean isEdit = false;
         if (rule != null) {
-            StopWatch stopWatch = LogManager.getLogger(StopWatch.DEFAULT_LOGGER_NAME)
-                    .getAppender("perf-file") != null ? new Log4JStopWatch() : null;
-            if (stopWatch != null) {
-                stopWatch.start("insert rule");
-            }
+            PerfMonitor perfMonitor = PerfMonitor.start();
             Game game = loadGameDefinitionById(rule.getGameId());
             if (game != null) {
                 if (rule instanceof ClasspathRule) {
@@ -353,9 +351,8 @@ public class GameManager implements GameService {
                     throw new IllegalArgumentException(
                             "the rule already exist for game " + rule.getGameId());
                 }
-                if (stopWatch != null) {
-                    stopWatch.stop("insert rule", "inserted rule for game " + rule.getGameId());
-                }
+                perfMonitor.stop(EngineMetrics.RULE_INSERT, rule.getGameId(),
+                        "inserted rule for game " + rule.getGameId());
             } else {
                 LogHub.error(rule.getGameId(), logger, "Game {} not found", rule.getGameId());
             }

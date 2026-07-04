@@ -53,6 +53,9 @@
   "scenario_not_found": "The requested scenario was not found.",
   "scenario_not_found_title": "Not found!",
 
+  "classification_not_found": "The requested classification was not found.",
+  "classification_not_found_title": "Not found!",
+
   "game_creation": "The game could not be created.",
   "game_creation_title": "Creation failed!",
 
@@ -73,6 +76,9 @@
 
   "scenario_creation": "A scenario with this name already exists in the game.",
   "scenario_creation_title": "Creation failed!",
+
+  "classification_creation": "A classification with this name already exists in the game.",
+  "classification_creation_title": "Creation failed!",
 
   "game_execution_failed": "The game action could not be executed.",
   "game_execution_failed_title": "Execution failed!",

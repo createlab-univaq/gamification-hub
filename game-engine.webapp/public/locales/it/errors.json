@@ -53,6 +53,9 @@
   "scenario_not_found": "Lo scenario richiesto non è stato trovato.",
   "scenario_not_found_title": "Non trovato!",
 
+  "classification_not_found": "La classifica richiesta non è stata trovata.",
+  "classification_not_found_title": "Non trovato!",
+
   "game_creation": "Impossibile creare il gioco.",
   "game_creation_title": "Creazione fallita!",
 
@@ -73,6 +76,9 @@
 
   "scenario_creation": "Esiste già uno scenario con questo nome nel gioco.",
   "scenario_creation_title": "Creazione fallita!",
+
+  "classification_creation": "Esiste già una classifica con questo nome nel gioco.",
+  "classification_creation_title": "Creazione fallita!",
 
   "game_execution_failed": "Impossibile eseguire l'azione di gioco.",
   "game_execution_failed_title": "Esecuzione fallita!",

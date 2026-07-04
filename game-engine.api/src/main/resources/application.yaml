@@ -9,9 +9,24 @@ spring:
     username: ${MONGODB_USER:username}
     password: ${MONGODB_PASSWORD:password}
     authentication-database: admin
+    representation:
+      uuid: standard
 
   main:
     allow-circular-references: true
   data:
     mongodb:
       auto-index-creation: true
+
+# stats: one structured line per game event | perf: one line per timed operation
+# flip to INFO to enable; the engine.* Micrometer timers are always active regardless
+logging:
+  level:
+    stats: "OFF"
+    perf: "OFF"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus

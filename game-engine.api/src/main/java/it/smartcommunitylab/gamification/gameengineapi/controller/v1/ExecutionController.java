@@ -10,9 +10,11 @@ import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundE
 import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.exception.RequestException;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ExecutionDTO;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.PlayerStateDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.SimulationRequestDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.SimulationResultDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
+import it.smartcommunitylab.gamification.gameengineapi.model.mapper.PlayerStateMapper;
 import it.smartcommunitylab.gamification.gameengineapi.service.SimulationService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -32,24 +34,26 @@ public class ExecutionController extends BaseGameController {
     private final PlayerService playerService;
     private final Workflow workflow;
     private final SimulationService simulationService;
+    private final PlayerStateMapper playerStateMapper;
 
-    public ExecutionController(GameService gameService, GameMapper gameMapper, PlayerService playerService, Workflow workflow, SimulationService simulationService) {
+    public ExecutionController(GameService gameService, GameMapper gameMapper, PlayerService playerService, Workflow workflow, SimulationService simulationService, PlayerStateMapper playerStateMapper) {
         super(gameService, gameMapper);
         this.playerService = playerService;
         this.workflow = workflow;
         this.simulationService = simulationService;
+        this.playerStateMapper = playerStateMapper;
     }
 
     @PostMapping
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#executionDTO.gameId)")
-    public ResponseEntity<PlayerState> executeGame(@RequestBody @Valid ExecutionDTO executionDTO) {
+    public ResponseEntity<PlayerStateDTO> executeGame(@RequestBody @Valid ExecutionDTO executionDTO) {
         log.info("REST request to execute game action {}", executionDTO);
         Game game = findGameByIdOrThrow(executionDTO.getGameId());
         if (!game.getActions().contains(executionDTO.getActionId())) {
             throw new EntityNotFoundException("Action", executionDTO.getActionId(), ErrorCodes.ACTION_NOT_FOUND);
         }
         try {
-            workflow.apply(executionDTO.getGameId(),
+            workflow.applySync(executionDTO.getGameId(),
                     executionDTO.getActionId(),
                     executionDTO.getPlayerId(),
                     executionDTO.getExecutionMoment().toEpochMilli(),
@@ -62,7 +66,7 @@ public class ExecutionController extends BaseGameController {
                     false,
                     false
             );
-            return ResponseEntity.ok(state);
+            return ResponseEntity.ok(playerStateMapper.toDTO(state));
         } catch (Exception e) {
             log.error("Game execution interrupted by unexpected error {}", e.getLocalizedMessage());
             throw new RequestException("Game execution failed", "Could not advance game state due to an error", ErrorCodes.GAME_EXECUTION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);

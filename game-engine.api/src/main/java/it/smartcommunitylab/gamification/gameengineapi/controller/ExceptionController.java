@@ -58,6 +58,12 @@ public class ExceptionController {
         return buildResponseObject(e.getTitle(), e.getMessage(), e.getCode(), e.getParams(), null, e.getStatus());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ExceptionResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("Invalid argument!\n{}", e.getMessage());
+        return buildResponseObject("Validation Error!", e.getMessage(), ErrorCodes.VALIDATION, List.of(), null, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<ExceptionResponse> handleMongoException(DataAccessException e) {
         log.error("Mongo Error!\n{}", e.getLocalizedMessage());

@@ -46,6 +46,8 @@ public class SecurityConfig {
                         authorize
                                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth", "/api/v1/auth/logout").permitAll()
+                                // TODO secure actuator endpoints before production (Prometheus scrapers cannot use the auth cookie)
+                                .requestMatchers("/actuator/**").permitAll()
                                 .anyRequest().authenticated()
                 )
         ;

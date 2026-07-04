@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.bson.UuidRepresentation;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
@@ -47,7 +48,10 @@ public class MongoConfig {
 	public MongoClient mongo() {
 		ConnectionString uri = new ConnectionString(env.getProperty("spring.data.mongodb.uri"));
 		MongoClientSettings mongoClientSettings = null;
-		mongoClientSettings = MongoClientSettings.builder().applyConnectionString(uri).build();
+		mongoClientSettings = MongoClientSettings.builder()
+				.applyConnectionString(uri)
+				.uuidRepresentation(UuidRepresentation.STANDARD)
+				.build();
 
 		try {
 			return MongoClients.create(mongoClientSettings);

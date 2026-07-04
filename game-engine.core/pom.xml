@@ -100,19 +100,13 @@
         </dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>2.0.0-alpha7</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-reload4j</artifactId>
-				</exclusion>
-			</exclusions>
+			<artifactId>slf4j-api</artifactId>
+			<version>2.0.16</version>
 		</dependency>
 		<dependency>
-			<groupId>org.perf4j</groupId>
-			<artifactId>perf4j</artifactId>
-			<version>0.9.16</version>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-core</artifactId>
+			<version>1.17.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -144,21 +138,19 @@
 			<version>2.6.6</version>
 		</dependency>
 
-		<!-- QUARTZ DEP -->
+		<!-- JOBRUNR DEP -->
 		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>2.4.0</version>
+			<groupId>org.jobrunr</groupId>
+			<artifactId>jobrunr</artifactId>
+			<version>8.7.1</version>
 		</dependency>
+
+		<!-- SPRING BOOT AUTOCONFIGURATION (compile-time only, used by GameEngineAutoConfiguration) -->
 		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz-jobs</artifactId>
-			<version>2.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>io.fluidsonic.mirror</groupId>
-			<artifactId>quartz-mongodb</artifactId>
-			<version>2.2.0-rc2</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+			<version>4.0.5</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -196,19 +188,6 @@
 			<version>2.4.6</version>
 		</dependency>
 
-
-<!-- POSTGRES -->
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>42.3.6</version>
-		</dependency>
-		<dependency>
-			<groupId>com.mchange</groupId>
-			<artifactId>mchange-commons-java</artifactId>
-			<version>0.2.15</version>
-			<scope>test</scope>
-		</dependency>
 
 	</dependencies>
 

@@ -2,8 +2,10 @@ package it.smartcommunitylab.gamification.gameengineapi.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -11,7 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExecutionDTO implements Serializable {
 
     @NotBlank
@@ -28,6 +31,10 @@ public class ExecutionDTO implements Serializable {
 
     private List<Object> customData;
 
-    private Instant executionMoment = Instant.now();
+    private Instant executionMoment;
+
+    public Instant getExecutionMoment() {
+        return executionMoment != null ? executionMoment : Instant.now();
+    }
 
 }

@@ -17,18 +17,18 @@ package eu.trentorise.game.services;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Service;
-
 import eu.trentorise.game.model.PlayerState;
 import eu.trentorise.game.model.simulation.SimulationResult;
 
-@Service
 public interface Workflow {
 
     public void apply(String gameId, String actionId, String userId, Map<String, Object> data,
             List<Object> workingMemoryObjects);
 
     public void apply(String gameId, String actionId, String playerId, long executionMoment,
+            Map<String, Object> data, List<Object> workingMemoryObjects);
+
+    public void applySync(String gameId, String actionId, String playerId, long executionMoment,
             Map<String, Object> data, List<Object> workingMemoryObjects);
 
     public SimulationResult simulate(String gameId, PlayerState syntheticState,

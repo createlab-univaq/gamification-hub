@@ -28,9 +28,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.LogManager;
-import org.perf4j.StopWatch;
-import org.perf4j.log4j.Log4JStopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +42,9 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.trentorise.game.core.EngineMetrics;
 import eu.trentorise.game.core.LogHub;
+import eu.trentorise.game.core.PerfMonitor;
 import eu.trentorise.game.core.ResourceNotFoundException;
 import eu.trentorise.game.core.StatsLogger;
 import eu.trentorise.game.model.ChallengeConcept;
@@ -302,12 +301,7 @@ public class DBPlayerManager implements PlayerService {
 
     public Page<PlayerState> loadStates(String gameId, Pageable pageable,
             boolean mergeChallenges, boolean filterHiddenChallenges) {
-        StopWatch stopWatch =
-                LogManager.getLogger(StopWatch.DEFAULT_LOGGER_NAME).getAppender("perf-file") != null
-                        ? new Log4JStopWatch() : null;
-        if (stopWatch != null) {
-            stopWatch.start("loadStates");
-        }
+        PerfMonitor perfMonitor = PerfMonitor.start();
         Page<StatePersistence> states = playerRepo.findByGameId(gameId, pageable);
         List<PlayerState> result = new ArrayList<PlayerState>();
         for (StatePersistence state : states) {
@@ -325,9 +319,7 @@ public class DBPlayerManager implements PlayerService {
         }
         PageImpl<PlayerState> res =
                 new PageImpl<PlayerState>(result, pageable, states.getTotalElements());
-        if (stopWatch != null) {
-            stopWatch.stop("loadStates", "Loaded states of game " + gameId);
-        }
+        perfMonitor.stop(EngineMetrics.LOAD_STATES, gameId, "Loaded states of game " + gameId);
         return res;
     }
 
