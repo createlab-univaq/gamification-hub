@@ -10,3 +10,10 @@ logs/
 cj.txt
 cookies*.txt
 *.cookiejar
+
+.env
+.env.*
+*.env.*
+game-engine.webapp/*.env.*
+game-engine.api/*.env.*
+game-engine.core/*.env.*
