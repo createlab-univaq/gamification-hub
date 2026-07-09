@@ -11,24 +11,26 @@ import {Loading} from "../../components/Loading.tsx";
 import {Navigate} from "react-router-dom";
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {Add} from "@mui/icons-material";
+import {Add, Games} from "@mui/icons-material";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {PageList} from "../../components/PageList.tsx";
 import {Stack, Typography} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 export function PlayerListPage() {
     const game = useGame()
     const {setNotification} = useNotificationContext()
     const [deletePlayer, setDeletePlayer] = useState<PlayerDto>()
     const [filters, setFilters] = useState<GetFilter<PlayerDto>[]>([])
+    const [t] = useTranslation()
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-players", game.id, filters],
-        queryFn: () => playerClient.getPlayers(game.id, filters),
+        queryFn: () => playerClient.getPlayers(game.id!, filters),
         enabled: !!game,
         placeholderData: keepPreviousData
     })
 
-    const {mutate} = useMutation({
+    const {mutate} = useMutation<unknown, object, { gameId: string, playerId: string }>({
         mutationKey: ["delete-player", game.id],
         mutationFn: (vars) => playerClient.deletePlayer(vars.gameId, vars.playerId),
         onSuccess: () => {
@@ -36,8 +38,8 @@ export function PlayerListPage() {
             setNotification({
                 notification: {
                     type: "success",
-                    title: "Giocatore Eliminato",
-                    content: `Il giocatore è stato eliminato con successo`
+                    title: t("players.deleted.title"),
+                    content: t("players.deleted.message")
                 },
                 isSnack: true
             })
@@ -69,23 +71,34 @@ export function PlayerListPage() {
 
     return <PageContainer>
         <PageHeader
-            title={"Giocatori"}
+            title={t("players.title")}
             buttons={[
                 {
-                    children: "Aggiungi",
+                    children: t("buttons:add"),
                     variant: "contained",
                     endIcon: <Add/>,
                     href: `/games/${game.id}/players/upsert`
                 }
             ]}
+            breadcrumbs={[
+                {
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
+                },
+                {
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
+                }
+            ]}
         />
-        <DeleteDialog message={`Vuoi davvero eliminare il giocatore "${deletePlayer?.playerId}" per sempre?`}
-                      deleteFn={() => mutate({gameId: game.id, playerId: deletePlayer.playerId})}
+        <DeleteDialog message={t("delete_message", {entity: deletePlayer?.playerId})}
+                      deleteFn={() => mutate({gameId: game.id!, playerId: deletePlayer?.playerId ?? ""})}
                       setElement={setDeletePlayer}
                       element={deletePlayer}
         />
         <PageList
-            items={data.content ?? []}
+            items={data?.content ?? []}
             renderItem={(item) => {
                 return <Stack>
                     <Typography sx={{fontWeight: "bold", fontSize: "1.2rem"}}>{item.playerId}</Typography>
@@ -97,10 +110,10 @@ export function PlayerListPage() {
             onItemDelete={(item) => {
                 setDeletePlayer(item)
             }}
-            emptyListMessage={<Typography>Nessun giocatore iscritto.</Typography>}
+            emptyListMessage={t("players.empty_list")}
             search={{
-                placeholder: "Nome...",
-                label: "Cerca",
+                placeholder: t("search_placeholder"),
+                label: t("players.search_placeholder"),
                 onSearch: (value) => {
                     filter(value)
                 }

@@ -8,35 +8,37 @@ import {Loading} from "../../components/Loading.tsx";
 import {Navigate} from "react-router-dom";
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {Add} from "@mui/icons-material";
+import {Add, Games} from "@mui/icons-material";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {Chip, Stack, Typography} from "@mui/material";
 import {PageList} from "../../components/PageList.tsx";
 import {useDebounced} from "../../hooks/use-debounced.ts";
 import type {ChallengeDto} from "../../api/types";
+import {useTranslation} from "react-i18next";
 
 export function ChallengeListPage() {
     const game = useGame()
     const {setNotification} = useNotificationContext()
     const [deleteChallenge, setDeleteChallenge] = useState<ChallengeDto>()
     const [search, setSearch] = useState<string>("")
+    const [t] = useTranslation()
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-challenges", game.id],
-        queryFn: () => challengeClient.getChallenges(game.id),
+        queryFn: () => challengeClient.getChallenges(game.id!),
         enabled: !!game
     })
 
     const {mutate} = useMutation({
         mutationKey: ["delete-challenge", game.id],
-        mutationFn: (challengeId: string) => challengeClient.deleteChallenge(game.id, challengeId),
+        mutationFn: (challengeId: string) => challengeClient.deleteChallenge(game.id!, challengeId),
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ["get-challenges", game.id]})
             setNotification({
                 notification: {
                     type: "success",
-                    title: "Modello di sfida eliminato",
-                    content: `Il modello di sfida è stato eliminato con successo`
+                    title: t("challenges.saved.title"),
+                    content: t("challenges.saved.messages")
                 },
                 isSnack: true
             })
@@ -66,17 +68,28 @@ export function ChallengeListPage() {
 
     return <PageContainer>
         <PageHeader
-            title={"Modelli di sfida"}
+            title={t("challenges.title")}
             buttons={[
                 {
-                    children: "Aggiungi",
+                    children: t("buttons:add"),
                     variant: "contained",
                     endIcon: <Add/>,
                     href: `/games/${game.id}/challenges/upsert`
                 }
             ]}
+            breadcrumbs={[
+                {
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
+                },
+                {
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
+                }
+            ]}
         />
-        <DeleteDialog message={`Vuoi davvero eliminare il modello di sfida "${deleteChallenge?.name}" per sempre?`}
+        <DeleteDialog message={t("delete_message", {entity: deleteChallenge?.name})}
                       deleteFn={() => mutate(deleteChallenge!.id!)}
                       setElement={setDeleteChallenge}
                       element={deleteChallenge}
@@ -92,14 +105,15 @@ export function ChallengeListPage() {
                     </Stack>
                 </Stack>
             }}
-            onItemUpdate={() => {}}
+            onItemUpdate={() => {
+            }}
             onItemDelete={(challenge) => {
                 setDeleteChallenge(challenge)
             }}
-            emptyListMessage={"Nessun modello di sfida trovato."}
+            emptyListMessage={t("challenges.empty_list")}
             search={{
-                label: "Cerca",
-                placeholder: "Modello...",
+                label: t("search_placeholder"),
+                placeholder: t("challenges.search_placeholder"),
                 onSearch: (value) => {
                     filter(value)
                 }

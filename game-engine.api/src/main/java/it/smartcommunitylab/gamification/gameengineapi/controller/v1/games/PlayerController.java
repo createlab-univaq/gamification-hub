@@ -10,6 +10,7 @@ import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.Play
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.PlayerMapper;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.PlayerStateMapper;
+import it.smartcommunitylab.gamification.gameengineapi.service.GroupChallengeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.annotations.ParameterObject;
@@ -27,12 +28,14 @@ public class PlayerController extends BaseGameController {
     private final PlayerService playerService;
     private final PlayerMapper playerMapper;
     private final PlayerStateMapper playerStateMapper;
+    private final GroupChallengeService groupChallengeService;
 
-    public PlayerController(GameService gameService, GameMapper gameMapper, PlayerService playerService, PlayerMapper playerMapper, PlayerStateMapper playerStateMapper) {
+    public PlayerController(GameService gameService, GameMapper gameMapper, PlayerService playerService, PlayerMapper playerMapper, PlayerStateMapper playerStateMapper, GroupChallengeService groupChallengeService) {
         super(gameService, gameMapper);
         this.playerService = playerService;
         this.playerMapper = playerMapper;
         this.playerStateMapper = playerStateMapper;
+        this.groupChallengeService = groupChallengeService;
     }
 
     @GetMapping
@@ -56,11 +59,13 @@ public class PlayerController extends BaseGameController {
     public ResponseEntity<PlayerStateDTO> getPlayer(@PathVariable String gameId, @PathVariable String playerId) {
         log.info("REST request to get player {} of game {}", playerId, gameId);
         findGameByIdOrThrow(gameId);
-        PlayerState state = playerService.loadState(gameId, playerId, false, false);
+        PlayerState state = playerService.loadState(gameId, playerId, false, true);
         if (state == null) {
             throw new EntityNotFoundException("Player", playerId, ErrorCodes.PLAYER_NOT_FOUND);
         }
-        return ResponseEntity.ok(playerStateMapper.toDTO(state));
+        PlayerStateDTO dto = playerStateMapper.toDTO(state);
+        dto.setGroupChallenges(groupChallengeService.list(gameId, playerId));
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping

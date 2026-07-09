@@ -1,0 +1,5 @@
+# Scrape targets for the gamification API.
+# Dev default: the API running on the host (Prometheus reaches it via host.docker.internal).
+# Prod: change the address here (hot-reloaded), or set PROMETHEUS_TARGETS to another targets dir.
+- targets:
+    - host.docker.internal:8080

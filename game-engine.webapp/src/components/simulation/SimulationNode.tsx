@@ -2,12 +2,14 @@ import type {FiredRuleDto} from "../../api/types";
 import type {NodeProps} from "@xyflow/react";
 import {Handle, Position} from "@xyflow/react";
 import {Chip, Divider, Stack, Typography} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 
 export function SimulationNode({data, selected, width}: NodeProps) {
 
     const rule = data.rule as FiredRuleDto;
     const fireSeq = data.fireSeq as number | null;
+    const [t] = useTranslation();
 
     return <>
         <Handle type="target" position={Position.Top} style={{background: "#555"}}/>
@@ -16,9 +18,9 @@ export function SimulationNode({data, selected, width}: NodeProps) {
                 width: width,
                 cursor: "pointer",
                 borderRadius: "0.5rem",
-                borderWidth:"2px",
-                borderStyle:"solid",
-                borderColor:  selected ? "primary.main" : "divider",
+                borderWidth: "2px",
+                borderStyle: "solid",
+                borderColor: selected ? "primary.main" : "divider",
                 backgroundColor: "background.paper",
                 transition: "border-color ease-in-out 0.15s",
             }}
@@ -44,7 +46,7 @@ export function SimulationNode({data, selected, width}: NodeProps) {
                 direction="row"
                 sx={{
                     gap: 0.5,
-                    p:1,
+                    p: 1,
                     flexWrap: "wrap",
                     alignItems: "center",
                     justifyContent: "center"
@@ -52,7 +54,7 @@ export function SimulationNode({data, selected, width}: NodeProps) {
             >
                 {!!rule.changes?.length && (
                     <Chip
-                        label={`${rule.changes.length} change${rule.changes.length > 1 ? "s" : ""}`}
+                        label={t("scenarios.form.graph.nodes.changes", {count: rule.changes.length})}
                         variant="outlined"
                         sx={{
                             color: "success.dark"

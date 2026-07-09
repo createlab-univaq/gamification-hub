@@ -616,10 +616,9 @@ public class DBPlayerManager implements PlayerService {
     // String pointConceptName, String periodName,
     // String key, String gameId, int pageNum, int pageSize) {
     @Override
-    public ClassificationBoard classifyPlayerStatesWithKey(long timestamp, String pointConceptName,
+    public Page<ClassificationPosition> classifyPlayerStatesWithKey(long timestamp, String pointConceptName,
             String periodName, String key, String gameId, Pageable pageable) {
 
-        ClassificationBoard classificationBoard = new ClassificationBoard();
         String field = "concepts.PointConcept." + pointConceptName
                 + ".obj.periods." + periodName + ".instances." + key + ".score";
         Criteria criteria = Criteria
@@ -628,7 +627,6 @@ public class DBPlayerManager implements PlayerService {
         Query query = new Query();
         // criteria.
         query.addCriteria(criteria);
-//        query.with(new Sort(Sort.Direction.DESC, field));
         query.with(Sort.by(Sort.Order.desc(field)));
         // fields in response.
         query.fields().include(field);
@@ -638,6 +636,7 @@ public class DBPlayerManager implements PlayerService {
         logger.info("Classification query " + query);
 
         List<StatePersistence> pStates = mongoTemplate.find(query, StatePersistence.class);
+        long total = mongoTemplate.count(new Query().addCriteria(criteria), StatePersistence.class);
 
         List<ClassificationPosition> classification = new ArrayList<ClassificationPosition>();
         for (StatePersistence state : pStates) {
@@ -645,43 +644,35 @@ public class DBPlayerManager implements PlayerService {
                     state.getIncrementalScore(pointConceptName, periodName, key),
                     state.getPlayerId()));
         }
-        classificationBoard.setBoard(classification);
-        classificationBoard.setType(ClassificationType.INCREMENTAL);
-        classificationBoard.setPointConceptName(pointConceptName);
 
-        return classificationBoard;
+        return new PageImpl<>(classification, pageable, total);
     }
 
     @Override
-    public ClassificationBoard classifyAllPlayerStates(Game g, String itemType, Pageable pageable) {
+    public Page<ClassificationPosition> classifyAllPlayerStates(Game g, String itemType, Pageable pageable) {
 
-        ClassificationBoard classificationBoard = new ClassificationBoard();
         List<ClassificationPosition> classification = new ArrayList<ClassificationPosition>();
 
         Criteria general = Criteria.where("gameId").is(g.getId());
 
         Query query = new Query();
         query.addCriteria(general);
-//        query.with(
-//                new Sort(Sort.Direction.DESC, "concepts.PointConcept." + itemType + ".obj.score"));
         query.with(Sort.by(Sort.Order.desc("concepts.PointConcept." + itemType + ".obj.score")));
-        
+
         query.fields().include("concepts.PointConcept." + itemType + ".obj.score");
         query.fields().include("playerId");
         // pagination.
         query.with(pageable);
 
         List<StatePersistence> pStates = mongoTemplate.find(query, StatePersistence.class);
+        long total = mongoTemplate.count(new Query().addCriteria(general), StatePersistence.class);
 
         for (StatePersistence state : pStates) {
             classification.add(new ClassificationPosition(state.getGeneralItemScore(itemType),
                     state.getPlayerId()));
         }
-        classificationBoard.setPointConceptName(itemType);
-        classificationBoard.setBoard(classification);
-        classificationBoard.setType(ClassificationType.GENERAL);
 
-        return classificationBoard;
+        return new PageImpl<>(classification, pageable, total);
     }
 
     private Page<PlayerState> convertToPlayerState(Page<StatePersistence> states,
@@ -714,6 +705,42 @@ public class DBPlayerManager implements PlayerService {
     public Page<PlayerState> search(String gameId, StringSearchQuery query, Pageable pageable) {
         Page<StatePersistence> states = playerRepo.search(gameId, query, pageable);
         return convertToPlayerState(states, pageable);
+    }
+
+    @Override
+    public ChallengeConcept deleteChallenge(String gameId, String playerId, String instanceName) {
+        ChallengeConceptPersistence persisted =
+                challengeConceptRepo.findByGameIdAndPlayerIdAndName(gameId, playerId, instanceName);
+        if (persisted == null) {
+            return null;
+        }
+        challengeConceptRepo.delete(persisted);
+        LogHub.info(gameId, logger, "deleted challenge {} of player {}", instanceName, playerId);
+        return persisted.getConcept();
+    }
+
+    @Override
+    public ChallengeConcept editChallenge(String gameId, String playerId, String instanceName, Date start, Date end,
+            Boolean hide) {
+        ChallengeConceptPersistence persisted =
+                challengeConceptRepo.findByGameIdAndPlayerIdAndName(gameId, playerId, instanceName);
+        if (persisted == null) {
+            return null;
+        }
+        ChallengeConcept concept = persisted.getConcept();
+        if (start != null) {
+            concept.setStart(start);
+        }
+        if (end != null) {
+            concept.setEnd(end);
+        }
+        if (hide != null) {
+            concept.getVisibility().setHidden(hide);
+        }
+        persisted.setConcept(concept);
+        challengeConceptRepo.save(persisted);
+        LogHub.info(gameId, logger, "edited challenge {} of player {}", instanceName, playerId);
+        return concept;
     }
 
     @Override

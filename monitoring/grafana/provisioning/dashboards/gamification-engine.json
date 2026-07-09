@@ -1,7 +1,7 @@
 {
   "uid": "gamification-engine",
-  "title": "Gamification Engine",
-  "tags": ["gamification", "engine"],
+  "title": "Engine Metrics",
+  "tags": ["metrics", "performace"],
   "timezone": "browser",
   "schemaVersion": 39,
   "version": 1,

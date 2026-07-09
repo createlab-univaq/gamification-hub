@@ -1,5 +1,4 @@
 import {Button, Card, CardActions, CardContent, Stack, TextField, Typography} from "@mui/material";
-import type {LoginRequest} from "../../api/types/types.ts";
 import {useMutation} from "@tanstack/react-query";
 import {authClient} from "../../api";
 import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
@@ -11,18 +10,20 @@ import {PasswordField} from "../../components/form/PasswordField.tsx";
 import {router} from "../../router";
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {useTranslation} from "react-i18next";
+import type {LoginRequestDto} from "../../api/types";
+import {LanguageSelector} from "../../components/LanguageSelector.tsx";
 
 export function LoginPage() {
 
     const {setNotification} = useNotificationContext()
     const {t} = useTranslation()
-    const form = useForm<LoginRequest>({
+    const form = useForm<LoginRequestDto>({
         defaultValues: {
             username: "",
             password: ""
         }
     })
-    const {mutate} = useMutation({
+    const {mutate} = useMutation<unknown, object, LoginRequestDto>({
         mutationFn: (request) => authClient.login(request),
         onSuccess: () => {
             router.navigate("/dashboard", {replace: true})
@@ -44,33 +45,35 @@ export function LoginPage() {
             alignItems: "center",
             justifyContent: "center"
         }}>
-            <Card sx={{maxWidth: "30%"}}>
+            <LanguageSelector defaultLanguage={"it"}/>
+            <Card sx={{maxWidth: "30%", mt:1}}>
                 <CardContent>
-                    <Form form={form} onSubmit={(fieldValues) => mutate({...fieldValues})}>
+                    <Form form={form} onSubmit={(fieldValues) => mutate(fieldValues as LoginRequestDto)}>
                         <Stack sx={{
                             gap: "2rem",
                             justifyContent: "center"
                         }}>
-                            <Typography sx={{textAlign: "center", textTransform:"uppercase"}} variant={"h4"}>{t("login_title")}</Typography>
+                            <Typography sx={{textAlign: "center", textTransform: "uppercase"}}
+                                        variant={"h4"}>{t("login_title")}</Typography>
                             <Stack sx={{
                                 gap: "1rem"
                             }}>
                                 <FormInput name={"username"}
                                            rules={{
-                                               required: "Campo obbligatorio",
+                                               required: t("required_field"),
                                                pattern: {
                                                    value: /^[a-zA-Z0-9_]+$/,
-                                                   message: "Lo username può contenere solo caratteri lettere e underscore."
+                                                   message: t("form.username_validation")
                                                }
                                            }}>
                                     <TextField type={"text"} label={"Username"} placeholder={"MyUsername"} fullWidth/>
                                 </FormInput>
                                 <FormInput name={"password"}
                                            rules={{
-                                               required: "Password obbligatoria",
+                                               required: t("required_field"),
                                                pattern: {
                                                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?])[A-Za-z\d@$!%*?]{4,}$/,
-                                                   message: "La password deve contenere almeno 4 caratteri, un carattere maiuscolo e minuscoolo, un numero ed un carattere speciale (@,$,!,%,*,?)"
+                                                   message: t("form.password_validation")
                                                }
                                            }}
                                 >
@@ -82,7 +85,8 @@ export function LoginPage() {
                                 justifyContent: "center",
                                 gap: "1rem"
                             }}>
-                                <Button fullWidth={true} type={"submit"} variant={"contained"}>{t("buttons:sign_in")}</Button>
+                                <Button fullWidth={true} type={"submit"}
+                                        variant={"contained"}>{t("buttons:sign_in")}</Button>
                             </CardActions>
                         </Stack>
                     </Form>

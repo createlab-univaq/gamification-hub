@@ -5,10 +5,11 @@ import "@xyflow/react/dist/style.css";
 import type {FiredRuleDto, PlayerStateDto, SimulationResultDto} from "../../api/types";
 import {Box, Stack, Typography} from "@mui/material";
 import {SimulationNode} from "./SimulationNode.tsx";
-import {computeFlowLayout} from "../../utils/react-flow-utils.ts";
+import {computeFlowLayout, type SimulationNodeType} from "../../utils/react-flow-utils.ts";
 import {SimulationNodeDetail} from "./SimulationNodeDetail.tsx";
 import {SimulationStateNode} from "./SimulationStateNode.tsx";
 import {SimulationStateNodeDetail} from "./SimulationStateNodeDetail.tsx";
+import {useTranslation} from "react-i18next";
 
 
 // ── Custom node ───────────────────────────────────────────────────────────────
@@ -26,7 +27,8 @@ export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
     const [selectedRule, setSelectedRule] = useState<FiredRuleDto | null>(null);
-    const [selectedStateNode, setSelectedStateNode] = useState<PlayerStateDto & { type: "end" | "start" }>()
+    const [selectedStateNode, setSelectedStateNode] = useState<PlayerStateDto & { type: "start" | "end" }>()
+    const [t] = useTranslation()
 
     useEffect(() => {
         let cancelled = false;
@@ -42,12 +44,12 @@ export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps
         };
     }, [simulationResult, setNodes, setEdges]);
 
-    const onNodeClick = useCallback((_: unknown, node: Node) => {
+    const onNodeClick = useCallback((_: unknown, node: SimulationNodeType) => {
         if (node.id === "__start__" || node.id == "__end__") {
             setSelectedRule(null);
             setSelectedStateNode({
-                ...node.data.state,
-                type: node.id.replaceAll("_", "")
+                ...(node.data.state ?? {}),
+                type: node.id.replaceAll("_", "") as "start" | "end"
             })
             return;
         }
@@ -79,7 +81,7 @@ export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps
                         fitView={true}
                     >
                         <Background/>
-                        <Controls/>
+                        <Controls orientation={"horizontal"}/>
                     </ReactFlow>
                 )}
             </Box>
@@ -87,7 +89,7 @@ export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps
             {selectedRule
                 ? <SimulationNodeDetail rule={selectedRule}/>
                 : <Typography variant="caption" color="text.secondary" sx={{textAlign: "center"}}>
-                    Click a node to see its details
+                    {t("scenarios.form.graph.details")}
                 </Typography>
             }
             {selectedStateNode &&

@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: gamification-api
+    metrics_path: /actuator/prometheus
+    # Targets come from file-based service discovery: edit files under targets/
+    # (or point PROMETHEUS_TARGETS at another dir) — Prometheus hot-reloads, no restart.
+    file_sd_configs:
+      - files:
+          - /etc/prometheus/targets/*.yml

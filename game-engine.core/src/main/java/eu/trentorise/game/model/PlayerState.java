@@ -123,6 +123,12 @@ public class PlayerState {
                 .collect(Collectors.toList());
     }
 
+    public List<BadgeCollectionConcept> badgeCollectionConcepts() {
+        return state.stream().filter(concept -> concept instanceof BadgeCollectionConcept)
+                .map(concept -> (BadgeCollectionConcept) concept)
+                .collect(Collectors.toList());
+    }
+
     public <T extends GameConcept> T removeConcept(String conceptName, Class<T> classType) {
         Iterator<GameConcept> stateIterator = state.iterator();
         T removed = null;

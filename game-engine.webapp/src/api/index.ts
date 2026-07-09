@@ -13,6 +13,10 @@ import {PlayerClient} from "./client/games/player-client.ts";
 import {ScenarioClient} from "./client/games/scenario-client.ts";
 import {TeamClient} from "./client/games/team-client.ts";
 import {BadgeClient} from "./client/games/badge-client.ts";
+import {ClassificationClient} from "./client/games/classification-client.ts";
+import {PlayerChallengeClient} from "./client/games/player-challenge-client.ts";
+import {PlayerInventoryClient} from "./client/games/player-inventory-client.ts";
+import {GroupChallengeClient} from "./client/games/group-challenge-client.ts";
 
 const apiBaseClient = new BaseApiClient({
     baseUrl: appConfig.baseApiUrl
@@ -30,3 +34,7 @@ export const playerClient = new PlayerClient(apiBaseClient)
 export const scenarioClient = new ScenarioClient(apiBaseClient)
 export const teamClient = new TeamClient(apiBaseClient)
 export const badgeClient = new BadgeClient(apiBaseClient)
+export const classificationClient = new ClassificationClient(apiBaseClient)
+export const playerChallengeClient = new PlayerChallengeClient(apiBaseClient)
+export const playerInventoryClient = new PlayerInventoryClient(apiBaseClient)
+export const groupChallengeClient = new GroupChallengeClient(apiBaseClient)

@@ -22,6 +22,8 @@ public class PlayerLevel {
 
     private static final double INFINITE_LEVEL_FLAG = -1;
 
+    public PlayerLevel(){}
+
     public PlayerLevel(Level levelDefinition, double actualScore) {
         this.levelName = levelDefinition.getName();
         this.pointConcept = levelDefinition.getPointConceptName();

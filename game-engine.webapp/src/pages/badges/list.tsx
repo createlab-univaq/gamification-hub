@@ -8,36 +8,38 @@ import {Loading} from "../../components/Loading.tsx";
 import {Navigate} from "react-router-dom";
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {Add} from "@mui/icons-material";
+import {Add, Games} from "@mui/icons-material";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {Chip, Stack, Typography} from "@mui/material";
 import {PageList} from "../../components/PageList.tsx";
 import {useDebounced} from "../../hooks/use-debounced.ts";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import type {BadgeCollectionDto} from "../../api/types";
+import {useTranslation} from "react-i18next";
 
 export function BadgeListPage() {
     const game = useGame()
     const {setNotification} = useNotificationContext()
     const [deleteBadge, setDeleteBadge] = useState<BadgeCollectionDto>()
     const [search, setSearch] = useState<string>("")
+    const [t] = useTranslation()
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-badges", game.id],
-        queryFn: () => badgeClient.getBadges(game.id),
+        queryFn: () => badgeClient.getBadges(game.id!),
         enabled: !!game
     })
 
     const {mutate} = useMutation({
         mutationKey: ["delete-badge", game.id],
-        mutationFn: (badgeId: string) => badgeClient.deleteBadge(game.id, badgeId),
+        mutationFn: (badgeId: string) => badgeClient.deleteBadge(game.id!, badgeId),
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ["get-badges", game.id]})
             setNotification({
                 notification: {
                     type: "success",
-                    title: "Collezione eliminata",
-                    content: `La collezione di medaglie è stata eliminata con successo`
+                    title: t("badges.saved.title"),
+                    content: t("badges.saved.message")
                 },
                 isSnack: true
             })
@@ -67,17 +69,28 @@ export function BadgeListPage() {
 
     return <PageContainer>
         <PageHeader
-            title={"Medaglie"}
+            title={t("badges.title")}
             buttons={[
                 {
-                    children: "Aggiungi",
+                    children: t("buttons:add"),
                     variant: "contained",
                     endIcon: <Add/>,
                     href: `/games/${game.id}/badges/upsert`
                 }
             ]}
+            breadcrumbs={[
+                {
+                    icon:<Games/>,
+                    label:t("sidebar.games"),
+                    href:"/dashboard"
+                },
+                {
+                    label:game.name ?? "My Game",
+                    href:`/games/${game.id}`
+                }
+            ]}
         />
-        <DeleteDialog message={`Vuoi davvero eliminare la collezione "${deleteBadge?.name}" per sempre?`}
+        <DeleteDialog message={t("delete_message", {entity:deleteBadge?.name})}
                       deleteFn={() => mutate(deleteBadge!.id!)}
                       setElement={setDeleteBadge}
                       element={deleteBadge}
@@ -101,10 +114,10 @@ export function BadgeListPage() {
             onItemDelete={(badge) => {
                 setDeleteBadge(badge)
             }}
-            emptyListMessage={<Typography>Nessuna collezione di medaglie trovata.</Typography>}
+            emptyListMessage={<Typography>{t("badges.empty_list")}</Typography>}
             search={{
-                label: "Cerca",
-                placeholder: "Collezione...",
+                label: t("search_placeholder"),
+                placeholder: t("badges.search_placeholder"),
                 onSearch: (value) => {
                     filter(value)
                 }

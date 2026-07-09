@@ -1,6 +1,6 @@
 package it.smartcommunitylab.gamification.gameengineapi.model.mapper;
 
-import eu.trentorise.game.model.core.ClassificationBoard;
+import eu.trentorise.game.model.core.ClassificationPosition;
 import eu.trentorise.game.task.ClassificationTask;
 import eu.trentorise.game.task.GeneralClassificationTask;
 import eu.trentorise.game.task.IncrementalClassificationTask;
@@ -9,6 +9,8 @@ import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationD
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationPositionDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationType;
 import org.mapstruct.Mapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,22 +41,32 @@ public interface ClassificationMapper {
         return dto;
     }
 
-    default ClassificationBoardDTO toBoardDTO(ClassificationTask task, ClassificationBoard board) {
+    default ClassificationBoardDTO toBoardDTO(ClassificationTask task, Page<ClassificationPosition> board) {
         ClassificationBoardDTO boardDTO = new ClassificationBoardDTO();
         boardDTO.setClassificationName(task.getName());
         boardDTO.setType(typeOf(task));
+        boardDTO.setPointConceptName(pointConceptNameOf(task));
         if (board != null) {
-            boardDTO.setPointConceptName(board.getPointConceptName());
+            long offset = board.getPageable().isPaged() ? board.getPageable().getOffset() : 0;
             List<ClassificationPositionDTO> positions = new ArrayList<>();
-            if (board.getBoard() != null) {
-                for (int i = 0; i < board.getBoard().size(); i++) {
-                    positions.add(new ClassificationPositionDTO(i + 1,
-                            board.getBoard().get(i).getPlayerId(), board.getBoard().get(i).getScore()));
-                }
+            for (int i = 0; i < board.getContent().size(); i++) {
+                ClassificationPosition position = board.getContent().get(i);
+                positions.add(new ClassificationPositionDTO((int) (offset + i + 1),
+                        position.getPlayerId(), position.getScore()));
             }
-            boardDTO.setBoard(positions);
+            boardDTO.setBoard(new PageImpl<>(positions, board.getPageable(), board.getTotalElements()));
         }
         return boardDTO;
+    }
+
+    default String pointConceptNameOf(ClassificationTask task) {
+        if (task instanceof IncrementalClassificationTask incrementalTask) {
+            return incrementalTask.getPointConceptName();
+        }
+        if (task instanceof GeneralClassificationTask generalTask) {
+            return generalTask.getItemType();
+        }
+        return null;
     }
 
     default ClassificationType typeOf(ClassificationTask task) {

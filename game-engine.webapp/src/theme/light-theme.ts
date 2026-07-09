@@ -83,10 +83,10 @@ export const lightTheme = createTheme({
         MuiTableHead: {
             styleOverrides: {
                 root: ({theme}) => ({
-                    backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
                     '& .MuiTableCell-root': {
-                        fontWeight: 600,
-                        color: theme.palette.text.secondary,
+                        fontWeight: "bold",
+                        color: theme.palette.text.primary,
                         fontSize: '0.75rem',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',

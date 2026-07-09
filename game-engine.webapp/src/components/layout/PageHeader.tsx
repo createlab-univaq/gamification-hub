@@ -1,24 +1,90 @@
-import type {ButtonProps} from "@mui/material"
-import {Button, Stack, Typography} from "@mui/material";
-import type {ReactElement} from "react";
+import {ChevronRight, Settings} from "@mui/icons-material";
+import {Breadcrumbs, Button, type ButtonProps, Divider, Stack, Typography} from "@mui/material"
+import type {ReactNode} from "react";
+import {useWindowSize} from "../../hooks/use-window-size.ts";
+import {PopoverButton} from "../PopoverButton.tsx";
 
-export interface PageHeaderProps {
-    title?: ReactElement
-    subTitle?: ReactElement
-    buttons?: ButtonProps[]
+export interface BreadcrumbProps {
+    label: string;
+    icon?: ReactNode;
+    href?: string;
 }
 
-export function PageHeader({buttons, subTitle, title}: PageHeaderProps) {
+export interface PageHeaderProps {
+    title?: ReactNode
+    subTitle?: ReactNode
+    buttons?: ButtonProps[]
+    breadcrumbs?: BreadcrumbProps[]
+}
+
+export function PageHeader({buttons, subTitle, title, breadcrumbs}: PageHeaderProps) {
 
     const Title = typeof title === "string" ? <Typography variant={"h4"}>{title}</Typography> : title
     const SubTitle = typeof subTitle === "string" ? <Typography variant={"body1"}>{subTitle}</Typography> : subTitle
+    const {width} = useWindowSize()
+    const MIN_WIDTH_FOR_BUTTONS = 760
+    const requiresPopoverButton = width < MIN_WIDTH_FOR_BUTTONS && (buttons?.length ?? 0) > 3
 
-    return <Stack>
+    return <Stack sx={{gap: 2}}>
+        {(breadcrumbs && breadcrumbs.length) &&
+            <Stack direction={"row"}>
+                <Breadcrumbs component={"span"} separator={<ChevronRight/>} sx={{gap: 0}}>
+                    {breadcrumbs.map(b => {
+                        return <Button
+                            sx={{
+                                py: 0.2,
+                                px: 0.5
+                            }}
+                            href={b.href}
+                            variant={"text"}
+                            disabled={!b.href}
+                            startIcon={b.icon}
+                        >
+                            {b.label}
+                        </Button>
+                    })}
+                </Breadcrumbs>
+            </Stack>
+        }
         <Stack direction={"row"} sx={{gap: 2, justifyContent: "space-between", alignItems: "center"}}>
             {Title}
-            <Stack direction={"row"} sx={{gap: 2}}>
-                {buttons?.map((b, index) => <Button {...b} key={`page-header-btn-${index}`}/>)}
-            </Stack>
+            {requiresPopoverButton &&
+                <PopoverButton id={"header-popover-buttons"}
+                               buttonLabel={<Settings sx={{fontSize: "2rem", cursor: "pointer"}}/>}
+                               button={{
+                                   variant: "text",
+                                   sx: {
+                                       width: "fit-content"
+                                   }
+                               }}
+                               popover={{
+                                   anchorOrigin: {
+                                       horizontal: "left",
+                                       vertical: "bottom"
+                                   },
+                                   transformOrigin: {
+                                       horizontal: "center",
+                                       vertical: "top"
+                                   },
+                                   children: <Stack sx={{zIndex: "10"}} divider={<Divider/>}>
+                                       {buttons?.map((b, index) =>
+                                           <Button fullWidth={true}
+                                                   {...b}
+                                                   sx={{
+                                                       borderRadius: 0,
+                                                       justifyContent: "space-between"
+                                                   }}
+                                                   key={`page-header-btn-${index}`}/>
+                                       )}
+                                   </Stack>
+                               }}
+                />
+            }
+            {!requiresPopoverButton &&
+                <Stack direction={"row"} sx={{gap: 2}}>
+                    {buttons?.map((b, index) => <Button {...b} key={`page-header-btn-${index}`}/>)}
+                </Stack>
+            }
         </Stack>
         {SubTitle}
     </Stack>

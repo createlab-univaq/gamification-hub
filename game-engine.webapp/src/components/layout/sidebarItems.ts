@@ -1,22 +1,21 @@
-import type {ReactElement} from "react";
+import type {SvgIconComponent} from "@mui/icons-material"
 import {
-    Checklist,
+    Bolt,
     Diversity3,
-    EmojiEvents,
-    FormatListNumbered,
     Games,
-    Groups,
     Layers,
+    Leaderboard,
     MilitaryTech,
-    Monitor,
-    PlayArrow,
+    People,
     Rule,
-    Science
+    Science,
+    SportsScore,
+    Stars
 } from "@mui/icons-material"
 
 interface SidebarItem {
     title: string
-    icon: ReactElement,
+    icon: SvgIconComponent,
     href: string,
     relative?: boolean
 }
@@ -38,19 +37,19 @@ const gameItems = [
     },
     {
         title: "sidebar.actions",
-        icon: PlayArrow,
+        icon: Bolt,
         href: "/actions",
         relative: true
     },
     {
         title: "sidebar.points",
-        icon: EmojiEvents,
+        icon: Stars,
         href: "/points",
         relative: true
     },
     {
         title: "sidebar.players",
-        icon: Groups,
+        icon: People,
         href: "/players",
         relative: true
     },
@@ -61,9 +60,9 @@ const gameItems = [
         relative: true
     },
     {
-        title: "sidebar.activities",
-        icon: Checklist,
-        href: "/tasks",
+        title: "sidebar.classifications",
+        icon: Leaderboard,
+        href: "/classifications",
         relative: true
     },
     {
@@ -87,23 +86,18 @@ const gameItems = [
     {
         title: "sidebar.challenges",
         href: "/challenges",
-        icon: FormatListNumbered,
-        relative: true
-    },
-    {
-        title: "sidebar.monitors",
-        icon: Monitor,
+        icon: SportsScore,
         relative: true
     }
 ] satisfies SidebarItem[]
 
 export const getSidebarItems = () => {
     const location = window.location.pathname
-    const basePath = location.split("/").at(1)
+    const basePath = location.split("/").at(1) ?? "dashboard"
     return SIDEBAR_ITEMS[basePath] ?? dashboardItems
 }
 
 const SIDEBAR_ITEMS = {
     "dashboard": dashboardItems,
     "games": [...dashboardItems, ...gameItems],
-} satisfies Record<string, SidebarItem[]>
+} as Record<string, SidebarItem[]>

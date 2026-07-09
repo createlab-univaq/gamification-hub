@@ -109,6 +109,12 @@ export type RuleDto = {
     content: string;
 };
 
+export type ChallengeEditDto = {
+    start?: string;
+    end?: string;
+    hide?: boolean;
+};
+
 export type ClassificationDto = {
     id?: string;
     gameId?: string;
@@ -157,9 +163,7 @@ export type PlayerDto = {
             [key: string]: unknown;
         };
         empty?: boolean;
-        [key: string]: unknown | {
-            [key: string]: unknown;
-        } | boolean | undefined;
+        [key: string]: unknown;
     };
     inventory?: Inventory;
 };
@@ -172,6 +176,85 @@ export type PlayerLevel = {
     startLevelScore?: number;
     endLevelScore?: number;
     toNextLevel?: number;
+};
+
+export type ItemChoiceDto = {
+    type?: string;
+    name?: string;
+};
+
+export type ChallengeChoiceDto = {
+    modelName?: string;
+    state?: string;
+};
+
+export type InventoryDto = {
+    challengeChoices?: Array<ChallengeChoiceDto>;
+    challengeActivationActions?: number;
+};
+
+export type AttendeeDto = {
+    playerId?: string;
+    role?: string;
+    challengeScore?: number;
+    valuationTime?: string;
+};
+
+export type GroupChallengeDto = {
+    id?: string;
+    gameId?: string;
+    instanceName?: string;
+    challengeModel?: string;
+    challengeTarget?: number;
+    state?: string;
+    origin?: string;
+    start?: string;
+    end?: string;
+    priority?: number;
+    pointConceptName?: string;
+    periodName?: string;
+    attendees?: Array<AttendeeDto>;
+    reward?: RewardDto;
+};
+
+export type RewardDto = {
+    percentage?: number;
+    threshold?: number;
+    bonusScore?: {
+        [key: string]: number;
+    };
+    calculationPointConceptName?: string;
+    calculationPeriodName?: string;
+    targetPointConceptName?: string;
+    targetPeriodName?: string;
+};
+
+export type ChallengeInvitationDto = {
+    gameId?: string;
+    proposerId?: string;
+    guestIds?: Array<string>;
+    challengeName?: string;
+    challengeModelName?: string;
+    challengeStart?: string;
+    challengeEnd?: string;
+    challengeTarget?: number;
+    pointConceptName?: string;
+    periodName?: string;
+    reward?: RewardDto;
+};
+
+export type ChallengeAssignmentDto = {
+    modelName?: string;
+    instanceName?: string;
+    data?: {
+        [key: string]: unknown;
+    };
+    challengeType?: string;
+    origin?: string;
+    start?: string;
+    end?: string;
+    priority?: number;
+    hide?: boolean;
 };
 
 export type LevelDto = {
@@ -268,21 +351,14 @@ export type ExecutionDto = {
     executionMoment?: string;
 };
 
-export type PlayerState = {
+export type PlayerStateDto = {
     playerId?: string;
     gameId?: string;
-    levels?: Array<PlayerLevel>;
-    state?: Array<GameConcept>;
-    customData?: {
-        data?: {
-            [key: string]: unknown;
-        };
-        empty?: boolean;
-        [key: string]: unknown | {
-            [key: string]: unknown;
-        } | boolean | undefined;
-    };
-    inventory?: Inventory;
+    pointConcepts?: Array<PointConceptDto>;
+    badgeCollections?: Array<BadgeCollectionDto>;
+    challenges?: Array<ChallengeConceptDto>;
+    inventory?: InventoryDto;
+    groupChallenges?: Array<GroupChallengeDto>;
 };
 
 export type SimulationRequestDto = {
@@ -311,14 +387,6 @@ export type FiredRuleDto = {
     changes?: Array<ConceptChangeDto>;
 };
 
-export type PlayerStateDto = {
-    playerId?: string;
-    gameId?: string;
-    pointConcepts?: Array<PointConceptDto>;
-    badgeCollections?: Array<BadgeCollectionDto>;
-    challenges?: Array<ChallengeConceptDto>;
-};
-
 export type SimulationResultDto = {
     initialState?: PlayerStateDto;
     finalState?: PlayerStateDto;
@@ -338,31 +406,31 @@ export type UserDto = {
 };
 
 export type PagePlayerDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
     size?: number;
     content?: Array<PlayerDto>;
     number?: number;
     sort?: SortObject;
-    first?: boolean;
-    last?: boolean;
     numberOfElements?: number;
-    pageable?: PageableObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
+    pageNumber?: number;
+    pageSize?: number;
+    paged?: boolean;
     offset?: number;
     sort?: SortObject;
-    pageSize?: number;
-    pageNumber?: number;
-    paged?: boolean;
     unpaged?: boolean;
 };
 
 export type SortObject = {
-    empty?: boolean;
     sorted?: boolean;
+    empty?: boolean;
     unsorted?: boolean;
 };
 
@@ -417,13 +485,27 @@ export type ClassificationBoardDto = {
     classificationName?: string;
     pointConceptName?: string;
     type?: 'GENERAL' | 'INCREMENTAL';
-    board?: Array<ClassificationPositionDto>;
+    board?: PageClassificationPositionDto;
 };
 
 export type ClassificationPositionDto = {
     position?: number;
     playerId?: string;
     score?: number;
+};
+
+export type PageClassificationPositionDto = {
+    totalElements?: number;
+    totalPages?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    size?: number;
+    content?: Array<ClassificationPositionDto>;
+    number?: number;
+    sort?: SortObject;
+    numberOfElements?: number;
+    empty?: boolean;
 };
 
 export type DeleteGameData = {
@@ -642,6 +724,64 @@ export type EditRuleResponses = {
 };
 
 export type EditRuleResponse = EditRuleResponses[keyof EditRuleResponses];
+
+export type DeleteChallengeData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+        instanceName: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/challenges/{instanceName}';
+};
+
+export type DeleteChallengeResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetChallengeData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+        instanceName: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/challenges/{instanceName}';
+};
+
+export type GetChallengeResponses = {
+    /**
+     * OK
+     */
+    200: ChallengeConceptDto;
+};
+
+export type GetChallengeResponse = GetChallengeResponses[keyof GetChallengeResponses];
+
+export type EditChallengeData = {
+    body: ChallengeEditDto;
+    path: {
+        gameId: string;
+        playerId: string;
+        instanceName: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/challenges/{instanceName}';
+};
+
+export type EditChallengeResponses = {
+    /**
+     * OK
+     */
+    200: ChallengeConceptDto;
+};
+
+export type EditChallengeResponse = EditChallengeResponses[keyof EditChallengeResponses];
 
 export type DeleteClassificationData = {
     body?: never;
@@ -1083,6 +1223,181 @@ export type AddPlayerResponses = {
 
 export type AddPlayerResponse = AddPlayerResponses[keyof AddPlayerResponses];
 
+export type ActivateChoiceData = {
+    body: ItemChoiceDto;
+    path: {
+        gameId: string;
+        playerId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/inventory/activations';
+};
+
+export type ActivateChoiceResponses = {
+    /**
+     * OK
+     */
+    200: InventoryDto;
+};
+
+export type ActivateChoiceResponse = ActivateChoiceResponses[keyof ActivateChoiceResponses];
+
+export type RefuseInvitationData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+        challengeName: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/group-challenges/{challengeName}/refuse';
+};
+
+export type RefuseInvitationResponses = {
+    /**
+     * OK
+     */
+    200: GroupChallengeDto;
+};
+
+export type RefuseInvitationResponse = RefuseInvitationResponses[keyof RefuseInvitationResponses];
+
+export type CancelInvitationData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+        challengeName: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/group-challenges/{challengeName}/cancel';
+};
+
+export type CancelInvitationResponses = {
+    /**
+     * OK
+     */
+    200: GroupChallengeDto;
+};
+
+export type CancelInvitationResponse = CancelInvitationResponses[keyof CancelInvitationResponses];
+
+export type AcceptInvitationData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+        challengeName: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/group-challenges/{challengeName}/accept';
+};
+
+export type AcceptInvitationResponses = {
+    /**
+     * OK
+     */
+    200: GroupChallengeDto;
+};
+
+export type AcceptInvitationResponse = AcceptInvitationResponses[keyof AcceptInvitationResponses];
+
+export type InviteData = {
+    body: ChallengeInvitationDto;
+    path: {
+        gameId: string;
+        playerId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/group-challenges/invitations';
+};
+
+export type InviteResponses = {
+    /**
+     * OK
+     */
+    200: GroupChallengeDto;
+};
+
+export type InviteResponse = InviteResponses[keyof InviteResponses];
+
+export type GetChallengesData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/challenges';
+};
+
+export type GetChallengesResponses = {
+    /**
+     * OK
+     */
+    200: Array<ChallengeConceptDto>;
+};
+
+export type GetChallengesResponse = GetChallengesResponses[keyof GetChallengesResponses];
+
+export type AssignChallengeData = {
+    body: ChallengeAssignmentDto;
+    path: {
+        gameId: string;
+        playerId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/challenges';
+};
+
+export type AssignChallengeResponses = {
+    /**
+     * OK
+     */
+    200: ChallengeConceptDto;
+};
+
+export type AssignChallengeResponse = AssignChallengeResponses[keyof AssignChallengeResponses];
+
+export type AcceptChallengeData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+        instanceName: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/challenges/{instanceName}/accept';
+};
+
+export type AcceptChallengeResponses = {
+    /**
+     * OK
+     */
+    200: ChallengeConceptDto;
+};
+
+export type AcceptChallengeResponse = AcceptChallengeResponses[keyof AcceptChallengeResponses];
+
+export type ForceChallengeChoiceData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/challenges/force-choice';
+};
+
+export type ForceChallengeChoiceResponses = {
+    /**
+     * OK
+     */
+    200: ChallengeConceptDto;
+};
+
+export type ForceChallengeChoiceResponse = ForceChallengeChoiceResponses[keyof ForceChallengeChoiceResponses];
+
 export type GetLevelsData = {
     body?: never;
     path: {
@@ -1313,7 +1628,7 @@ export type ExecuteGameResponses = {
     /**
      * OK
      */
-    200: PlayerState;
+    200: PlayerStateDto;
 };
 
 export type ExecuteGameResponse = ExecuteGameResponses[keyof ExecuteGameResponses];
@@ -1454,6 +1769,44 @@ export type GetPlayerResponses = {
 };
 
 export type GetPlayerResponse = GetPlayerResponses[keyof GetPlayerResponses];
+
+export type GetInventoryData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/inventory';
+};
+
+export type GetInventoryResponses = {
+    /**
+     * OK
+     */
+    200: InventoryDto;
+};
+
+export type GetInventoryResponse = GetInventoryResponses[keyof GetInventoryResponses];
+
+export type GetGroupChallengesData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/group-challenges';
+};
+
+export type GetGroupChallengesResponses = {
+    /**
+     * OK
+     */
+    200: Array<GroupChallengeDto>;
+};
+
+export type GetGroupChallengesResponse = GetGroupChallengesResponses[keyof GetGroupChallengesResponses];
 
 export type GetNotificationsData = {
     body?: never;

@@ -1,4 +1,6 @@
 import {createBrowserRouter, Navigate} from "react-router-dom";
+import {lazy, Suspense} from "react";
+import {Loading} from "../components/Loading.tsx";
 import {LoginPage} from "../pages/login/page.tsx";
 import {AuthRoutes} from "./AuthRoutes.tsx";
 import {LogoutPage} from "../pages/logout/page.tsx";
@@ -10,14 +12,17 @@ import {GameRoutes} from "./GameRoutes.tsx";
 import {GamePage} from "../pages/games/page.tsx";
 import {ErrorPage} from "../pages/error/page.tsx";
 import {RuleListPage} from "../pages/rules/list.tsx";
-import {TestPage} from "../pages/TestPage.tsx";
-import {BlocklyRuleUpsertPage} from "../pages/rules/upsert.tsx";
-import {SimulationPage} from "../pages/simulation/page.tsx";
+const TestPage = lazy(() => import("../pages/TestPage.tsx").then(m => ({default: m.TestPage})));
+const BlocklyRuleUpsertPage = lazy(() => import("../pages/rules/upsert.tsx").then(m => ({default: m.BlocklyRuleUpsertPage})));
+const SimulationPage = lazy(() => import("../pages/scenarios/page.tsx").then(m => ({default: m.SimulationPage})));
 import {ScenarioListPage} from "../pages/scenarios/list.tsx";
 import {ChallengeListPage} from "../pages/challenges/list.tsx";
 import {ChallengeUpsertPage} from "../pages/challenges/upsert.tsx";
 import {TeamListPage} from "../pages/teams/list.tsx";
 import {TeamUpsertPage} from "../pages/teams/upsert.tsx";
+import {ClassificationListPage} from "../pages/classification/list.tsx";
+import {ClassificationUpsertPage} from "../pages/classification/upsert.tsx";
+import {ClassificationBoardPage} from "../pages/classification/board.tsx";
 import {BadgeListPage} from "../pages/badges/list.tsx";
 import {BadgeUpsertPage} from "../pages/badges/upsert.tsx";
 import {BadgeDetailsPage} from "../pages/badges/details.tsx";
@@ -44,7 +49,7 @@ export const router = createBrowserRouter([
     },
     {
         path: "/testing",
-        element: <TestPage/>,
+        element: <Suspense fallback={<Loading fullScreen={true}/>}><TestPage/></Suspense>,
         errorElement: <ErrorPage/>
     },
     {
@@ -95,16 +100,16 @@ export const router = createBrowserRouter([
                             },
                             {
                                 path: "rules/upsert",
-                                element: <BlocklyRuleUpsertPage/>
+                                element: <Suspense fallback={<Loading fullScreen={true}/>}><BlocklyRuleUpsertPage/></Suspense>
                             },
                             {
                                 path: "rules/upsert/:ruleId",
-                                element: <BlocklyRuleUpsertPage/>
+                                element: <Suspense fallback={<Loading fullScreen={true}/>}><BlocklyRuleUpsertPage/></Suspense>
                             },
                             // SIMULATIONS AND STATIC ANALYSIS
                             {
                                 path: "simulate",
-                                element: <SimulationPage/>
+                                element: <Suspense fallback={<Loading fullScreen={true}/>}><SimulationPage/></Suspense>
                             },
                             // SCENARIOS (the simulation page is the scenario upsert)
                             {
@@ -113,11 +118,11 @@ export const router = createBrowserRouter([
                             },
                             {
                                 path: "scenarios/upsert",
-                                element: <SimulationPage/>
+                                element: <Suspense fallback={<Loading fullScreen={true}/>}><SimulationPage/></Suspense>
                             },
                             {
                                 path: "scenarios/upsert/:scenarioId",
-                                element: <SimulationPage/>
+                                element: <Suspense fallback={<Loading fullScreen={true}/>}><SimulationPage/></Suspense>
                             },
                             {
                                 path: "impact-analysis",
@@ -152,6 +157,23 @@ export const router = createBrowserRouter([
                             {
                                 path: "teams/upsert/:teamId",
                                 element: <TeamUpsertPage/>
+                            },
+                            // CLASSIFICATIONS / LEADERBOARDS
+                            {
+                                path: "classifications",
+                                element: <ClassificationListPage/>
+                            },
+                            {
+                                path: "classifications/upsert",
+                                element: <ClassificationUpsertPage/>
+                            },
+                            {
+                                path: "classifications/upsert/:classificationId",
+                                element: <ClassificationUpsertPage/>
+                            },
+                            {
+                                path: "classifications/:classificationId/board",
+                                element: <ClassificationBoardPage/>
                             },
                             // CHALLENGE MODELS
                             {

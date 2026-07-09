@@ -5,6 +5,10 @@ import ELK from "elkjs/lib/elk.bundled.js";
 
 const elk = new ELK();
 
+export interface SimulationNodeType extends Node {
+    state?: PlayerStateDto
+}
+
 const ruleNodeStyle = (width: string) => ({
     padding: 0,
     border: "none",
@@ -22,7 +26,11 @@ async function applyElkLayout(
         id: "root",
         layoutOptions: options,
         children: nodes.map(n => ({id: n.id, width: size.width, height: size.height})),
-        edges: edges.filter(e => e.source !== e.target).map(e => ({id: e.id, sources: [e.source], targets: [e.target]})),
+        edges: edges.filter(e => e.source !== e.target).map(e => ({
+            id: e.id,
+            sources: [e.source],
+            targets: [e.target]
+        })),
     });
     const positions = new Map<string, { x: number; y: number }>();
     layout.children?.forEach(c => positions.set(c.id, {x: c.x ?? 0, y: c.y ?? 0}));

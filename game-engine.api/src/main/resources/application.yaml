@@ -2,7 +2,7 @@ spring:
   application:
     name: Gamification-API
   profiles:
-    active: local
+    active: ${SPRING_PROFILES_ACTIVE:local}
   mongodb:
     port: ${MONGODB_PORT:50000}
     database: ${MONGODB_NAME:gamification-api-db}
@@ -11,6 +11,7 @@ spring:
     authentication-database: admin
     representation:
       uuid: standard
+    host: ${MONGODB_HOST:localhost}
 
   main:
     allow-circular-references: true
@@ -20,10 +21,6 @@ spring:
 
 # stats: one structured line per game event | perf: one line per timed operation
 # flip to INFO to enable; the engine.* Micrometer timers are always active regardless
-logging:
-  level:
-    stats: "OFF"
-    perf: "OFF"
 
 management:
   endpoints:

@@ -5,7 +5,7 @@ import eu.trentorise.game.managers.ClassificationUtils;
 import eu.trentorise.game.model.Game;
 import eu.trentorise.game.model.PointConcept;
 import eu.trentorise.game.model.PointConcept.PeriodInstance;
-import eu.trentorise.game.model.core.ClassificationBoard;
+import eu.trentorise.game.model.core.ClassificationPosition;
 import eu.trentorise.game.model.core.GameTask;
 import eu.trentorise.game.repo.GamePersistence;
 import eu.trentorise.game.repo.GameRepo;
@@ -28,6 +28,7 @@ import it.smartcommunitylab.gamification.gameengineapi.service.ClassificationSer
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -156,7 +157,7 @@ public class ClassificationServiceImpl implements ClassificationService {
         Game game = loadGameOrThrow(gameId);
         ClassificationTask task = findTask(game, classificationId);
 
-        ClassificationBoard board;
+        Page<ClassificationPosition> board;
         if (task instanceof IncrementalClassificationTask incrementalTask) {
             long moment = timestamp > -1 ? timestamp
                     : (periodInstanceIndex > -1 ? -1 : System.currentTimeMillis());

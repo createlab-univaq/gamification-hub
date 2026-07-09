@@ -1,7 +1,8 @@
 import {Box, Button, Checkbox, Divider, Stack} from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
-import type {ReactElement} from "react";
+import type {ReactNode} from "react";
 import {LinkCard} from "./LinkCard.tsx";
+import {useTranslation} from "react-i18next";
 
 type LayoutType = "grid" | "list"
 
@@ -14,24 +15,35 @@ export interface LayoutListProps<T> {
     items: T[],
     layout?: LayoutType
     itemHref: (i: T) => string
-    onItemUpdate?: (i: T, event: Event) => void
-    onItemDelete?: (i: T, event: Event) => void
-    renderItem: (i: T) => ReactElement,
-    emptyListMessage?:ReactElement
+    onItemUpdate?: (i: T, event: MouseEvent) => void
+    onItemDelete?: (i: T, event: MouseEvent) => void
+    renderItem: (i: T, layout: LayoutType) => ReactNode,
+    emptyListMessage?: ReactNode
     selection?: ListSelection<T>
 }
 
-export function LayoutList<T>({layout, items, onItemDelete, renderItem, itemHref, onItemUpdate, emptyListMessage, selection}: LayoutListProps<T>) {
+export function LayoutList<T>({
+                                  layout,
+                                  items,
+                                  onItemDelete,
+                                  renderItem,
+                                  itemHref,
+                                  onItemUpdate,
+                                  emptyListMessage,
+                                  selection
+                              }: LayoutListProps<T>) {
 
     const hasUpdateButton = !!onItemUpdate
     const hasDeleteButton = !!onItemDelete
     const hasButtons = hasUpdateButton || hasDeleteButton
     const hasEmptyListMessage = !!emptyListMessage
+    const isGrid = layout === "grid"
+    const [t] = useTranslation()
 
     return <Box sx={{
-        display: layout === "list" ? "flex" : "grid",
+        display: !isGrid ? "flex" : "grid",
         flexDirection: "column",
-        gridTemplateColumns: layout === "grid"
+        gridTemplateColumns: isGrid
             ? {xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)"}
             : undefined,
         alignItems: "stretch",
@@ -39,7 +51,7 @@ export function LayoutList<T>({layout, items, onItemDelete, renderItem, itemHref
         py: 2
     }}>
         {items.map((item, i) => {
-            const itemElement = renderItem(item)
+            const itemElement = renderItem(item, layout ?? "list")
             return <LinkCard
                 key={`list-item-${i}`}
                 href={itemHref(item)}
@@ -49,14 +61,20 @@ export function LayoutList<T>({layout, items, onItemDelete, renderItem, itemHref
                 }}
             >
                 <Stack
-                    direction={layout === "list" ? "row" : "column"}
-                    divider={<Divider orientation={layout==="list" ? "vertical" : "horizontal"}/>}
+                    direction={!isGrid ? "row" : "column"}
+                    divider={<Divider orientation={!isGrid ? "vertical" : "horizontal"}/>}
                     sx={{
-                        alignItems: layout === "list" ? "center" : "flex-start",
-                        justifyContent: layout === "list" ? "space-between" : "center",
+                        flexGrow: 1,
+                        alignItems: !isGrid ? "center" : "flex-start",
+                        justifyContent: !isGrid ? "space-between" : "flex-start",
                     }}
                 >
-                    <Stack direction={"row"} sx={{alignItems: "center", gap: 1}}>
+                    <Stack direction={"row"} sx={{
+                        width: isGrid ? "100%" : "fit-content",
+                        alignItems: isGrid ? "flex-start" : "center",
+                        gap: 1,
+                        flexGrow: isGrid ? 1 : 0
+                    }}>
                         {selection &&
                             <Checkbox
                                 checked={selection.isSelected(item)}
@@ -73,29 +91,39 @@ export function LayoutList<T>({layout, items, onItemDelete, renderItem, itemHref
                         <Stack
                             direction={"row"}
                             sx={{
-                                width: layout==="grid" ? "100%" : "fit-content",
-                                justifyContent:"space-between"
+                                width: isGrid ? "100%" : "fit-content",
+                                justifyContent: "space-between",
+                                gap: isGrid ? 1 : 0,
+                                mt: isGrid ? 1 : 0
                             }}
                         >
                             {hasUpdateButton &&
                                 <Button
+                                    variant={isGrid ? "outlined" : "text"}
+                                    endIcon={isGrid ? <Edit/> : undefined}
+                                    sx={{flex: isGrid ? 1 : "unset"}}
                                     onClick={(e) => {
                                         onItemUpdate(item, e)
                                     }}
                                 >
-                                    <Edit sx={{fontSize: "2rem"}}/>
+                                    {isGrid ? t("buttons:update") : <Edit sx={{fontSize: "2rem"}}/>}
                                 </Button>
                             }
                             {hasDeleteButton &&
                                 <Button
                                     color={"error"}
+                                    variant={isGrid ? "outlined" : "text"}
+                                    endIcon={isGrid ? <Delete/> : undefined}
+                                    sx={{flex: isGrid ? 1 : "unset"}}
                                     onClick={(e) => {
                                         e.preventDefault()
                                         e.stopPropagation()
                                         onItemDelete(item, e)
                                     }}
                                 >
-                                    <Delete sx={{fontSize: "2rem", color: (theme) => theme.palette.error.main}}/>
+                                    {isGrid
+                                        ? t("buttons:delete")
+                                        : <Delete sx={{fontSize: "2rem", color: (theme) => theme.palette.error.main}}/>}
                                 </Button>
                             }
                         </Stack>

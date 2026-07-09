@@ -1,9 +1,7 @@
 package it.smartcommunitylab.gamification.gameengineapi.model.dto;
 
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 @Data
 public class ClassificationBoardDTO {
@@ -14,6 +12,6 @@ public class ClassificationBoardDTO {
 
     private ClassificationType type;
 
-    private List<ClassificationPositionDTO> board = new ArrayList<>();
+    private Page<ClassificationPositionDTO> board;
 
 }

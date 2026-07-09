@@ -16,6 +16,7 @@
 
 package eu.trentorise.game.services;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import eu.trentorise.game.model.PlayerState;
 import eu.trentorise.game.model.TeamState;
 import eu.trentorise.game.model.core.ChallengeAssignment;
 import eu.trentorise.game.model.core.ClassificationBoard;
+import eu.trentorise.game.model.core.ClassificationPosition;
 import eu.trentorise.game.model.core.ComplexSearchQuery;
 import eu.trentorise.game.model.core.RawSearchQuery;
 import eu.trentorise.game.model.core.StringSearchQuery;
@@ -56,9 +58,9 @@ public interface PlayerService {
 	public Page<PlayerState> loadStates(String gameId, String playerId, Pageable pageable, boolean mergeGroupChallenges,
 			boolean filterHiddenChallenges);
 
-	public ClassificationBoard classifyAllPlayerStates(Game g, String itemType, Pageable pageable);
+	public Page<ClassificationPosition> classifyAllPlayerStates(Game g, String itemType, Pageable pageable);
 
-	public ClassificationBoard classifyPlayerStatesWithKey(long timestamp, String pointConceptName, String periodName,
+	public Page<ClassificationPosition> classifyPlayerStatesWithKey(long timestamp, String pointConceptName, String periodName,
 			String key, String gameId, Pageable pageable);
 
 	public PlayerState saveState(PlayerState state);
@@ -104,6 +106,11 @@ public interface PlayerService {
 	public ChallengeConcept acceptChallenge(String gameId, String playerId, String challengeName);
 
 	public ChallengeConcept forceChallengeChoice(String gameId, String playerId);
+
+	public ChallengeConcept deleteChallenge(String gameId, String playerId, String instanceName);
+
+	public ChallengeConcept editChallenge(String gameId, String playerId, String instanceName, Date start, Date end,
+			Boolean hide);
 
 	/*
 	 * BLACKLIST

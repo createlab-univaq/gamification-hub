@@ -1,14 +1,15 @@
-import type {NodeProps} from "@xyflow/react";
-import {Handle} from "@xyflow/react";
+import {Handle, type NodeProps, Position} from "@xyflow/react";
 import {Paper, Typography} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 export function SimulationStateNode({id}: NodeProps) {
 
     const isStart = id === "__start__"
-    const label = isStart ? "Initial State" : "Final State"
+    const [t] = useTranslation();
+    const label = isStart ? t("scenarios.form.graph.nodes.start") : t("scenarios.form.graph.nodes.end")
 
     return <>
-        {!isStart && <Handle type={"target"} position={"top"}/>}
+        {!isStart && <Handle type={"target"} position={Position.Top}/>}
         <Paper
             sx={{
                 p: 1.5, cursor: "pointer",
@@ -17,8 +18,8 @@ export function SimulationStateNode({id}: NodeProps) {
                 transition: "border-color 0.15s",
             }}
         >
-            <Typography>{label}</Typography>
+            <Typography color={"secondary"}>{label}</Typography>
         </Paper>
-        {isStart && <Handle type={"source"} position={"bottom"}/>}
+        {isStart && <Handle type={"source"} position={Position.Bottom}/>}
     </>
 }

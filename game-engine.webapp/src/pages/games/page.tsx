@@ -4,7 +4,7 @@ import {useGame} from "../../components/GameContext.tsx";
 import type {GridSize} from "@mui/material";
 import {Grid, Stack, Typography} from "@mui/material";
 import {LinkCard} from "../../components/LinkCard.tsx";
-import {Delete, Download, Edit, PlayArrow} from "@mui/icons-material";
+import {Delete, Download, Edit, Games, PlayArrow} from "@mui/icons-material";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useMutation} from "@tanstack/react-query";
 import {gameClient} from "../../api";
@@ -45,7 +45,7 @@ export function GamePage() {
 
     const {mutate: exportGame, isPending: isExporting} = useMutation({
         mutationKey: ["export-game", game.id],
-        mutationFn: () => gameClient.exportGame(game.id),
+        mutationFn: () => gameClient.exportGame(game.id!),
         onSuccess: (data) => {
             downloadJson(`${game.name ?? game.id}.json`, [data])
         },
@@ -61,7 +61,7 @@ export function GamePage() {
 
     const {mutate} = useMutation({
         mutationKey: ["delete-game"],
-        mutationFn: (gameId) => gameClient.deleteGame(gameId),
+        mutationFn: (gameId: string) => gameClient.deleteGame(gameId),
         onSuccess: () => {
             // Remove cached game
             localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify({}))
@@ -89,10 +89,17 @@ export function GamePage() {
                 <Stack direction={"row"} sx={{alignItems: "center", gap: 2}}>
                     <Typography variant={"h4"}>{game.name}</Typography>
                     <StatusDot size={"1.5rem"}
-                               title={!game.terminated ? t("game.is_not_expired_label") : t("game.is_expired_label")}
+                               title={!game.terminated ? t("game.is_expired_label") : t("game.is_not_expired_label")}
                                type={game.terminated ? "success" : "error"}/>
                 </Stack>
             }
+            breadcrumbs={[
+                {
+                    label: "Games",
+                    icon: <Games/>,
+                    href: "/dashboard"
+                }
+            ]}
             buttons={[
                 {
                     endIcon: <PlayArrow/>,
@@ -122,8 +129,8 @@ export function GamePage() {
                 }
             ]}
         />
-        <DeleteDialog message={t("delete_message", {entity:deleteElement?.name})}
-                      deleteFn={() => mutate(deleteElement?.id)}
+        <DeleteDialog message={t("delete_message", {entity: deleteElement?.name})}
+                      deleteFn={() => mutate(deleteElement?.id ?? "")}
                       setElement={setDeleteElement}
                       element={deleteElement}
         />
@@ -133,10 +140,10 @@ export function GamePage() {
             {!!game.expiration && <Typography>{t("game.expiration")}: {formatDate(game.expiration)}</Typography>}
         </Stack>
         <Grid container={true} columns={{
-            md: "3",
-            lg: "3",
-            sm: "1",
-            xs: "1"
+            md: 3,
+            lg: 3,
+            sm: 1,
+            xs: 1
         }} spacing={"2rem"}
         >
             <GameConceptGridElement size={1.5} href={`/games/${game.id}/rules`} title={t("sidebar.rules")}

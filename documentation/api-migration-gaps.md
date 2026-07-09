@@ -1,62 +1,42 @@
 # API Migration Gaps — old engine → new `game-engine.api`
 
-Features supported by the engine core (`game-engine.core`, `eu.trentorise.game`) but **not yet exposed** by the new REST API (`game-engine.api`, `it.smartcommunitylab.gamification.gameengineapi`).
+Tracks engine-core capabilities (`game-engine.core`, `eu.trentorise.game`) against what the new REST API (`game-engine.api`) exposes. Legend: `[x]` exposed · `[~]` partial · `[ ]` not yet.
 
-Derived by diffing the engine core's public capability surface (services/managers) against the endpoints the new API currently registers. Use the checkboxes to track porting progress.
+## Exposed by the new API
 
-## Already exposed by the new API (baseline)
+- **Auth** — `POST /api/v1/auth`, `POST /api/v1/auth/logout`, `GET /api/v1/auth/user`
+- **Games** — CRUD (`/api/v1/games`), `POST /import`, `GET /{id}/export`, `POST /export`, `GET /{id}/impact`, list filters via `GameCriteria`; terminate via `PUT` (`terminated` flag)
+- **Actions** — CRUD (`/games/{gameId}/actions`)
+- **Rules** — CRUD + `POST /validate`
+- **Point concepts** — CRUD
+- **Badges / collections** — CRUD
+- **Levels** — list / get / upsert (`POST`) / delete
+- **Challenge models** — CRUD (game-definition only)
+- **Teams** — CRUD (id == name, members validated in one batch query)
+- **Players** — list / get / create / delete
+- **Notifications** — read/query (`GET /games/{gameId}/notifications`)
+- **Classification / leaderboards** — CRUD + `GET /{id}/board` (general + incremental)
+- **Simulation scenarios** — CRUD (`/games/{gameId}/scenarios`)
+- **Execution** — `POST /api/v1/executions` (apply action, **synchronous**, guarded against runaway rules), `POST /api/v1/executions/simulations` (synthetic, non-persisting)
 
-- Auth — `POST /api/v1/auth`, `GET /api/v1/auth/user`
-- Games — CRUD (`/api/v1/games`), `POST /import`, `GET /{id}/impact`
-- Rules — CRUD (`/api/v1/games/{gameId}/rules`), `POST /validate`
-- Point concepts — CRUD (`/api/v1/games/{gameId}/point-concepts`)
-- Badges / collections — CRUD (`/api/v1/games/{gameId}/badges`)
-- Challenge **models** — CRUD (`/api/v1/games/{gameId}/challenges`) — *game-definition only* (confirmed: backed by `gameService.readChallengeModels`/`saveChallengeModel`/`deleteChallengeModel`)
-- Simulation — `POST /api/v1/simulate` (synthetic state, no persistence)
+## Remaining gaps
 
----
-
-## Tier 1 — blocks real runtime use
-
-- [ ] **Execute an action / run the engine** — `Workflow.apply(gameId, actionId, playerId, [executionMoment], data, factObjects)`. Submit a player action/event so rules fire and player state is persisted. Today only `simulate` exists (synthetic, non-persisting), so a game cannot actually be *played* through the new API.
-- [ ] **Player state & data** — entire `PlayerService` read/write surface is unexposed:
-  - [ ] Read a player's state (`loadState`, with merge/filter options)
-  - [ ] List players, paginated (`readPlayers`)
-  - [ ] Search players — raw / structured / text queries (`search`)
-  - [ ] Read a player's points / badges / challenges (`DBPlayerManager.readPlayerState` with selective concepts)
-  - [ ] Save / delete a player state (`saveState`, `deleteState`)
-  - [ ] Update **custom data** (`updateCustomData`)
-  - [ ] Activate **inventory** choice (`choiceActivation`)
-- [ ] **Notifications** — all `NotificationManager` read/query variants (per game, per player, time-range, include/exclude types, paginated).
-
-## Tier 2 — core gamification features
-
-- [ ] **Levels** — `upsertLevel`, `deleteLevel`, threshold add/update/delete, `calculateLevels`. (No levels controller; point-concepts and badges exist but levels do not.)
-- [ ] **Challenge assignment & lifecycle** (player-facing, distinct from model CRUD): `assignChallenge`, `acceptChallenge`, `forceChallengeChoice`, instance `update`, `readChallenges` / `readSingleChallenge`.
+### Tier 1 — player-facing gameplay
+- [ ] **Player-facing challenge lifecycle** (distinct from model CRUD): `assignChallenge`, `acceptChallenge`, `forceChallengeChoice`, instance `update`, `readChallenges` / `readSingleChallenge`.
 - [ ] **Group challenges & invitations** — invite / accept / refuse / cancel, condition checks, active-by-date queries.
-- [ ] **Leaderboards / classification** — `classifyAllPlayerStates`, period-based `classifyPlayerStatesWithKey`. (No leaderboard endpoint.)
-- [ ] **Teams** — save/read teams, add/remove members.
+- [~] **Player state extras** — basic player CRUD is exposed; still missing: custom-data update (`updateCustomData`), inventory choice activation (`choiceActivation`), advanced search (raw / structured / text).
 
-## Tier 3 — operational / analytics
-
-- [ ] **Scheduled tasks / jobs** — `TaskService` create/update/destroy game tasks (classification, cron) + task data read/write.
+### Tier 2 — operational / analytics
 - [ ] **Game statistics** — `loadGameStats` (aggregated / per-period).
 - [ ] **Archive / history** — `readArchives` (archived single & group challenges by state/date).
 - [ ] **Execution traces / player-move history** — read of execution logs (`TraceService` writes; old API exposed reads).
 - [ ] **Challenge reports** — JSON + CSV export (`readChallengeReportJSON` / `readChallengeReportCSV`).
 - [ ] **Player blacklist** — block / unblock / read.
 - [ ] **System matching** — `readSystemPlayerState` (auto-match eligible players).
-
-## Minor / lifecycle
-
-- [ ] **Game export** (import exists; export does not).
-- [ ] **Game activate / terminate** and **load-by-owner / by-domain / only-active** filters.
-- [ ] **Actions** — listing/definition of a game's actions.
-
----
+- [~] **Task / job management** — classification/leaderboard jobs are created/updated/deleted through the classifications endpoints and run on JobRunr inside the engine; a generic `TaskService` CRUD + task-data surface is not separately exposed.
 
 ## Notes
 
-- `/games/{gameId}/challenges` is **challenge models** (game definition), confirmed against the controller — player-facing challenge operations are therefore genuinely absent.
-- This list is "engine-core capability minus new endpoints." The original REST API may have had a few thin wrappers beyond core (health/console) not captured here.
-- Impact analysis (`/{gameId}/impact`) is exposed but is a weak static analysis for this engine's rule style — see prior discussion; tracked separately, not a migration gap.
+- Scheduling was migrated from Quartz to **JobRunr inside the engine core**; the engine is a self-configuring library (defaults in core, overridable via `engine.*` from the API). Classification/leaderboard jobs are managed through the classifications endpoints.
+- `/{gameId}/impact` is a weak static analysis for this engine's rule style — tracked separately, not a migration gap.
+- **Frontend status**: pages exist for actions, badges, challenges, games, levels, players, point-concepts, rules, scenarios, simulation, teams. **Classification / leaderboards frontend is the current in-progress work** (backend done and live-tested).

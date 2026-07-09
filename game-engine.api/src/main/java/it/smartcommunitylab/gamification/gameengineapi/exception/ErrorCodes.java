@@ -27,6 +27,7 @@ public final class ErrorCodes {
     public static final String POINT_CONCEPT_NOT_FOUND = "point_concept_not_found";
     public static final String BADGE_NOT_FOUND = "badge_not_found";
     public static final String CHALLENGE_NOT_FOUND = "challenge_not_found";
+    public static final String CHALLENGE_INSTANCE_NOT_FOUND = "challenge_instance_not_found";
     public static final String PLAYER_NOT_FOUND = "player_not_found";
     public static final String TEAM_NOT_FOUND = "team_not_found";
     public static final String SCENARIO_NOT_FOUND = "scenario_not_found";

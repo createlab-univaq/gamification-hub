@@ -19,9 +19,9 @@ export function navigateTo(url: string | URL, option?: NavigateOption) {
     router.navigate(url, option)
 }
 
-export function getBaseGamePath(){
+export function getBaseGamePath() {
     const pathParams = location.pathname.split("/")
-    if(pathParams.length > 2 && pathParams[1].includes("games")) {
+    if (pathParams.length > 2 && pathParams[1].includes("games")) {
         return `/games/${pathParams[2]}`
     }
     return ""

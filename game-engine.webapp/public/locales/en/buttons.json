@@ -12,5 +12,19 @@
   "save": "Save",
   "reset": "Reset",
   "validate": "Validate",
-  "console": "Console"
+  "console": "Console",
+  "scenarios": {
+    "add_action": "Add action",
+    "add_point_concept": "Add point concept",
+    "add_badge_collection": "Add badge collection",
+    "add_challenge": "Add challenge",
+    "add_attribute": "Add attribute"
+  },
+  "force": "Force choice",
+  "activate": "Activate",
+  "invite": "Invite",
+  "accept": "Accept",
+  "deny": "Deny",
+  "cancel": "Cancel",
+  "assign": "Assign"
 }

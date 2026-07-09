@@ -1,5 +1,7 @@
 export type GetFilter<T> = {
-    name: keyof T & string,
+    // keyof T keeps DTO-field intellisense; (string & {}) widens it to accept
+    // extra query params (page, size, ...) without losing the suggestions
+    name: (keyof T & string) | (string & {}),
     value: string
 }
 

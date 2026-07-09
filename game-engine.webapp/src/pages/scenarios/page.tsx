@@ -14,7 +14,7 @@ export function SimulationPage() {
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-scenario", game.id, scenarioId],
-        queryFn: () => scenarioClient.getScenario(game.id, scenarioId),
+        queryFn: () => scenarioClient.getScenario(game.id!, scenarioId!),
         enabled: !!game && !!scenarioId
     })
 
@@ -28,7 +28,7 @@ export function SimulationPage() {
     }
 
     return <PageContainer>
-        <SimulationForm gameId={game.id} scenario={data}/>
+        <SimulationForm gameId={game.id!} scenario={data}/>
     </PageContainer>
 
 }

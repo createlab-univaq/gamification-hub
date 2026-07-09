@@ -12,5 +12,19 @@
   "save": "Salva",
   "reset": "Ripristina",
   "validate": "Valida",
-  "console": "Terminale"
+  "console": "Terminale",
+  "scenarios": {
+    "add_action": "Aggiungi azione",
+    "add_point_concept": "Aggiungi punteggio",
+    "add_badge_collection": "Aggiungi medaglia",
+    "add_challenge": "Aggiungi sfida",
+    "add_attribute": "Aggiungi attributo"
+  },
+  "force": "Forza scelta",
+  "activate": "Attiva",
+  "invite": "Invita",
+  "accept": "Accetta",
+  "deny": "Rifiuta",
+  "cancel": "Annulla",
+  "assign": "Assegna"
 }

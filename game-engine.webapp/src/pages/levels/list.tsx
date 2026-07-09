@@ -7,7 +7,7 @@ import {Loading} from "../../components/Loading.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {Navigate} from "react-router-dom";
 import {Stack, Typography} from "@mui/material";
-import {Add} from "@mui/icons-material";
+import {Add, Games} from "@mui/icons-material";
 import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
 import {useState} from "react";
 import type {LevelDto} from "../../api/types";
@@ -16,20 +16,22 @@ import {PageList} from "../../components/PageList.tsx";
 import {useDebounced} from "../../hooks/use-debounced.ts";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import type {GetFilter} from "../../api/filters/filters.ts";
+import {useTranslation} from "react-i18next";
 
 export function LevelListPage() {
     const game = useGame()
     const {setNotification} = useNotificationContext()
     const [deleteLevel, setDeleteLevel] = useState<LevelDto>()
     const [filters, setFilters] = useState<GetFilter<LevelDto>[]>([])
+    const [t] = useTranslation()
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-levels", game.id, filters],
-        queryFn: () => levelClient.getLevels(game.id, filters),
+        queryFn: () => levelClient.getLevels(game.id!, filters),
         enabled: !!game,
         placeholderData: keepPreviousData
     })
 
-    const {mutate} = useMutation({
+    const {mutate} = useMutation<unknown, object, { gameId: string, levelName: string }>({
         mutationKey: ["delete-level", game.id],
         mutationFn: (vars) => levelClient.deleteLevel(vars.gameId, vars.levelName),
         onSuccess: () => {
@@ -37,8 +39,8 @@ export function LevelListPage() {
             setNotification({
                 notification: {
                     type: "success",
-                    title: "Livello Eliminato",
-                    content: `Il livello è stato eliminato con successo`
+                    title: t("levels.saved.title"),
+                    content: t("levels.saved.message")
                 },
                 isSnack: true
             })
@@ -69,18 +71,29 @@ export function LevelListPage() {
 
     return <PageContainer>
         <PageHeader
-            title={"Livelli"}
+            title={t("levels.title")}
             buttons={[
                 {
-                    children: "Aggiungi",
-                    variant:"contained",
+                    children: t("buttons:add"),
+                    variant: "contained",
                     endIcon: <Add/>,
-                    href:`/games/${game.id}/levels/upsert`
+                    href: `/games/${game.id}/levels/upsert`
+                }
+            ]}
+            breadcrumbs={[
+                {
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
+                },
+                {
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
                 }
             ]}
         />
-        <DeleteDialog message={`Vuoi davvero eliminare il livello "${deleteLevel?.name}" per sempre?`}
-                      deleteFn={() => mutate({gameId: game.id, levelName: deleteLevel.name})}
+        <DeleteDialog message={t("delete_message", {entity: deleteLevel?.name})}
+                      deleteFn={() => mutate({gameId: game.id!, levelName: deleteLevel?.name ?? ""})}
                       setElement={setDeleteLevel}
                       element={deleteLevel}
         />
@@ -90,7 +103,7 @@ export function LevelListPage() {
             renderItem={(level) => {
                 return <Stack sx={{gap: 1}}>
                     <Typography sx={{fontWeight: "bold", fontSize: "1.2rem"}}>{level.name}</Typography>
-                    <Typography>Soglie: {level.thresholds?.length ?? 0}</Typography>
+                    <Typography>{t("levels.thresholds")}: {level.thresholds?.length ?? 0}</Typography>
                 </Stack>
             }}
             onItemUpdate={(level, event) => {
@@ -101,10 +114,10 @@ export function LevelListPage() {
             onItemDelete={(level) => {
                 setDeleteLevel(level)
             }}
-            emptyListMessage={<Typography>Nessun livello trovato.</Typography>}
+            emptyListMessage={t("levels.empty_list")}
             search={{
-                label: "Cerca",
-                placeholder: "Livello...",
+                label: t("search_placeholder"),
+                placeholder: t("levels.search_placeholder"),
                 onSearch: (value) => {
                     filter(value)
                 }

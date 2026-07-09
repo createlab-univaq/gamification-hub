@@ -15,7 +15,7 @@ i18n
             order: ["localStorage", "navigator"],
             caches: ["localStorage"],
         },
-        ns:["errors", "commons", "buttons"],
+        ns:["errors", "commons", "buttons", "enums"],
         defaultNS: "commons",
         fallbackLng: "en",
         interpolation: {
@@ -23,13 +23,13 @@ i18n
         }
     })
 ;
-i18n.services.formatter.add("lowercase", (value)=>{
+i18n.services?.formatter?.add("lowercase", (value)=>{
     return value.toLowerCase()
 })
-i18n.services.formatter.add("uppercase", (value)=>{
+i18n.services?.formatter?.add("uppercase", (value)=>{
     return value.toUpperCase()
 })
-i18n.services.formatter.add("capitalize", (value)=>{
+i18n.services?.formatter?.add("capitalize", (value)=>{
     return value && String(value[0]).toUpperCase() + String(value).slice(1)
 })
 export default i18n;

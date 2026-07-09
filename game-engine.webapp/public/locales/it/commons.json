@@ -7,6 +7,19 @@
   "welcome": "Bentornato {{name}}",
   "name": "Nome",
   "required_field": "Campo obbligatorio!",
+  "form": {
+    "labels": {
+      "challenge_select":"Modello di sfida",
+      "instance_name": "Nome istanza",
+      "initial_state": "Stato iniziale",
+      "start": "Inizio",
+      "end": "Fine",
+      "hidden": "Nascosto",
+      "assign_challenge": "Assegna sfida"
+    },
+    "password_validation": "La password deve contenere almeno 4 caratteri, un carattere maiuscolo e minuscoolo, un numero ed un carattere speciale (@,$,!,%,*,?)",
+    "username_validation": "Lo username può contenere solo caratteri lettere e underscore."
+  },
   "sidebar": {
     "rules": "Regole",
     "games": "Giochi",
@@ -14,12 +27,11 @@
     "points": "Punteggi",
     "players": "Giocatori",
     "teams": "Squadre",
-    "activities": "Attività",
+    "classifications": "Classifiche",
     "badges": "Medaglie",
     "levels": "Livelli",
     "scenarios": "Scenari",
-    "challenges": "Sfide",
-    "monitors": "Monitoraggio"
+    "challenges": "Modelli di sfida"
   },
   "total_amount": "{{entity, capitalize}} totali: {{number}}",
   "game": {
@@ -79,6 +91,191 @@
       "title": "Validazione completata",
       "success": "La regola è stata compilata con successo. Nessun errore trovato",
       "warning": "Regola compilata con avvisi"
+    }
+  },
+  "leaderboards": {
+    "title": "Classifiche",
+    "types": {
+      "general": "Generale",
+      "incremental": "Incrementale"
+    },
+    "checkout": "Vedi classifica",
+    "empty_list": "Nessuna classifica trovata",
+    "search_placeholder": "Classifica...",
+    "point_concept": "Punteggio",
+    "period": "Periodo",
+    "upsert": {
+      "new": "Aggiungi classifica",
+      "edit": "Aggiorna classifica"
+    },
+    "saved": {
+      "title": "Classifica salvata!",
+      "content": "La classifica {{name}} è stata salvata con successo"
+    },
+    "deleted": {
+      "title": "Classifica eliminata",
+      "content": "La classifica è stata eliminata con successo"
+    },
+    "form": {
+      "name": "Nome classifica",
+      "type": "Tipo",
+      "type_general": "Generale (tutto il tempo)",
+      "type_incremental": "Incrementale (per periodo)",
+      "point_concept": "Punteggio",
+      "items_to_notify": "Posizioni da notificare (top-N)",
+      "cron": "Cron (schedulazione)",
+      "cron_helper": "Espressione cron a 5 campi per l'esecuzione della classifica",
+      "cron_invalid": "Espressione cron non valida",
+      "period": "Periodo",
+      "period_required": "Campo obbligatorio per le classifiche incrementali!"
+    },
+    "board": {
+      "period_index": "Indice periodo (0 = corrente)",
+      "player": "Giocatore",
+      "score": "Punteggio",
+      "empty": "Nessun dato in classifica."
+    }
+  },
+  "scenarios": {
+    "title": "Scenari",
+    "search_placeholder": "Scenario...",
+    "empty_list": "Nessun scenario trovato",
+    "deleted": {
+      "title": "Scenario eliminato!",
+      "message": "Lo scenario è eliminato con successo"
+    },
+    "form": {
+      "name_placeholder": "La mia simulazione",
+      "save": {
+        "title": "Scenario salvato!",
+        "message": "Lo scenario \"{{name}}\" è stato salvato con successo"
+      },
+      "inputs": {
+        "title": "Input simulazione"
+      },
+      "outputs": {
+        "title": "Risultato aspettato",
+        "placeholder": "I risultati verranno mostrati qui",
+        "count": "Regole eseguite: {{count}}",
+        "no_rules_fired": "Nessuna regola eseguita",
+        "test": {
+          "success": {
+            "title": "Test passato!",
+            "message": "Il risultato della simulazione corrisponde con i valori aspettati"
+          },
+          "fail": {
+            "title": "Test fallito!",
+            "message": "Uno o più valori non corrispondono con i risultati aspettati"
+          }
+        }
+      },
+      "graph": {
+        "details": "Clicca un nodo per vedere i dettagli",
+        "nodes": {
+          "start": "Stato Iniziale",
+          "end": "Stato Finale",
+          "caused_by": "Causata da {{rule}}",
+          "changes": "{{count}} cambiamenti"
+        }
+      }
+    }
+  },
+  "badges": {
+    "title": "Modelli di medaglia",
+    "empty_list": "Nessuna medaglia trovata",
+    "search_placeholder": "Medaglia...",
+    "deleted": {
+      "title": "Medaglia eliminata!",
+      "message": "La medaglia è stata rimossa con successo"
+    },
+    "saved": {
+      "title": "Medaglia salvata!",
+      "message": "La medaglia \"{{name}}\" è stata salvata con successo"
+    }
+  },
+  "challenges": {
+    "title": "Modelli di sfida",
+    "empty_list": "Nessuna sfida trovata",
+    "search_placeholder": "Sfida...",
+    "deleted": {
+      "title": "Sfida eliminata!",
+      "message": "La sfida è stata rimossa con successo"
+    },
+    "saved": {
+      "title": "Sfida salvata!",
+      "message": "La sfida \"{{name}}\" è stata salvata con successo"
+    }
+  },
+  "levels": {
+    "title": "Livelli",
+    "empty_list": "Nessun livello trovato",
+    "search_placeholder": "Livello...",
+    "thresholds": "Soglie",
+    "deleted": {
+      "title": "Livello eliminato!",
+      "message": "Il livello è stato rimosso con successo"
+    },
+    "saved": {
+      "title": "Livello salvato!",
+      "message": "Il livello \"{{name}}\" è stata salvata con successo"
+    }
+  },
+  "players": {
+    "title": "Giocatori",
+    "empty_list": "Nessun giocatore trovato",
+    "search_placeholder": "Giocatore...",
+    "deleted": {
+      "title": "Giocatore eliminato!",
+      "message": "Il giocatore è stato eliminato con successo"
+    },
+    "saved": {
+      "title": "Giocatore salvato!",
+      "message": "Il giocatore \"{{name}}\" è stato salvato con successo"
+    },
+    "challenges": {
+      "accepted": {
+        "title": "Sfida accettata!",
+        "message": "La sfida è stata accettata"
+      },
+      "assigned": {
+        "title": "Sfida assegnata!",
+        "message": "La sfida è stata assegnata con successo"
+      }
+    },
+    "inventories": {
+      "title":"Inventario",
+      "available_choices": "Azioni di attivazione disponibili: {{count}}" ,
+      "choices": {
+        "empty_list": "Nessuna scelta disponibile",
+        "forced": {
+          "title": "Scelta forzata!",
+          "message": "La scelta della sfida è stata forzata con successo"
+        },
+        "activated": {
+          "title": "Scelta attivata!",
+          "message": "Il modello di sfida è stato attivato"
+        }
+      }
+    },
+    "groups": {
+      "challenges": {
+        "title": "Sfide di gruppo",
+        "empty_list": "Nessuna sfida di gruppo trovata",
+        "invites": {
+          "accepted": {
+            "title": "Invito accettato!",
+            "message": "L'invito è stato accettato con successo"
+          },
+          "denied": {
+            "title": "Invito rifiutato!",
+            "message": "L'invito è stato rifiutato con successo"
+          },
+          "cancelled": {
+            "title": "Invito annullato!",
+            "message": "L'invito è stato annullato con successo"
+          }
+        }
+      }
     }
   }
 }

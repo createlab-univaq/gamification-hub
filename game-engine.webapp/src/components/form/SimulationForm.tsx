@@ -31,6 +31,7 @@ import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {SimulationFlowGraph} from "../simulation/SimulationFlowGraph.tsx";
 import {PageHeader} from "../layout/PageHeader.tsx";
+import {useTranslation} from "react-i18next";
 
 interface SimulationFormProps {
     gameId: string
@@ -196,6 +197,7 @@ function toFormValues(scenario: SimulationScenarioDto): SimulationFormValues {
 
 export function SimulationForm({gameId, scenario}: SimulationFormProps) {
     const {setNotification} = useNotificationContext()
+    const [t] = useTranslation()
 
     const form = useForm<SimulationFormValues>({
         defaultValues: {
@@ -223,12 +225,18 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
     const expectedChallenges = useFieldArray({control: form.control, name: "expectedChallenges"})
 
     useEffect(() => {
-        if (scenario) {
-            form.reset(toFormValues(scenario))
-        }
+        resetForm(scenario)
     }, [scenario]);
 
-    const {mutate, data: result, isPending, reset} = useMutation<SimulationResultDto, unknown, SimulationFormValues>({
+    const resetForm = (values?: SimulationScenarioDto) => {
+        if (values) {
+            form.reset(toFormValues(values))
+        } else {
+            form.reset()
+        }
+    }
+
+    const {mutate, data: result, isPending, reset} = useMutation<SimulationResultDto, object, SimulationFormValues>({
         mutationFn: (values) => simulationClient.simulate(buildRequest(gameId, values)),
         onSuccess: (data, variables) => {
             const testResult = matchExpectations(variables, data.finalState)
@@ -238,8 +246,8 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
             setNotification({
                 notification: {
                     type: testResult ? "success" : "error",
-                    title: testResult ? "Test passato" : "Test fallito",
-                    content: testResult ? "Il risultato della simulazione corrisponde con i valori aspettati" : "Uno o più valori non corrispondono con quello pensato"
+                    title: testResult ? t("scenarios.form.outputs.test.success.title") : t("scenarios.form.outputs.test.fail.title"),
+                    content: testResult ? t("scenarios.form.outputs.test.success.message") : t("scenarios.form.outputs.test.fail.message")
                 },
                 isSnack: true
             })
@@ -264,9 +272,9 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
         onSuccess: (data) => {
             setNotification({
                 notification: {
-                    type: "success", 
-                    title: "Scenario Salvato",
-                    content: `Scenario ${data.name} salvato con successo`
+                    type: "success",
+                    title: t("scenarios.form.save.title"),
+                    content: t("scenarios.form.save.message", {name: data.name})
                 },
                 isSnack: true
             })
@@ -285,42 +293,42 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
 
     return (
         <Form form={form} onSubmit={(v) => {
-            mutate(v)
+            mutate(v as SimulationFormValues)
         }}>
             <PageHeader
                 title={
                     <FormInput name={"name"}>
-                        <TextField label={"Nome scenario"}/>
+                        <TextField label={t("name")} placeholder={t("scenarios.form.name_placeholder")}/>
                     </FormInput>
                 }
                 buttons={[
                     {
-                        children: "Torna alla lista",
+                        children: t("buttons:turn_back"),
                         variant: "outlined",
                         startIcon: <ArrowBack/>,
                         disabled: isSaving,
                         onClick: () => navigateTo(`/games/${gameId}/scenarios`)
                     },
                     {
-                        children: scenario ? "Aggiorna scenario" : "Salva scenario",
+                        children: t("buttons:save"),
                         variant: "contained",
-                        loading: isSaving,
-                        disabled: !name?.trim() || isSaving,
+                        loading: isSaving || isPending,
+                        disabled: !name?.trim() || isSaving || isPending,
                         endIcon: <Save/>,
                         onClick: onSave
                     },
                     {
-                        children: "Simulate",
+                        children: t("buttons:simulate"),
                         type: "submit",
                         variant: "contained",
                         loading: isPending,
                         endIcon: <PlayArrow/>
                     },
                     {
-                        children: "Clear",
-                        type: "reset",
+                        children: t("buttons:reset"),
                         onClick: () => {
-                            reset();
+                            reset()
+                            resetForm(scenario)
                         },
                         variant: "outlined",
                         loading: isPending,
@@ -333,13 +341,13 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                 <Stack sx={{flex: 1, minWidth: 0}}>
                     <Accordion sx={{borderRadius: 0}} defaultExpanded={true}>
                         <AccordionSummary expandIcon={<ExpandMore/>}>
-                            <Typography sx={{fontWeight: 600}}>Simulation Input</Typography>
+                            <Typography sx={{fontWeight: 600}}>{t("scenarios.form.inputs.title")}</Typography>
                         </AccordionSummary>
                         <Stack sx={{flex: 1, minWidth: 0}}>
                             {/* Actions */}
                             <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
                                 <AccordionSummary expandIcon={<ExpandMore/>}>
-                                    <Typography sx={{fontWeight: 600}}>Actions</Typography>
+                                    <Typography sx={{fontWeight: 600}}>{t("sidebar.actions")}</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Stack sx={{gap: 1}}>
@@ -353,9 +361,9 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                                 </IconButton>
                                             </Stack>
                                         ))}
-                                        <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                        <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                                                 onClick={() => actions.append({value: ""})}>
-                                            Add Action
+                                            {t("buttons:scenarios.add_action")}
                                         </Button>
                                     </Stack>
                                 </AccordionDetails>
@@ -364,7 +372,7 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                             {/* Point Concepts */}
                             <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
                                 <AccordionSummary expandIcon={<ExpandMore/>}>
-                                    <Typography sx={{fontWeight: 600}}>Point Concepts</Typography>
+                                    <Typography sx={{fontWeight: 600}}>{t("sidebar.points")}</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Stack sx={{gap: 1}}>
@@ -382,9 +390,9 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                                 </IconButton>
                                             </Stack>
                                         ))}
-                                        <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                        <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                                                 onClick={() => pointConcepts.append({name: "", score: "0"})}>
-                                            Add Point Concept
+                                            {t("buttons:scenarios.add_point_concept")}
                                         </Button>
                                     </Stack>
                                 </AccordionDetails>
@@ -393,7 +401,7 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                             {/* Badge Collections */}
                             <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
                                 <AccordionSummary expandIcon={<ExpandMore/>}>
-                                    <Typography sx={{fontWeight: 600}}>Badge Collections</Typography>
+                                    <Typography sx={{fontWeight: 600}}>{t("sidebar.badges")}</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Stack sx={{gap: 1}}>
@@ -412,9 +420,9 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                                 </IconButton>
                                             </Stack>
                                         ))}
-                                        <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                        <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                                                 onClick={() => badgeCollections.append({name: "", badges: ""})}>
-                                            Add Badge Collection
+                                            {t("buttons:scenarios.add_badge_collection")}
                                         </Button>
                                     </Stack>
                                 </AccordionDetails>
@@ -423,7 +431,7 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                             {/* Challenges */}
                             <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
                                 <AccordionSummary expandIcon={<ExpandMore/>}>
-                                    <Typography sx={{fontWeight: 600}}>Challenges</Typography>
+                                    <Typography sx={{fontWeight: 600}}>{t("sidebar.challenges")}</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Stack sx={{gap: 2}}>
@@ -433,11 +441,11 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                                            register={form.register}
                                                            onRemove={() => challenges.remove(i)}/>
                                         ))}
-                                        <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                        <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                                                 onClick={() => challenges.append({
                                                     name: "", modelName: "", state: "", fields: []
                                                 })}>
-                                            Add Challenge
+                                            {t("buttons:scenarios.add_challenge")}
                                         </Button>
                                     </Stack>
                                 </AccordionDetails>
@@ -462,9 +470,9 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                                 </IconButton>
                                             </Stack>
                                         ))}
-                                        <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                        <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                                                 onClick={() => customData.append({key: "", value: ""})}>
-                                            Add Attribute
+                                            {t("buttons:scenarios.add_attribute")}
                                         </Button>
                                     </Stack>
                                 </AccordionDetails>
@@ -489,9 +497,9 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                                 </IconButton>
                                             </Stack>
                                         ))}
-                                        <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                        <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                                                 onClick={() => inputData.append({key: "", value: ""})}>
-                                            Add Attribute
+                                            {t("buttons:scenarios.add_attribute")}
                                         </Button>
                                     </Stack>
                                 </AccordionDetails>
@@ -500,18 +508,14 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                     </Accordion>
                     <Accordion>
                         <AccordionSummary expandIcon={<ExpandMore/>}>
-                            <Typography sx={{fontWeight: 600}}>Expected Output</Typography>
+                            <Typography sx={{fontWeight: 600}}>{t("scenarios.form.outputs.title")}</Typography>
                         </AccordionSummary>
                         <Stack sx={{flex: 1, minWidth: 0}}>
-                            <Typography variant="caption" color="text.secondary" sx={{px: 2, pt: 1}}>
-                                Only the entries listed here are checked against the simulated final state.
-                            </Typography>
-
                             {/* Expected Point Concepts */}
                             <Accordion defaultExpanded
                                        sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
                                 <AccordionSummary expandIcon={<ExpandMore/>}>
-                                    <Typography sx={{fontWeight: 600}}>Point Concepts</Typography>
+                                    <Typography sx={{fontWeight: 600}}>{t("sidebar.points")}</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Stack sx={{gap: 1}}>
@@ -529,9 +533,9 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                                 </IconButton>
                                             </Stack>
                                         ))}
-                                        <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                        <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                                                 onClick={() => expectedPointConcepts.append({name: "", score: "0"})}>
-                                            Add Point Concept
+                                            {t("buttons:scenarios.add_point_concept")}
                                         </Button>
                                     </Stack>
                                 </AccordionDetails>
@@ -540,7 +544,7 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                             {/* Expected Badge Collections */}
                             <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
                                 <AccordionSummary expandIcon={<ExpandMore/>}>
-                                    <Typography sx={{fontWeight: 600}}>Badge Collections</Typography>
+                                    <Typography sx={{fontWeight: 600}}>{t("sidebar.badges")}</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Stack sx={{gap: 1}}>
@@ -559,9 +563,9 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                                 </IconButton>
                                             </Stack>
                                         ))}
-                                        <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                        <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                                                 onClick={() => expectedBadgeCollections.append({name: "", badges: ""})}>
-                                            Add Badge Collection
+                                            {t("buttons:scenarios.add_badge_collection")}
                                         </Button>
                                     </Stack>
                                 </AccordionDetails>
@@ -570,7 +574,7 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                             {/* Expected Challenges */}
                             <Accordion sx={{backgroundColor: "transparent", borderRadius: "0 !important"}}>
                                 <AccordionSummary expandIcon={<ExpandMore/>}>
-                                    <Typography sx={{fontWeight: 600}}>Challenges</Typography>
+                                    <Typography sx={{fontWeight: 600}}>{t("sidebar.challenges")}</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Stack sx={{gap: 2}}>
@@ -580,11 +584,11 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                                            register={form.register}
                                                            onRemove={() => expectedChallenges.remove(i)}/>
                                         ))}
-                                        <Button size="small" startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
+                                        <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                                                 onClick={() => expectedChallenges.append({
                                                     name: "", modelName: "", state: "", fields: []
                                                 })}>
-                                            Add Challenge
+                                            {t("buttons:scenarios.add_challenge")}
                                         </Button>
                                     </Stack>
                                 </AccordionDetails>
@@ -600,16 +604,17 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                             display: "flex", alignItems: "center", justifyContent: "center",
                             height: 200, border: "1px dashed", borderColor: "divider", borderRadius: 2
                         }}>
-                            <Typography color="text.secondary">Results will appear here</Typography>
+                            <Typography color="text.secondary">{t("scenarios.form.outputs.placeholder")}</Typography>
                         </Box>
                     )}
 
                     {result && <>
                         <Typography variant="h6">
-                            Fired Rules ({result.firedRules?.length ?? 0})
+                            {t("scenarios.form.outputs.count", {count: result.firedRules?.length ?? 0})}
                         </Typography>
                         {result.firedRules?.length === 0
-                            ? <Typography color="text.secondary">No rules fired.</Typography>
+                            ?
+                            <Typography color="text.secondary">{t("scenarios.form.outputs.no_rules_fired")}</Typography>
                             : <SimulationFlowGraph simulationResult={result}/>
                         }
                     </>}

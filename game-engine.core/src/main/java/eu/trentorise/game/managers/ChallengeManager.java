@@ -202,6 +202,10 @@ public class ChallengeManager {
 		return groupChallengeRepo.activeGroupChallenges(gameId, playerId, atDate);
 	}
 
+	public List<GroupChallenge> playerGroupChallenges(String gameId, String playerId) {
+		return groupChallengeRepo.playerGroupChallenges(gameId, playerId);
+	}
+
 	public List<GroupChallenge> groupChallengeToFail(String gameId, Date atDate) {
 		return groupChallengeRepo.groupChallengesToFail(gameId, atDate);
 	}

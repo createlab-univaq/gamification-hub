@@ -7,7 +7,7 @@ import {Loading} from "../../components/Loading.tsx";
 import {Navigate} from "react-router-dom";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {Typography} from "@mui/material";
-import {AccountTree, Add} from "@mui/icons-material";
+import {AccountTree, Add, Games} from "@mui/icons-material";
 import {useState} from "react";
 import type {RuleDto} from "../../api/types";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
@@ -27,12 +27,12 @@ export function RuleListPage() {
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-rules", game.id, filters],
         queryFn: () => {
-            return ruleClient.getRules(game.id, filters)
+            return ruleClient.getRules(game.id!, filters)
         },
         enabled: !!game,
         placeholderData: keepPreviousData
     })
-    const {mutate} = useMutation({
+    const {mutate} = useMutation<unknown, object, { gameId: string, ruleId: string }>({
         mutationKey: ["delete-rule"],
         mutationFn: (vars) => ruleClient.deleteRule(vars.gameId, vars.ruleId),
         onSuccess: () => {
@@ -86,9 +86,20 @@ export function RuleListPage() {
                             endIcon: <AccountTree/>
                         }
                     ]}
+                    breadcrumbs={[
+                        {
+                            icon:<Games/>,
+                            label:t("sidebar.games"),
+                            href:"/dashboard"
+                        },
+                        {
+                            label:game.name ?? "My Game",
+                            href:`/games/${game.id}`
+                        }
+                    ]}
         />
-        <DeleteDialog message={t("delete_message", {entity:deleteRule?.name})}
-                      deleteFn={() => mutate({gameId: game.id, ruleId: deleteRule.id})}
+        <DeleteDialog message={t("delete_message", {entity: deleteRule?.name})}
+                      deleteFn={() => mutate({gameId: game.id!, ruleId: deleteRule?.id ?? ""})}
                       setElement={setDeleteRule}
                       element={deleteRule}
         />
