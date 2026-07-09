@@ -1,4 +1,4 @@
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {Navigate, useParams} from "react-router-dom";
 import {keepPreviousData, useQuery} from "@tanstack/react-query";
 import {classificationClient} from "../../api";
@@ -30,7 +30,7 @@ const LEADERBOARD_PODIUM_COLOURS = {
     1: "gold",
     2: "silver",
     3: "brown"
-}
+} as Record<number, string>
 
 type BoardFilters = {
     periodInstanceIndex: number
@@ -51,7 +51,7 @@ export function ClassificationBoardPage() {
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-classification-board", game.id, classificationId, filters],
-        queryFn: () => classificationClient.getBoard(game.id, classificationId!, criteria),
+        queryFn: () => classificationClient.getBoard(game.id!, classificationId!, criteria),
         enabled: !!game && !!classificationId,
         placeholderData: keepPreviousData
     })
@@ -112,11 +112,11 @@ export function ClassificationBoardPage() {
                         <TableBody>
                             {rows.map((p) => (
                                 <TableRow key={p.playerId}>
-                                    <TableCell sx={{display:"flex", alignItems:"center", gap:2}}>
+                                    <TableCell sx={{display: "flex", alignItems: "center", gap: 2}}>
                                         {p.position}
-                                        {p.position <= 3 &&
+                                        {p.position! <= 3 &&
                                             <EmojiEvents sx={{
-                                                color: LEADERBOARD_PODIUM_COLOURS[p.position]
+                                                color: LEADERBOARD_PODIUM_COLOURS[p.position!]
                                             }}/>
                                         }
                                     </TableCell>

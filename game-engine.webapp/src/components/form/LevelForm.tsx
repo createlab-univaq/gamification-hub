@@ -6,7 +6,7 @@ import {useMutation, useQuery} from "@tanstack/react-query";
 import {challengeClient, levelClient, pointConceptClient} from "../../api";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Button, Card, CardContent, Collapse, Divider, IconButton, Stack, TextField, Typography} from "@mui/material";
 import {Add, Delete, Settings} from "@mui/icons-material";
 import {FormInput} from "./FormInput.tsx";
@@ -62,7 +62,7 @@ export function LevelForm({level, gameId}: LevelFormProps) {
         return next
     })
 
-    const {mutate, isPending} = useMutation({
+    const {mutate, isPending} = useMutation<LevelDto, Error, { gameId: string, lvl: LevelDto }>({
         mutationKey: ["upsert-level"],
         mutationFn: ({gameId, lvl}) => levelClient.upsertLevel(gameId, lvl),
         onSuccess: (data) => {
@@ -84,7 +84,7 @@ export function LevelForm({level, gameId}: LevelFormProps) {
         }
     })
 
-    function initForm(level: LevelDto) {
+    function initForm(level?: LevelDto) {
         form.reset({
             name: level?.name ?? "",
             pointConceptName: level?.pointConceptName ?? "",

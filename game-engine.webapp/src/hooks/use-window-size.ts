@@ -19,7 +19,7 @@ export function useWindowSize() {
         return ()=>{
             window.removeEventListener("resize", updateSize)
         }
-    }, [window.innerWidth]);
+    }, []);
 
     return size
 

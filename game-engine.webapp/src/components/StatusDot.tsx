@@ -1,4 +1,4 @@
-import {Box, Stack, Tooltip} from "@mui/material";
+import {Stack, Tooltip} from "@mui/material";
 
 interface StatusDotProps {
     type?: "normal" | "warning" | "success" | "error",
@@ -10,7 +10,7 @@ export function StatusDot({type, title, size}: StatusDotProps) {
     return <Tooltip title={title}>
         <Stack
             sx={{
-                display:"inline-block",
+                display: "inline-block",
                 width: size ?? "1rem",
                 height: size ?? "1rem",
                 borderRadius: "50%",

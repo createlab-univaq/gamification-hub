@@ -1,13 +1,13 @@
-import type {LayoutListProps} from "./LayoutList.tsx";
+import type {LayoutListProps, LayoutType} from "./LayoutList.tsx";
 import {LayoutList} from "./LayoutList.tsx";
 import {Box, Divider, IconButton, Stack, TextField} from "@mui/material";
 import {GridOn, List} from "@mui/icons-material";
-import {useState} from "react";
+import {type ChangeEvent, useState} from "react";
 
 interface SearchProps {
     label?: string
     placeholder?: string
-    onSearch?: (value: string, e: Event) => void
+    onSearch?: (value: string, e: ChangeEvent) => void
 }
 
 interface PageListProps<T> extends Omit<LayoutListProps<T>, "layout"> {
@@ -16,9 +16,9 @@ interface PageListProps<T> extends Omit<LayoutListProps<T>, "layout"> {
 
 export function PageList<T>({search, ...props}: PageListProps<T>) {
 
-    const [layout, setLayout] = useState("list")
+    const [layout, setLayout] = useState<LayoutType>("list")
 
-    return <Stack sx={{py:2, flex: 1, minHeight: 0}}>
+    return <Stack sx={{py: 2, flex: 1, minHeight: 0}}>
         <Stack
             direction={"row"}
             sx={{
@@ -27,8 +27,8 @@ export function PageList<T>({search, ...props}: PageListProps<T>) {
         >
             <TextField
                 type={"text"}
-                label={search.label}
-                placeholder={search.placeholder}
+                label={search?.label}
+                placeholder={search?.placeholder}
                 sx={{
                     minWidth: "30%"
                 }}
@@ -38,11 +38,11 @@ export function PageList<T>({search, ...props}: PageListProps<T>) {
             />
             <Stack direction={"row"} divider={<Divider orientation={"vertical"}/>}>
                 <IconButton
-                    color={layout === "list" ? "primary" : "text"}
+                    color={layout === "list" ? "primary" : "default"}
                     size={"small"}
                     sx={{
-                        "&:hover":{
-                            backgroundColor:"unset"
+                        "&:hover": {
+                            backgroundColor: "unset"
                         }
                     }}
                     onClick={() => setLayout("list")}
@@ -51,10 +51,10 @@ export function PageList<T>({search, ...props}: PageListProps<T>) {
                 </IconButton>
                 <IconButton
                     size={"small"}
-                    color={layout === "grid" ? "primary" : "text"}
+                    color={layout === "grid" ? "primary" : "default"}
                     sx={{
-                        "&:hover":{
-                            backgroundColor:"unset"
+                        "&:hover": {
+                            backgroundColor: "unset"
                         }
                     }}
                     onClick={() => setLayout("grid")}

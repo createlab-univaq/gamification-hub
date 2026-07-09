@@ -3,8 +3,7 @@ import {useState} from "react";
 import type {TextFieldProps} from "@mui/material/TextField";
 import {Visibility, VisibilityOff} from '@mui/icons-material'
 
-interface PasswordFieldProps extends Omit<TextFieldProps, "type" | "slotProps"> {
-}
+type PasswordFieldProps = Omit<TextFieldProps, "type" | "slotProps">
 
 export function PasswordField(props: PasswordFieldProps) {
 

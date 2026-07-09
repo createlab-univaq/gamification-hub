@@ -1,6 +1,6 @@
 export const CHALLENGE_TYPES = ["ASSIGNED", "ACTIVE", "PROPOSED"] as const
 
-export type ChallengeType =  typeof CHALLENGE_TYPES[number];
+export type ChallengeType = typeof CHALLENGE_TYPES[number];
 
 export const ChallengeTypeChipColorRecord = {
     ACTIVE: "success.dark",

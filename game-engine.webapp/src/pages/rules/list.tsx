@@ -1,6 +1,6 @@
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {keepPreviousData, useMutation, useQuery} from "@tanstack/react-query";
 import {queryClient, ruleClient} from "../../api";
 import {Loading} from "../../components/Loading.tsx";
@@ -11,7 +11,7 @@ import {AccountTree, Add, Games} from "@mui/icons-material";
 import {useState} from "react";
 import type {RuleDto} from "../../api/types";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {PageList} from "../../components/PageList.tsx";
 import type {GetFilter} from "../../api/filters/filters.ts";
 import {useDebounced} from "../../hooks/use-debounced.ts";
@@ -88,13 +88,13 @@ export function RuleListPage() {
                     ]}
                     breadcrumbs={[
                         {
-                            icon:<Games/>,
-                            label:t("sidebar.games"),
-                            href:"/dashboard"
+                            icon: <Games/>,
+                            label: t("sidebar.games"),
+                            href: "/dashboard"
                         },
                         {
-                            label:game.name ?? "My Game",
-                            href:`/games/${game.id}`
+                            label: game.name ?? "My Game",
+                            href: `/games/${game.id}`
                         }
                     ]}
         />

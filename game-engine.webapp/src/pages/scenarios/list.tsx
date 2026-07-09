@@ -1,5 +1,5 @@
-import {useGame} from "../../components/GameContext.tsx";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useGame} from "../../hooks/use-game";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {useState} from "react";
 import {keepPreviousData, useMutation, useQuery} from "@tanstack/react-query";
 import {queryClient, scenarioClient} from "../../api";
@@ -90,7 +90,8 @@ export function ScenarioListPage() {
                     <Typography sx={{fontWeight: "bold", fontSize: "1.2rem"}}>{scenario.name}</Typography>
                 </Stack>
             )}
-            onItemUpdate={()=>{}}
+            onItemUpdate={() => {
+            }}
             onItemDelete={(scenario) => setDeleteScenario(scenario)}
             emptyListMessage={<Typography>{t("scenarios.empty_list")}</Typography>}
             search={{

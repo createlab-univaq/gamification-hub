@@ -1,14 +1,16 @@
 import {Navigate, Outlet} from "react-router-dom";
-import {useNotificationContext} from "../components/notification/NotificationProvider.tsx";
 import {isAuthenticated} from "../utils/auth-utils.ts";
+import {useTranslation} from "react-i18next";
 
 export function AuthRoutes() {
+
+    const [t] = useTranslation();
 
     if (!isAuthenticated()) {
         return <Navigate to={"/login"} state={{
             type: "error",
-            title: "User not authorized",
-            content: "You are not authorized to enter the page."
+            title: t("user_not_authorized_title"),
+            content: t("user_not_authorized")
         }}/>
     }
 

@@ -2,12 +2,12 @@ import {useForm} from "react-hook-form";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {groupChallengeClient, playerClient, pointConceptClient, queryClient} from "../../api";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
 import {Button, Dialog, DialogContent, DialogTitle, Divider, Stack, TextField, Typography} from "@mui/material";
-import type {ChallengeInvitationDto} from "../../api/types";
+import type {ChallengeInvitationDto, GroupChallengeDto} from "../../api/types";
 
 interface GroupChallengeInviteFormProps {
     gameId: string
@@ -64,7 +64,7 @@ export function GroupChallengeInviteForm({gameId, playerId, open, onClose}: Grou
         (pointConcepts ?? []).find(pc => pc.name === selectedPointConcept)?.periods ?? {}
     )
 
-    const {mutate, isPending} = useMutation({
+    const {mutate, isPending} = useMutation<GroupChallengeDto, Error, InviteFormValues>({
         mutationKey: ["invite-group-challenge", gameId, playerId],
         mutationFn: (values: InviteFormValues) => {
             const payload: ChallengeInvitationDto = {
@@ -89,7 +89,11 @@ export function GroupChallengeInviteForm({gameId, playerId, open, onClose}: Grou
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ["get-player", gameId, playerId]})
             setNotification({
-                notification: {type: "success", title: "Invito creato", content: "L'invito alla sfida di gruppo è stato creato"},
+                notification: {
+                    type: "success",
+                    title: "Invito creato",
+                    content: "L'invito alla sfida di gruppo è stato creato"
+                },
                 isSnack: true
             })
             form.reset()
@@ -104,7 +108,7 @@ export function GroupChallengeInviteForm({gameId, playerId, open, onClose}: Grou
     return <Dialog open={open} onClose={onClose} fullWidth={true} maxWidth={"sm"}>
         <DialogTitle>Invita a una sfida di gruppo</DialogTitle>
         <DialogContent>
-            <Form form={form} onSubmit={(values) => mutate(values)} readonly={isPending}>
+            <Form form={form} onSubmit={(values) => mutate(values as InviteFormValues)} readonly={isPending}>
                 <Stack sx={{gap: 3, pt: 1}}>
                     <AutocompleteFormItem
                         name={"guestIds"}

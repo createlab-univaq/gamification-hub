@@ -1,5 +1,5 @@
-import {useGame} from "../../components/GameContext.tsx";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useGame} from "../../hooks/use-game";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {useState} from "react";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {badgeClient, queryClient} from "../../api";
@@ -80,17 +80,17 @@ export function BadgeListPage() {
             ]}
             breadcrumbs={[
                 {
-                    icon:<Games/>,
-                    label:t("sidebar.games"),
-                    href:"/dashboard"
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
                 },
                 {
-                    label:game.name ?? "My Game",
-                    href:`/games/${game.id}`
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
                 }
             ]}
         />
-        <DeleteDialog message={t("delete_message", {entity:deleteBadge?.name})}
+        <DeleteDialog message={t("delete_message", {entity: deleteBadge?.name})}
                       deleteFn={() => mutate(deleteBadge!.id!)}
                       setElement={setDeleteBadge}
                       element={deleteBadge}

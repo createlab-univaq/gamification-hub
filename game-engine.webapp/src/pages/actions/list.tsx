@@ -1,5 +1,3 @@
-import {useGame} from "../../components/GameContext.tsx";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
 import {useState} from "react";
 import {keepPreviousData, useMutation, useQuery} from "@tanstack/react-query";
 import {actionClient, queryClient} from "../../api";
@@ -16,6 +14,8 @@ import {useDebounced} from "../../hooks/use-debounced.ts";
 import type {ActionDto} from "../../api/types";
 import type {GetFilter} from "../../api/filters/filters.ts";
 import {useTranslation} from "react-i18next";
+import {useGame} from "../../hooks/use-game";
+import {useNotificationContext} from "../../hooks/use-notification-context.ts";
 
 type DeleteActionType = {
     gameId: string;
@@ -87,13 +87,13 @@ export function ActionListPage() {
             ]}
             breadcrumbs={[
                 {
-                    icon:<Games/>,
-                    label:t("sidebar.games"),
-                    href:"/dashboard"
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
                 },
                 {
-                    label:game.name ?? "My Game",
-                    href:`/games/${game.id}`
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
                 }
             ]}
         />

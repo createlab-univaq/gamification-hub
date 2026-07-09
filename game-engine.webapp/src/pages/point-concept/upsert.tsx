@@ -1,4 +1,4 @@
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {Navigate, useParams} from "react-router-dom";
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
@@ -16,7 +16,7 @@ export function PointConceptUpsertPage() {
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-pc", pcId],
-        queryFn: () => pointConceptClient.getPointConcept(game.id, pcId),
+        queryFn: () => pointConceptClient.getPointConcept(game.id!, pcId!),
         enabled: !!game && !!pcId
     })
 
@@ -30,9 +30,9 @@ export function PointConceptUpsertPage() {
     }
 
     return <PageContainer>
-        <PageHeader title={pcId ?"Modifica punteggio" : "Aggiungi punteggio"}/>
+        <PageHeader title={pcId ? "Modifica punteggio" : "Aggiungi punteggio"}/>
         <Stack sx={{marginTop: 3}}>
-            <PointConceptForm gameId={game.id} pointConcept={data}/>
+            <PointConceptForm gameId={game.id!} pointConcept={data}/>
         </Stack>
     </PageContainer>
 

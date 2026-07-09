@@ -5,7 +5,7 @@ import {useMutation, useQuery} from "@tanstack/react-query";
 import {classificationClient, pointConceptClient} from "../../api";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
@@ -126,7 +126,7 @@ export function ClassificationForm({gameId, classification}: ClassificationFormP
         }
     })
 
-    return <Form form={form} onSubmit={(values) => mutate(values)} readonly={isPending}>
+    return <Form form={form} onSubmit={(values) => mutate(values as ClassificationFormValues)} readonly={isPending}>
         <Stack sx={{gap: 3}}>
             <FormInput name={"name"} rules={{required: t("required_field")}}>
                 <TextField label={t("leaderboards.form.name")} required={true} fullWidth={true} type={"text"}
@@ -179,7 +179,8 @@ export function ClassificationForm({gameId, classification}: ClassificationFormP
             }
 
             <Stack direction={"row"} sx={{justifyContent: "space-between", alignItems: "center"}}>
-                <Button href={`/games/${gameId}/classifications`} variant={"contained"}>{t("buttons:turn_back")}</Button>
+                <Button href={`/games/${gameId}/classifications`}
+                        variant={"contained"}>{t("buttons:turn_back")}</Button>
                 <Stack direction={"row"} sx={{gap: 2}}>
                     <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
                     <Button type={"reset"} onClick={() => form.reset(toFormValues(classification))}

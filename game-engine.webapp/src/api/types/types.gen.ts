@@ -137,6 +137,17 @@ export type ActionDto = {
     name?: string;
 };
 
+export type LoginRequestDto = {
+    username: string;
+    password: string;
+};
+
+export type UserDto = {
+    id?: string;
+    username?: string;
+    active?: boolean;
+};
+
 export type ValidationMessageDto = {
     id?: number;
     text?: string;
@@ -394,38 +405,27 @@ export type SimulationResultDto = {
     changes?: Array<ConceptChangeDto>;
 };
 
-export type LoginRequestDto = {
-    username: string;
-    password: string;
-};
-
-export type UserDto = {
-    id?: string;
-    username?: string;
-    active?: boolean;
-};
-
 export type PagePlayerDto = {
     totalElements?: number;
     totalPages?: number;
     size?: number;
     content?: Array<PlayerDto>;
     number?: number;
-    sort?: SortObject;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
+    sort?: SortObject;
     pageable?: PageableObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
     offset?: number;
+    paged?: boolean;
     sort?: SortObject;
-    unpaged?: boolean;
     pageSize?: number;
     pageNumber?: number;
-    paged?: boolean;
+    unpaged?: boolean;
 };
 
 export type SortObject = {
@@ -500,10 +500,10 @@ export type PageClassificationPositionDto = {
     size?: number;
     content?: Array<ClassificationPositionDto>;
     number?: number;
-    sort?: SortObject;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
+    sort?: SortObject;
     pageable?: PageableObject;
     empty?: boolean;
 };
@@ -964,6 +964,22 @@ export type UpdateActionResponses = {
 };
 
 export type UpdateActionResponse = UpdateActionResponses[keyof UpdateActionResponses];
+
+export type UpdateUserData = {
+    body: LoginRequestDto;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/update-user';
+};
+
+export type UpdateUserResponses = {
+    /**
+     * OK
+     */
+    200: UserDto;
+};
+
+export type UpdateUserResponse = UpdateUserResponses[keyof UpdateUserResponses];
 
 export type GetGamesData = {
     body?: never;
@@ -1982,3 +1998,17 @@ export type UpsertLevel1Responses = {
 };
 
 export type UpsertLevel1Response = UpsertLevel1Responses[keyof UpsertLevel1Responses];
+
+export type DeactivateUserData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/deactivate';
+};
+
+export type DeactivateUserResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};

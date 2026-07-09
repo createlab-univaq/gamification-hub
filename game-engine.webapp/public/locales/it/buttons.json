@@ -30,5 +30,7 @@
   "accept": "Accetta",
   "deny": "Rifiuta",
   "cancel": "Annulla",
-  "assign": "Assegna"
+  "assign": "Assegna",
+  "copy": "Copia",
+  "clear": "Pulisci"
 }

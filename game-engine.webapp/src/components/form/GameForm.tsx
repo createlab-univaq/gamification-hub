@@ -9,7 +9,7 @@ import {Form} from "./Form.tsx";
 import {Button, Stack, TextField} from "@mui/material";
 import {FormInput} from "./FormInput.tsx";
 import {navigateTo} from "../../utils/navigation-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {GAME_STORAGE_KEY} from "../../utils/storage-utils.ts";
 import {FormCheckbox} from "./FormCheckbox.tsx";
 
@@ -28,7 +28,7 @@ export function GameForm({game}: GameFormProps) {
     })
     const {setNotification} = useNotificationContext()
 
-    const {mutate, isPending} = useMutation<GameDto, unknown, GameDto>({
+    const {mutate, isPending} = useMutation<GameDto, Error, GameDto>({
         mutationFn: (request) => {
             const requestData = {
                 ...request,
@@ -61,9 +61,9 @@ export function GameForm({game}: GameFormProps) {
         }
     })
 
-    const initForm = (game: GameDto) => {
+    const initForm = (game?: GameDto) => {
         form.reset({
-            ...game
+            ...(game ?? {})
         })
     }
 

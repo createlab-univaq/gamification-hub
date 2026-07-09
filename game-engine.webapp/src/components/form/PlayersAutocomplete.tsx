@@ -4,6 +4,7 @@ import {useState} from "react";
 import {keepPreviousData, useQuery} from "@tanstack/react-query";
 import {playerClient} from "../../api";
 import {useDebounced} from "../../hooks/use-debounced.ts";
+import {useTranslation} from "react-i18next";
 
 interface PlayersAutocompleteProps {
     name: string
@@ -14,6 +15,7 @@ interface PlayersAutocompleteProps {
 export function PlayersAutocomplete({name, gameId, label}: PlayersAutocompleteProps) {
     const {control} = useFormContext()
     const [search, setSearch] = useState("")
+    const [t] = useTranslation();
 
     const {data, isFetching} = useQuery({
         queryKey: ["players-search", gameId, search],
@@ -48,7 +50,7 @@ export function PlayersAutocomplete({name, gameId, label}: PlayersAutocompletePr
                 }}
                 isOptionEqualToValue={(opt, val) => opt === val}
                 renderInput={(params) => (
-                    <TextField {...params} label={label} placeholder={"Cerca giocatore..."} onBlur={field.onBlur}/>
+                    <TextField {...params} label={label} placeholder={t("search_placeholder")} onBlur={field.onBlur}/>
                 )}
             />
         }}

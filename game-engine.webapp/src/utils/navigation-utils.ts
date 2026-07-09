@@ -3,11 +3,11 @@ import type {NotificationType} from "../components/notification/Notification.tsx
 import {router} from "../router";
 
 
-interface NavigateState {
+export interface NavigateState {
     type: NotificationType,
     title: string
     content?: string
-    data?: Record<string, any>
+    data?: Record<string, unknown>
 }
 
 interface NavigateOption extends Omit<RouterNavigateOptions, "state"> {

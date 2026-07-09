@@ -2,6 +2,7 @@ import type {Control, UseFormRegister} from "react-hook-form";
 import {useFieldArray} from "react-hook-form";
 import {Button, Card, CardContent, IconButton, MenuItem, Select, Stack, TextField, Typography} from "@mui/material";
 import {Add, Delete} from "@mui/icons-material";
+import type {SimulationFormValues} from "./SimulationForm.tsx";
 
 type ChallengeArrayName = "challenges" | "expectedChallenges"
 

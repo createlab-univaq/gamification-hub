@@ -1,5 +1,5 @@
-import {useGame} from "../../components/GameContext.tsx";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useGame} from "../../hooks/use-game";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {useState} from "react";
 import type {PlayerDto} from "../../api/types";
 import type {GetFilter} from "../../api/filters/filters.ts";

@@ -1,4 +1,4 @@
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {Navigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {ruleClient} from "../../api";
@@ -13,7 +13,7 @@ export function BlocklyRuleUpsertPage() {
 
     const {data, isError, error, isLoading} = useQuery({
         queryKey: ["get-rule", ruleId],
-        queryFn: () => ruleClient.getRule(game.id, ruleId),
+        queryFn: () => ruleClient.getRule(game.id!, ruleId!),
         enabled: !!ruleId,
         retry: false
     })
@@ -29,7 +29,7 @@ export function BlocklyRuleUpsertPage() {
     }
 
     return <BlocklyRuleForm
-        gameId={game.id}
+        gameId={game.id!}
         rule={data}
     />
 

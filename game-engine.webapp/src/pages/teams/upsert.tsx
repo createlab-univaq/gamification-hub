@@ -1,4 +1,4 @@
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {Navigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {teamClient} from "../../api";
@@ -16,7 +16,7 @@ export function TeamUpsertPage() {
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-team", game.id, teamId],
-        queryFn: () => teamClient.getTeam(game.id, teamId),
+        queryFn: () => teamClient.getTeam(game.id!, teamId!),
         enabled: !!game && !!teamId
     })
 
@@ -32,7 +32,7 @@ export function TeamUpsertPage() {
     return <PageContainer>
         <PageHeader title={teamId ? "Aggiorna squadra" : "Aggiungi squadra"}/>
         <Stack sx={{marginTop: 3}}>
-            <TeamForm gameId={game.id} team={data}/>
+            <TeamForm gameId={game.id!} team={data}/>
         </Stack>
     </PageContainer>
 

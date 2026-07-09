@@ -207,6 +207,11 @@
     "title": "Modelli di medaglia",
     "empty_list": "Nessuna medaglia trovata",
     "search_placeholder": "Medaglia...",
+    "visibility": {
+      "label": "Visibilità",
+      "hidden": "Nascosta",
+      "visible": "Visibile"
+    },
     "deleted": {
       "title": "Medaglia eliminata!",
       "message": "La medaglia è stata rimossa con successo"

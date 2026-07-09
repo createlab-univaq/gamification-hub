@@ -9,7 +9,7 @@ import {useMutation} from "@tanstack/react-query";
 import {authClient} from "../../api";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useState} from "react";
 import {Form} from "../../components/form/Form.tsx";
@@ -76,7 +76,7 @@ export function UserSettingsPage() {
         }
     })
 
-    const [deactivateModalOpen, setDeactivateModalOpen] = useState(false);
+    const [deactivateModalOpen, setDeactivateModalOpen] = useState<boolean | undefined>(false);
 
     return <PageContainer>
         <PageHeader

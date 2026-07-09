@@ -1,35 +1,25 @@
-import {createContext, PropsWithChildren, ReactNode, useContext, useEffect, useMemo, useState} from "react";
+import {type PropsWithChildren, type ReactNode, useCallback, useMemo, useState} from "react";
 import type {NotificationType} from "./Notification.tsx";
 import {FullScreenNotification, PopupNotification} from "./Notification.tsx";
-import {useLocation} from "react-router-dom";
+import {NotificationContext} from "../../hooks/use-notification-context.ts";
 
 
 export interface NotificationMessage {
     title: ReactNode
     content: ReactNode
     type: NotificationType
-    details?:Record<string, string>
+    details?: Record<string, string>
 }
 
-interface NotificationContextState {
+export interface NotificationContextState {
     notification: NotificationMessage | undefined
     isSnack: boolean
     setNotification: (value: Omit<NotificationContextState, "setNotification">) => void
 }
 
-const defaultState = {
-    notification: undefined,
-    isSnack: true,
-    setNotification: () => {
-    }
-} satisfies NotificationContextState
-
-const NotificationContext = createContext<NotificationContextState>(defaultState)
-
-export const useNotificationContext = ()=>useContext(NotificationContext)
 
 export function NotificationProvider({children}: PropsWithChildren) {
-    const [notification, setNotification] = useState<NotificationMessage>(undefined)
+    const [notification, setNotification] = useState<NotificationMessage>()
     const [isSnack, setSnack] = useState(false)
     const [isOpen, setOpen] = useState(false)
 
@@ -39,7 +29,7 @@ export function NotificationProvider({children}: PropsWithChildren) {
         setOpen(!!value.notification)
     }
 
-    const handleClose = (value: boolean) => {
+    const handleClose = useCallback((value: boolean) => {
         if (!value) {
             updateNotifications({
                 notification: undefined,
@@ -48,7 +38,7 @@ export function NotificationProvider({children}: PropsWithChildren) {
             return
         }
         setOpen(value)
-    }
+    }, [isSnack])
 
 
     const NotificationArea = useMemo(() => {
@@ -61,7 +51,7 @@ export function NotificationProvider({children}: PropsWithChildren) {
         }
         return <FullScreenNotification title={notification.title} message={notification.content}
                                        type={notification.type} isOpen={isOpen} setOpen={handleClose}/>
-    }, [notification, isSnack, isOpen])
+    }, [notification, isSnack, isOpen, handleClose])
 
     return <NotificationContext value={{
         setNotification: updateNotifications,

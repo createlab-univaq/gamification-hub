@@ -1,10 +1,10 @@
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {Navigate, useParams} from "react-router-dom";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {useMutation, useQuery} from "@tanstack/react-query";
-import {pointConceptClient, queryClient} from "../../api";
+import {pointConceptClient} from "../../api";
 import {Loading} from "../../components/Loading.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {Card, CardContent, CardHeader, Stack, Typography} from "@mui/material";
@@ -24,19 +24,19 @@ export function PointConceptDetailsPage() {
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-pc", pcId],
-        queryFn: () => pointConceptClient.getPointConcept(game.id, pcId),
+        queryFn: () => pointConceptClient.getPointConcept(game.id!, pcId!),
         enabled: !!game && !!pcId
     })
 
-    const {mutate, isPending} = useMutation({
-        mutationKey:["delete-pc", pcId],
-        mutationFn:({gameId, pcId})=>pointConceptClient.deletePointConcept(gameId, pcId),
+    const {mutate, isPending} = useMutation<unknown, Error, {gameId:string, pcId:string}>({
+        mutationKey: ["delete-pc", pcId],
+        mutationFn: ({gameId, pcId}) => pointConceptClient.deletePointConcept(gameId, pcId),
         onSuccess: () => {
             navigateTo(`/games/${game.id}/points`, {
-                state:{
-                    type:"success",
-                    title:"Punteggio Eliminato",
-                    content:`Punteggio eliminato con successo!`
+                state: {
+                    type: "success",
+                    title: "Punteggio Eliminato",
+                    content: `Punteggio eliminato con successo!`
                 }
             })
         },
@@ -60,30 +60,30 @@ export function PointConceptDetailsPage() {
     }
 
     return <PageContainer>
-        <DeleteDialog message={`Vuoi davvero eliminare il punteggio ${data.name}`}
-                      deleteFn={()=>mutate({gameId:game.id, pcId:pcId})}
+        <DeleteDialog message={`Vuoi davvero eliminare il punteggio ${data?.name}`}
+                      deleteFn={() => mutate({gameId: game.id!, pcId: pcId!})}
                       setElement={setDeleteElement}
                       element={deleteElement}
         />
         <PageHeader
-            title={data.name}
+            title={data?.name}
             buttons={[
                 {
-                    disabled:isPending,
-                    loading:isPending,
+                    disabled: isPending,
+                    loading: isPending,
                     children: "Modifica",
                     variant: "contained",
-                    href:`/games/${game.id}/points/upsert/${pcId}`,
+                    href: `/games/${game.id}/points/upsert/${pcId}`,
                     endIcon: <Edit/>
                 },
                 {
-                    disabled:isPending,
-                    loading:isPending,
+                    disabled: isPending,
+                    loading: isPending,
                     children: "Delete",
                     color: "error",
                     variant: "contained",
                     endIcon: <Delete/>,
-                    onClick:()=>setDeleteElement(data)
+                    onClick: () => setDeleteElement(data)
                 }
             ]}
         />
@@ -97,20 +97,20 @@ export function PointConceptDetailsPage() {
                 lg: "row"
             }}
         >
-            {Array.from(Object.values(data.periods)).map(period => {
+            {Array.from(Object.values(data!.periods!)).map(period => {
                 return <Card key={`period-${period.identifier}`}>
                     <CardHeader title={period.identifier}/>
                     <CardContent>
                         <Stack sx={{gap: 2}}>
                             <Typography>Valido
-                                da: <b>{formatDate(period.start)}</b> a <b>{formatDate(period.end)}</b></Typography>
-                            <Typography><b>Durata:</b> {formatMilliseconds(period.period)}</Typography>
+                                da: <b>{formatDate(period.start!)}</b> a <b>{formatDate(period.end!)}</b></Typography>
+                            <Typography><b>Durata:</b> {formatMilliseconds(period.period!)}</Typography>
                             <Typography><b>Istanze mantenute:</b> {period.capacity}</Typography>
                         </Stack>
                     </CardContent>
                 </Card>
             })}
-            {!Array.from(Object.values(data.periods)).length && <Typography>Nessun periodo definito.</Typography>}
+            {!Array.from(Object.values(data!.periods!)).length && <Typography>Nessun periodo definito.</Typography>}
         </Stack>
     </PageContainer>
 

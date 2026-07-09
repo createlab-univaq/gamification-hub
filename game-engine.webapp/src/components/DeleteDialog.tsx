@@ -6,10 +6,10 @@ interface DeleteDialogProps<T> {
     message: string
     deleteFn: () => void
     element?: T
-    setElement: (e: T) => void
+    setElement: (e: T | undefined) => void
 }
 
-export function DeleteDialog({deleteFn, message, element, setElement}: DeleteDialogProps) {
+export function DeleteDialog<T>({deleteFn, message, element, setElement}: DeleteDialogProps<T>) {
 
     const {t} = useTranslation()
 
@@ -37,7 +37,7 @@ export function DeleteDialog({deleteFn, message, element, setElement}: DeleteDia
         }}>
             <Typography variant={"h4"}>{t("delete_title")}</Typography>
             <Typography variant={"body1"}>{message}</Typography>
-            <ButtonGroup direction={"row"} sx={{justifyContent: "space-between"}}>
+            <ButtonGroup sx={{justifyContent: "space-between"}}>
                 <Button color={"error"} variant={"contained"} onClick={deleteFn}>{t("buttons:confirm")}</Button>
             </ButtonGroup>
         </Stack>

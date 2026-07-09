@@ -11,20 +11,22 @@ import {DroolEditor} from '../rule-builder/DroolEditor.tsx'
 import {PanelSeparator} from '../PanelSeparator.tsx'
 import {droolsFileToBlocklyState} from '../blockly-builder/drl-meta-to-blockly.ts'
 import {useDebounced} from '../../hooks/use-debounced.ts'
-import type {ConsoleMessage} from '../MessageConsole.tsx'
+import type {ConsoleMessage, ConsoleMessageType} from '../MessageConsole.tsx'
 import {MessageConsole} from '../MessageConsole.tsx'
 import type {WorkspaceSvg} from "blockly";
-import type {Abstract} from "blockly/core/events/events_abstract";
 import {generateDrlFromWorkspace} from "../blockly-builder/drl-generator.ts";
 import type {RuleDto, ValidationMessageDto} from "../../api/types";
 import {useMutation} from "@tanstack/react-query";
 import {ruleClient} from "../../api";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {Loading} from "../Loading.tsx";
 import {getRuleNameFromBlock, isUpdateEvent} from "../../utils/builder-utils.ts";
 import {useTranslation} from "react-i18next";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+import type {Abstract} from "blockly/core/events/events_abstract";
+import {useNotificationContext} from "../../hooks/use-notification-context.ts";
 
 interface BlocklyRuleFormProps {
     rule?: RuleDto
@@ -43,15 +45,14 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
     const [ruleName, setRuleName] = useState(rule?.name ?? "")
     const [t] = useTranslation()
 
-    const {mutate: upsertRuleMutate, isPending: upsertRulePending} = useMutation({
+    const {mutate: upsertRuleMutate, isPending: upsertRulePending} = useMutation<RuleDto, Error, RuleDto>({
         mutationFn: (request) => {
             pushMessage([{
                 time: new Date(),
-                type: "text",
+                type: "info",
                 content: t("console.saving")
             }])
-            if (rule) {
-
+            if (rule && rule.id) {
                 return ruleClient.updateRule(rule.id, request)
             }
             return ruleClient.addRule(request)
@@ -61,14 +62,18 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                 state: {
                     type: "success",
                     title: t("rules.save_title"),
-                    content: t("rules.save_message", {name:data.name})
+                    content: t("rules.save_message", {name: data.name})
                 }
             })
         },
         onError: handleErrors
     })
 
-    const {mutate: validateMutation, isPending: validateIsPending, reset: validateReset} = useMutation<ValidationMessageDto[], unknown, RuleDto>({
+    const {
+        mutate: validateMutation,
+        isPending: validateIsPending,
+        reset: validateReset
+    } = useMutation<ValidationMessageDto[], Error, RuleDto>({
         mutationFn: (request) => {
             pushMessage([{
                 content: t("console.validation.start"),
@@ -77,11 +82,11 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
             return ruleClient.validateRule(request)
         },
         onSettled: (data) => {
-            if(!data) {
+            if (!data) {
                 return;
             }
-            const errors = data.filter(msg=>msg.level === "ERROR")
-            const warnings = data.filter(msg=>msg.level === "WARNING")
+            const errors = data.filter(msg => msg.level === "ERROR")
+            const warnings = data.filter(msg => msg.level === "WARNING")
             if (!errors.length && !warnings.length) {
                 setNotification({
                     notification: {
@@ -98,7 +103,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                 }])
                 return
             }
-            if(warnings.length && !errors.length) {
+            if (warnings.length && !errors.length) {
                 setNotification({
                     notification: {
                         type: "warning",
@@ -108,11 +113,11 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                     isSnack: true
                 })
             }
-            pushMessage(data.map(msg=>{
+            pushMessage(data.map(msg => {
                 return {
-                    content: msg.text,
+                    content: msg?.text ?? "",
                     time: new Date(),
-                    type: msg.level?.toLocaleLowerCase() ?? "error"
+                    type: (msg.level?.toLocaleLowerCase() ?? "error") as ConsoleMessageType
                 }
             }))
             setConsoleActive(true)
@@ -126,7 +131,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
         })
     }
 
-    function handleErrors(errors) {
+    function handleErrors(errors: Error) {
         console.error(errors)
         const apiError = getApiError(errors)
         if (apiError.details) {
@@ -148,11 +153,11 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
 
     const pushMessage = (messages: ConsoleMessage[]) => {
         if (consoleActive) {
-            if (messages.length > 0 && consolePanelRef.current.isCollapsed()) {
+            if (messages.length > 0 && consolePanelRef?.current?.isCollapsed()) {
                 consolePanelRef.current.resize("40%")
             }
         }
-        setConsoleMessages((prevState)=>{
+        setConsoleMessages((prevState) => {
             return [...prevState, ...messages]
         })
     }
@@ -292,7 +297,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                                         <Button
                                             sx={{padding: 0, minWidth: 0, width: "min-content"}}
                                             onClick={() => {
-                                                consolePanelRef.current.collapse()
+                                                consolePanelRef.current?.collapse()
                                             }}
                                             variant={"contained"}
                                         >
@@ -315,11 +320,11 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                                         <Button
                                             sx={{padding: 0, minWidth: 0, width: "min-content"}}
                                             onClick={() => {
-                                                if (consolePanelRef.current.isCollapsed()) {
-                                                    consolePanelRef.current.expand()
+                                                if (consolePanelRef.current?.isCollapsed()) {
+                                                    consolePanelRef.current?.expand()
                                                     return
                                                 }
-                                                consolePanelRef.current.resize("100%")
+                                                consolePanelRef.current?.resize("100%")
                                                 setConsoleActive(true)
                                             }}
                                             variant={"contained"}
@@ -365,7 +370,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                     >
                         <Button
                             sx={{padding: 0, minWidth: 0, width: "min-content"}}
-                            onClick={() => builderPanelRef.current.collapse()}
+                            onClick={() => builderPanelRef.current?.collapse()}
                             variant={"contained"}
                         >
                             <ChevronLeft sx={{
@@ -384,7 +389,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                         </Button>
                         <Button
                             sx={{padding: 0, minWidth: 0, width: "min-content"}}
-                            onClick={() => droolEditorPanelRef.current.collapse()}
+                            onClick={() => droolEditorPanelRef.current?.collapse()}
                             variant={"contained"}
                         >
                             <ChevronRight sx={{

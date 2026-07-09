@@ -1,6 +1,6 @@
 import {useMutation} from "@tanstack/react-query";
 import {scenarioClient, simulationClient} from "../../api";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {useFieldArray, useForm} from "react-hook-form";
 import {useEffect} from "react";
@@ -44,7 +44,7 @@ type ChallengeRow = { name: string; modelName: string; state: string; fields: KV
 
 type KVRow = { key: string; value: string }
 
-type SimulationFormValues = {
+export type SimulationFormValues = {
     name: string
     actionIds: { value: string }[]
     pointConcepts: PointConceptRow[]

@@ -30,5 +30,7 @@
   "accept": "Accept",
   "deny": "Deny",
   "cancel": "Cancel",
-  "assign": "Assign"
+  "assign": "Assign",
+  "copy": "Copy",
+  "clear": "Clear"
 }

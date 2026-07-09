@@ -1,4 +1,4 @@
-import {createContext, Dispatch, PropsWithChildren, SetStateAction, useContext, useMemo, useState} from "react";
+import {type PropsWithChildren, useMemo, useState} from "react";
 import {Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, Toolbar, Typography} from "@mui/material";
 import {useWindowSize} from "../../hooks/use-window-size.ts";
 import {getSidebarItems} from "./sidebarItems.ts";
@@ -6,19 +6,8 @@ import {useLocation} from "react-router-dom";
 import {SIDEBAR_OPEN_KEY} from "../../utils/storage-utils.ts";
 import {getBaseGamePath} from "../../utils/navigation-utils.ts";
 import {useTranslation} from "react-i18next";
+import {UseSidebarContext, useSidebarContext} from "../../hooks/use-sidebar-context.ts";
 
-interface SidebarContextProps {
-    isOpen: boolean
-    setOpen: Dispatch<SetStateAction<boolean>>
-}
-
-const SidebarContext = createContext<SidebarContextProps>({
-    isOpen: false,
-    setOpen: () => {
-    }
-})
-
-export const useSidebarContext = () => useContext(SidebarContext)
 
 export function SidebarContextProvider({defaultOpen, children}: PropsWithChildren<{ defaultOpen: boolean }>) {
 
@@ -30,9 +19,9 @@ export function SidebarContextProvider({defaultOpen, children}: PropsWithChildre
         localStorage.setItem(SIDEBAR_OPEN_KEY, `${open}`)
     }
 
-    return <SidebarContext value={{isOpen, setOpen: updateSideBarState}}>
+    return <UseSidebarContext value={{isOpen, setOpen: updateSideBarState}}>
         {children}
-    </SidebarContext>
+    </UseSidebarContext>
 }
 
 export function SidebarLayout() {
@@ -92,7 +81,7 @@ export function SidebarLayout() {
                     >
                         <ListItemButton href={itemHref} sx={{margin: 0, padding: 0}}>
                             <ListItemIcon>
-                                <Icon color={isSelected ? "primary" : "background.paper"} sx={{fontSize: "2rem"}}/>
+                                <Icon color={isSelected ? "primary" : "action"} sx={{fontSize: "2rem"}}/>
                             </ListItemIcon>
                             <Typography hidden={!isOpen}
                                         sx={{fontWeight: isSelected ? "bold" : "normal"}}>{t(item.title)}</Typography>

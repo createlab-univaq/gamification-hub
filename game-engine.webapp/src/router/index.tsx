@@ -36,8 +36,9 @@ import {PlayerUpsertPage} from "../pages/players/upsert.tsx";
 import {PlayerDetailsPage} from "../pages/players/details.tsx";
 import {UserSettingsPage} from "../pages/settings/page.tsx";
 
-const TestPage = lazy(() => import("../pages/TestPage.tsx").then(m => ({default: m.TestPage})));
+// eslint-disable-next-line react-refresh/only-export-components
 const BlocklyRuleUpsertPage = lazy(() => import("../pages/rules/upsert.tsx").then(m => ({default: m.BlocklyRuleUpsertPage})));
+// eslint-disable-next-line react-refresh/only-export-components
 const SimulationPage = lazy(() => import("../pages/scenarios/page.tsx").then(m => ({default: m.SimulationPage})));
 
 export const router = createBrowserRouter([
@@ -48,11 +49,6 @@ export const router = createBrowserRouter([
     {
         path: "/",
         element: <Navigate to={"/login"}/>,
-    },
-    {
-        path: "/testing",
-        element: <Suspense fallback={<Loading fullScreen={true}/>}><TestPage/></Suspense>,
-        errorElement: <ErrorPage/>
     },
     {
         element: <PublicRoutes/>,

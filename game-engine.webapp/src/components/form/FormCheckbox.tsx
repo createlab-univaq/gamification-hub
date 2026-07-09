@@ -1,13 +1,13 @@
 import {Checkbox, FormControlLabel} from "@mui/material";
-import {Controller, useFormContext} from "react-hook-form";
+import {Controller, type FieldValues, useFormContext} from "react-hook-form";
 import type {FormInputProps} from "./FormInput.tsx";
 
-interface FormCheckboxProps extends Omit<FormInputProps, "children"> {
+interface FormCheckboxProps extends Omit<FormInputProps<FieldValues>, "children"> {
     label?: string
-    labelPlacement?:"end" | "start" | "top" | "bottom"
+    labelPlacement?: "end" | "start" | "top" | "bottom"
 }
 
-export function FormCheckbox({name, defaultValue, disabled, rules, label, labelPlacement,...rest}: FormCheckboxProps) {
+export function FormCheckbox({name, defaultValue, disabled, rules, label, labelPlacement, ...rest}: FormCheckboxProps) {
 
     const {control} = useFormContext()
 

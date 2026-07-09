@@ -1,5 +1,5 @@
 import type {PeriodDto, PointConceptDto} from "../../api/types";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import type {FieldValues} from "react-hook-form";
 import {useFieldArray, useForm} from "react-hook-form";
 import {useMutation} from "@tanstack/react-query";
@@ -46,7 +46,7 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
     })
     const periods = useFieldArray({control: form.control, name: "periods"})
 
-    const {mutate, isPending} = useMutation({
+    const {mutate, isPending} = useMutation<PointConceptDto, Error, { gameId: string, pc: PointConceptDto }>({
         mutationKey: ["upsert-pc", gameId, pointConcept],
         mutationFn: ({gameId, pc}) => {
             if (pointConcept) {

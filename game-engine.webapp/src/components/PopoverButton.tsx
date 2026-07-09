@@ -1,10 +1,10 @@
-import {ReactElement, useState} from "react";
-import {Button,  Popover} from "@mui/material";
+import {type ReactNode, useState} from "react";
 import type {ButtonProps, PopoverProps} from "@mui/material"
+import {Button, Popover} from "@mui/material";
 
 interface PopoverButtonProps {
     id: string
-    buttonLabel: ReactElement
+    buttonLabel: ReactNode
     button: ButtonProps
     popover: Omit<PopoverProps, "open">
 }

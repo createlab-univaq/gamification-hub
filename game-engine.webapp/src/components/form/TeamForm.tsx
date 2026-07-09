@@ -4,7 +4,7 @@ import {useMutation} from "@tanstack/react-query";
 import {teamClient} from "../../api";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {Button, Stack, TextField, Typography} from "@mui/material";
@@ -69,7 +69,7 @@ export function TeamForm({gameId, team}: TeamFormProps) {
     })
 
     return <Form form={form}
-                 onSubmit={(values) => mutate(values)}
+                 onSubmit={(values) => mutate(values as TeamFormValues)}
                  readonly={isPending}
     >
         <Stack sx={{gap: 3}}>

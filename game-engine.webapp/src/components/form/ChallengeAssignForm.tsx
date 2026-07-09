@@ -2,7 +2,7 @@ import {useForm} from "react-hook-form";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {challengeClient, playerChallengeClient, queryClient} from "../../api";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";

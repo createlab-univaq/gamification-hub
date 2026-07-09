@@ -2,7 +2,7 @@ import {Stack} from "@mui/material";
 import type {PropsWithChildren} from "react";
 import {useEffect} from "react";
 import {useLocation} from "react-router-dom";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 
 export function PageContainer({children}: PropsWithChildren) {
@@ -20,7 +20,7 @@ export function PageContainer({children}: PropsWithChildren) {
                 },
                 isSnack: true
             })
-            navigateTo(location.pathname, {replace: true, state: null})
+            navigateTo(location.pathname, {replace: true, state: undefined})
         }
     }, [location]);
 

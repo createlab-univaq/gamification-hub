@@ -3,7 +3,7 @@ import {useEffect} from "react";
 import {useMutation} from "@tanstack/react-query";
 import {playerChallengeClient, queryClient} from "../../api";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {Button, Dialog, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";

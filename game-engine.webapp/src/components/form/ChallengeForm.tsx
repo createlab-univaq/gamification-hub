@@ -1,10 +1,10 @@
-import {useForm, useFieldArray} from "react-hook-form";
+import {useFieldArray, useForm} from "react-hook-form";
 import {useEffect} from "react";
 import {useMutation} from "@tanstack/react-query";
 import {challengeClient} from "../../api";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {Add, Delete} from "@mui/icons-material";
@@ -71,7 +71,7 @@ export function ChallengeForm({gameId, challenge}: ChallengeFormProps) {
     })
 
     return <Form form={form}
-                 onSubmit={(values) => mutate(values)}
+                 onSubmit={(values) => mutate(values as ChallengeFormValues)}
                  readonly={isPending}
     >
         <Stack sx={{gap: 3}}>

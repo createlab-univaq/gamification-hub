@@ -13,7 +13,7 @@ export function SimulationNodeDetail({rule}: { rule: FiredRuleDto }) {
 
                 {rule.cause && (
                     <Typography variant="body2" color="text.secondary">
-                        {t("scenarios.form.graph.caused_by", {rule:rule.cause})}
+                        {t("scenarios.form.graph.caused_by", {rule: rule.cause})}
                     </Typography>
                 )}
 

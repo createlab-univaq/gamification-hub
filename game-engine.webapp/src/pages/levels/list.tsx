@@ -1,4 +1,4 @@
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
 import {keepPreviousData, useMutation, useQuery} from "@tanstack/react-query";
@@ -8,7 +8,7 @@ import {getApiError, translateApiErrorToNotification} from "../../utils/error-ut
 import {Navigate} from "react-router-dom";
 import {Stack, Typography} from "@mui/material";
 import {Add, Games} from "@mui/icons-material";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {useState} from "react";
 import type {LevelDto} from "../../api/types";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";

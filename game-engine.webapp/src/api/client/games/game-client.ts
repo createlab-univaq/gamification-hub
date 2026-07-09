@@ -1,5 +1,5 @@
 import {BaseApiClient} from "../base-client.ts";
-import type {GameDto, ImportGameDto, RuleImpactDto} from "../../types";
+import type {GameDto, GamePersistanceDto, ImportGameDto, RuleImpactDto} from "../../types";
 import {buildSearchParams, type GetFilter} from "../../filters/filters.ts";
 
 export class GameClient {
@@ -23,7 +23,7 @@ export class GameClient {
     }
 
     public async importGames(games:ImportGameDto[]) {
-        return await this.baseClient.post("/games/import", games)
+        return await this.baseClient.post<GamePersistanceDto[]>("/games/import", games)
     }
 
     public async exportGame(gameId: string) {

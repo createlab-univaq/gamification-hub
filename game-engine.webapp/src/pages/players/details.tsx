@@ -1,8 +1,8 @@
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {Navigate, useParams} from "react-router-dom";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {groupChallengeClient, playerChallengeClient, playerClient, playerInventoryClient, queryClient} from "../../api";
 import {Loading} from "../../components/Loading.tsx";

@@ -1,22 +1,19 @@
-import type {ControllerProps, FieldPath, FieldValues} from "react-hook-form"
+import type {ControllerProps, FieldValues} from "react-hook-form"
 import {Controller, useFormContext} from "react-hook-form";
-import React, {ReactElement} from "react";
+import React, {type ReactElement} from "react";
 
 
-export interface FormInputProps<
-    TFieldValues extends FieldValues = FieldValues,
-    TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
-> extends Omit<ControllerProps, "render" | "control"> {
+export interface FormInputProps<T extends FieldValues> extends Omit<ControllerProps<T>, "render" | "control"> {
     children: ReactElement;
 }
 
-export function FormInput<T>({
-                                 name,
-                                 defaultValue,
-                                 rules,
-                                 children,
-                                 ...rest
-                             }: FormInputProps) {
+export function FormInput<T extends FieldValues>({
+                                                     name,
+                                                     defaultValue,
+                                                     rules,
+                                                     children,
+                                                     ...rest
+                                                 }: FormInputProps<T>) {
 
     const {control} = useFormContext<T>()
 
@@ -25,7 +22,7 @@ export function FormInput<T>({
                        defaultValue={defaultValue}
                        rules={rules}
                        {...rest}
-                       render={({formState, fieldState, field}) => {
+                       render={({fieldState, field}) => {
                            return React.cloneElement(children, {
                                ...field,
                                key: name,

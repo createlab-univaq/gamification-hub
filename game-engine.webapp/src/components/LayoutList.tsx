@@ -1,10 +1,10 @@
 import {Box, Button, Checkbox, Divider, Stack} from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
-import type {ReactNode} from "react";
+import type {ReactNode, SyntheticEvent} from "react";
 import {LinkCard} from "./LinkCard.tsx";
 import {useTranslation} from "react-i18next";
 
-type LayoutType = "grid" | "list"
+export type LayoutType = "grid" | "list"
 
 export interface ListSelection<T> {
     isSelected: (i: T) => boolean
@@ -15,8 +15,8 @@ export interface LayoutListProps<T> {
     items: T[],
     layout?: LayoutType
     itemHref: (i: T) => string
-    onItemUpdate?: (i: T, event: MouseEvent) => void
-    onItemDelete?: (i: T, event: MouseEvent) => void
+    onItemUpdate?: (i: T, event: SyntheticEvent) => void
+    onItemDelete?: (i: T, event: SyntheticEvent) => void
     renderItem: (i: T, layout: LayoutType) => ReactNode,
     emptyListMessage?: ReactNode
     selection?: ListSelection<T>

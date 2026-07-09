@@ -1,21 +1,12 @@
-import {createContext, PropsWithChildren, useContext, useState} from "react";
+import {type PropsWithChildren, useState} from "react";
 import type {GameDto} from "../api/types";
 import {Navigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {gameClient} from "../api";
 import {getObjectFromLocalStorage} from "../utils/storage-utils.ts";
 import {Loading} from "./Loading.tsx";
+import {GameContext} from "../hooks/use-game.ts";
 
-
-const GameContext = createContext<GameDto>(null)
-
-export const useGame = () => {
-    const ctx = useContext(GameContext)
-    if (!ctx) {
-        throw new Error("GameContext can only be used inside a GameProvider!")
-    }
-    return ctx
-}
 
 const GAME_KEY = "gamification-engine.ui.game"
 
@@ -32,7 +23,7 @@ export function GameContextProvider({children}: PropsWithChildren) {
 
     const {isError, isLoading, data} = useQuery({
         queryKey: [queryKey],
-        queryFn: () => gameClient.getGame(gameId),
+        queryFn: () => gameClient.getGame(gameId!),
         enabled: isEnabled,
         staleTime: Infinity,
     })

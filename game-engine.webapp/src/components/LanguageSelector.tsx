@@ -1,7 +1,7 @@
 import type {Language} from "../utils/lng-utils.ts";
-import {ReactElement, useEffect, useState} from "react";
-import {MenuItem, Select} from "@mui/material";
+import {type ReactNode} from "react";
 import type {MenuItemProps} from "@mui/material";
+import {MenuItem, Select} from "@mui/material";
 import i18n from "../../i18n.ts";
 import ReactCountryFlag from "react-country-flag";
 
@@ -11,8 +11,8 @@ interface LanguageSelectorProps {
 }
 
 interface LanguageItemProps extends Omit<MenuItemProps, "children"> {
-    code:string
-    label:ReactElement
+    code: string
+    label: ReactNode
 }
 
 function getCountryCodeFromLanguage(lng: Language) {
@@ -27,7 +27,7 @@ function getCountryCodeFromLanguage(lng: Language) {
 }
 
 function LanguageItem({code, label, ...props}: LanguageItemProps) {
-    return <MenuItem sx={{flex: 1, alignItems: "center", justifyContent: "space-between", gap:1}} {...props}>
+    return <MenuItem sx={{flex: 1, alignItems: "center", justifyContent: "space-between", gap: 1}} {...props}>
         {label}
         <ReactCountryFlag countryCode={code} svg={true}/>
     </MenuItem>
@@ -35,45 +35,32 @@ function LanguageItem({code, label, ...props}: LanguageItemProps) {
 
 export function LanguageSelector({defaultLanguage}: LanguageSelectorProps) {
 
-    const [lng, setLng] = useState({
-        lang: defaultLanguage,
-        code: getCountryCodeFromLanguage("en")
-    })
 
-    useEffect(() => {
-        setLng(() => {
-            return {
-                lang: i18n.language,
-                code: getCountryCodeFromLanguage(i18n.language)
-            }
-        })
-    }, []);
+    const lng = {
+        lang: i18n.language ?? defaultLanguage,
+        code: getCountryCodeFromLanguage((i18n.language as Language) ?? "en")
+    }
 
-    const handleChange = (lang) => {
+    const handleChange = (lang: Language) => {
         i18n.changeLanguage(lang)
-        console.log(lang)
-        setLng({
-            lang,
-            code:getCountryCodeFromLanguage(lang)
-        })
     }
 
     return <Select
         variant={"standard"}
         size={"small"}
         value={lng.lang}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={(e) => handleChange(e.target.value as Language)}
         sx={{
-            "&:before":{
-                borderBottom:"unset"
+            "&:before": {
+                borderBottom: "unset"
             }
         }}
         renderValue={(value) => {
             return <ReactCountryFlag
-                countryCode={getCountryCodeFromLanguage(value)}
+                countryCode={getCountryCodeFromLanguage(value as Language)}
                 svg={true}
                 style={{
-                    width:"2rem"
+                    width: "2rem"
                 }}
             />
         }}

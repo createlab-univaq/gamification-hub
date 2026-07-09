@@ -1,4 +1,4 @@
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
 import {Stack} from "@mui/material";
@@ -11,7 +11,7 @@ export function PlayerUpsertPage() {
     return <PageContainer>
         <PageHeader title={"Aggiungi giocatore"}/>
         <Stack sx={{marginTop: 3}}>
-            <PlayerForm gameId={game.id}/>
+            <PlayerForm gameId={game.id!}/>
         </Stack>
     </PageContainer>
 

@@ -1,8 +1,8 @@
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {Navigate, useParams} from "react-router-dom";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {badgeClient} from "../../api";
 import {Loading} from "../../components/Loading.tsx";
@@ -13,6 +13,7 @@ import {navigateTo} from "../../utils/navigation-utils.ts";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useState} from "react";
 import type {BadgeCollectionDto} from "../../api/types";
+import {useTranslation} from "react-i18next";
 
 export function BadgeDetailsPage() {
 
@@ -20,14 +21,15 @@ export function BadgeDetailsPage() {
     const {badgeId} = useParams()
     const {setNotification} = useNotificationContext()
     const [deleteElement, setDeleteElement] = useState<BadgeCollectionDto>()
+    const [t] = useTranslation()
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-badge", game.id, badgeId],
-        queryFn: () => badgeClient.getBadge(game.id, badgeId),
+        queryFn: () => badgeClient.getBadge(game.id!, badgeId!),
         enabled: !!game && !!badgeId
     })
 
-    const {mutate, isPending} = useMutation({
+    const {mutate, isPending} = useMutation<unknown, Error, { gameId: string, badgeId: string }>({
         mutationKey: ["delete-badge", badgeId],
         mutationFn: (vars) => badgeClient.deleteBadge(vars.gameId, vars.badgeId),
         onSuccess: () => {
@@ -56,18 +58,18 @@ export function BadgeDetailsPage() {
     }
 
     return <PageContainer>
-        <DeleteDialog message={`Vuoi davvero eliminare la collezione ${data.name}`}
-                      deleteFn={() => mutate({gameId: game.id, badgeId: badgeId})}
+        <DeleteDialog message={t("delete_message", {entity: data?.name})}
+                      deleteFn={() => mutate({gameId: game.id!, badgeId: badgeId!})}
                       setElement={setDeleteElement}
                       element={deleteElement}
         />
         <PageHeader
-            title={data.name}
+            title={data?.name}
             buttons={[
                 {
                     disabled: isPending,
                     loading: isPending,
-                    children: "Modifica",
+                    children: t("buttons:update"),
                     variant: "contained",
                     href: `/games/${game.id}/badges/upsert/${badgeId}`,
                     endIcon: <Edit/>
@@ -75,7 +77,7 @@ export function BadgeDetailsPage() {
                 {
                     disabled: isPending,
                     loading: isPending,
-                    children: "Delete",
+                    children: t("buttons:delete"),
                     color: "error",
                     variant: "contained",
                     endIcon: <Delete/>,
@@ -84,13 +86,14 @@ export function BadgeDetailsPage() {
             ]}
         />
         <Stack sx={{gap: 2, py: 2}}>
-            <Typography><b>Visibilità:</b> {data.hidden ? "Nascosta" : "Visibile"}</Typography>
+            <Typography><b>{t("badges.visibility.label")}</b> {data?.hidden ? t("badges.visibility.hidden") : t("badges.visibility.visibile")}
+            </Typography>
             <Card>
-                <CardHeader title={`Medaglie (${data.badges?.length ?? 0})`}/>
+                <CardHeader title={`${t("sidebar.badges")} (${data?.badges?.length ?? 0})`}/>
                 <CardContent>
                     <Stack direction={"row"} sx={{gap: 1, flexWrap: "wrap"}}>
-                        {(data.badges ?? []).map(b => <Chip key={b} label={b}/>)}
-                        {!(data.badges ?? []).length && <Typography>Nessuna medaglia definita.</Typography>}
+                        {(data?.badges ?? []).map(b => <Chip key={b} label={b}/>)}
+                        {!(data?.badges ?? []).length && <Typography>{t("badges.empty_list")}</Typography>}
                     </Stack>
                 </CardContent>
             </Card>

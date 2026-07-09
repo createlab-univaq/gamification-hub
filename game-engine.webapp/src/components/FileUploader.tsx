@@ -1,10 +1,10 @@
 import {Box, Stack, Typography} from "@mui/material";
-import {useRef, useState, type DragEvent} from "react";
-import {CloudUpload, InsertDriveFile, DeleteForever} from "@mui/icons-material";
+import {type DragEvent, useRef, useState} from "react";
+import {CloudUpload, DeleteForever, InsertDriveFile} from "@mui/icons-material";
 
 interface FileUploaderProps {
     multiple?: boolean
-    disabled?:boolean
+    disabled?: boolean
     acceptedMimeTypes?: string[]
     onChange?: (files: FileList) => void
 }
@@ -46,7 +46,7 @@ export function FileUploader({acceptedMimeTypes, onChange, multiple, disabled}: 
         <fieldset disabled={disabled}>
             <Box
                 onClick={() => {
-                    if(!disabled) {
+                    if (!disabled) {
                         inputRef.current?.click()
                     }
                 }}
@@ -75,11 +75,15 @@ export function FileUploader({acceptedMimeTypes, onChange, multiple, disabled}: 
                     multiple={multiple}
                     type="file"
                     hidden
-                    onChange={(event) => handleChangeEvent(event.target.files)}
+                    onChange={(event) => {
+                        if (event.target.files) {
+                            handleChangeEvent(event.target.files)
+                        }
+                    }}
                     accept={acceptedMimeTypes?.join(",")}
                 />
                 {files.length === 0 ? (
-                    <Stack spacing={1} sx={{color: "text.secondary", alignItems:"center"}}>
+                    <Stack spacing={1} sx={{color: "text.secondary", alignItems: "center"}}>
                         <CloudUpload sx={{fontSize: 48}}/>
                         <Typography variant="body2">
                             Drag &amp; drop or click to upload
@@ -104,7 +108,7 @@ export function FileUploader({acceptedMimeTypes, onChange, multiple, disabled}: 
                             <DeleteForever
                                 className="delete-icon"
                                 onClick={(e) => {
-                                    if(disabled) {
+                                    if (disabled) {
                                         return
                                     }
                                     e.stopPropagation()

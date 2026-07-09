@@ -16,8 +16,8 @@ interface ImportGameModalProps {
 export function ImportGameModal({setOpen, open, onError, onSuccess}: ImportGameModalProps) {
 
     const [errors, setErrors] = useState<string[]>([])
-    const [games, setGames] = useState<ImportGameDto[]>([])
-    const {mutate, isPending} = useMutation<GamePersistanceDto[], DefaultError, ImportGameDto>({
+    const [games, setGames] = useState<ImportGameDto[]>()
+    const {mutate, isPending} = useMutation<GamePersistanceDto[], DefaultError, ImportGameDto[]>({
         mutationKey: ["import-games"],
         mutationFn: (data) => gameClient.importGames(data),
         onError: onError,
@@ -70,7 +70,9 @@ export function ImportGameModal({setOpen, open, onError, onSuccess}: ImportGameM
                 loading={isPending}
                 disabled={isPending}
                 onClick={() => {
-                    mutate(games)
+                    if (games) {
+                        mutate(games)
+                    }
                 }}
             >
                 Save

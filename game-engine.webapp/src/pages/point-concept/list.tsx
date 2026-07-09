@@ -1,5 +1,5 @@
-import {useGame} from "../../components/GameContext.tsx";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useGame} from "../../hooks/use-game";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {useState} from "react";
 import {keepPreviousData, useMutation, useQuery} from "@tanstack/react-query";
 import {pointConceptClient, queryClient} from "../../api";
@@ -24,12 +24,12 @@ export function PointConceptListPage() {
     const [filters, setFilters] = useState<GetFilter<PointConceptDto>[]>([])
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-pcs", game.id, filters],
-        queryFn: () => pointConceptClient.getPointConcepts(game.id, filters),
+        queryFn: () => pointConceptClient.getPointConcepts(game.id!, filters),
         enabled: !!game,
         placeholderData: keepPreviousData
     })
 
-    const {mutate} = useMutation({
+    const {mutate} = useMutation<unknown, Error, { gameId: string, pcId: string }>({
         mutationKey: ["delete-pc", game.id],
         mutationFn: (vars) => pointConceptClient.deletePointConcept(vars.gameId, vars.pcId),
         onSuccess: () => {
@@ -81,14 +81,14 @@ export function PointConceptListPage() {
             ]}
         />
         <DeleteDialog message={`Vuoi davvero eliminare il punteggio "${deletePc?.name}" per sempre?`}
-                      deleteFn={() => mutate({gameId: game.id, pcId: deletePc.id})}
+                      deleteFn={() => mutate({gameId: game.id!, pcId: deletePc!.id!})}
                       setElement={setDeletePc}
                       element={deletePc}
         />
         <PageList
             items={data ?? []}
             renderItem={(item) => {
-                const periodNumber = Array.from(Object.values(item.periods)).length
+                const periodNumber = Array.from(Object.values(item.periods!)).length
                 return <Stack>
                     <Typography sx={{fontWeight: "bold", fontSize: "1.2rem"}}>{item.name}</Typography>
                     <Typography>{periodNumber} periodi</Typography>

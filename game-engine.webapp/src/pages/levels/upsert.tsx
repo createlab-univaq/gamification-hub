@@ -1,4 +1,4 @@
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {Navigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {levelClient} from "../../api";
@@ -15,7 +15,7 @@ export function UpsertLevelPage() {
 
     const {isLoading, data, error, isError} = useQuery({
         queryKey: ["get-level", levelName],
-        queryFn: () => levelClient.getLevel(game.id, levelName),
+        queryFn: () => levelClient.getLevel(game.id!, levelName!),
         enabled: !!game && !!levelName
     })
 
@@ -30,8 +30,8 @@ export function UpsertLevelPage() {
 
     return <PageContainer>
         <PageHeader title={levelName ? "Aggiorna Livello" : "Aggiungi Livello"}/>
-        <Stack sx={{marginTop:3}}>
-            <LevelForm gameId={game.id} level={data}/>
+        <Stack sx={{marginTop: 3}}>
+            <LevelForm gameId={game.id!} level={data}/>
         </Stack>
     </PageContainer>
 }

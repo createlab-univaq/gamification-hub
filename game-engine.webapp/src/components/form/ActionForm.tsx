@@ -1,14 +1,15 @@
 import {useForm} from "react-hook-form";
-import React, {useEffect} from "react";
+import {useCallback, useEffect} from "react";
 import {useMutation} from "@tanstack/react-query";
 import {actionClient} from "../../api";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {Button, Stack, TextField} from "@mui/material";
 import {useTranslation} from "react-i18next";
+import type {ActionDto} from "../../api/types";
 
 interface ActionFormProps {
     gameId: string
@@ -25,7 +26,7 @@ export function ActionForm({action, gameId}: ActionFormProps) {
         }
     })
 
-    const {mutate, isPending} = useMutation({
+    const {mutate, isPending} = useMutation<ActionDto, Error, { gameId: string, newAction: ActionDto }>({
         mutationKey: ["upsert-action", gameId, action],
         mutationFn: ({gameId, newAction}) => {
             if (action) {
@@ -52,17 +53,17 @@ export function ActionForm({action, gameId}: ActionFormProps) {
         }
     })
 
-    function initForm(action) {
+    const initForm = useCallback((action?: string) => {
         form.reset({
-            name:action
+            name: action ?? ""
         })
-    }
+    }, [form])
 
     useEffect(() => {
         if (action) {
             initForm(action)
         }
-    }, [action]);
+    }, [action, initForm]);
 
     return <Form form={form}
                  onSubmit={(fieldValues) => mutate({gameId: gameId, newAction: fieldValues})}
@@ -86,7 +87,8 @@ export function ActionForm({action, gameId}: ActionFormProps) {
                 <Button href={`/games/${gameId}/actions`} variant={"contained"}>{t("buttons:turn_back")}</Button>
                 <Stack direction={"row"} sx={{gap: 2}}>
                     <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
-                    <Button type={"reset"} onClick={() => initForm(action)} variant={"outlined"}>{t("buttons:reset")}</Button>
+                    <Button type={"reset"} onClick={() => initForm(action)}
+                            variant={"outlined"}>{t("buttons:reset")}</Button>
                 </Stack>
             </Stack>
         </Stack>

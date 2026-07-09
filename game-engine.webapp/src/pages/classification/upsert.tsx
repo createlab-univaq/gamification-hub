@@ -1,4 +1,4 @@
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {Navigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {classificationClient} from "../../api";
@@ -18,7 +18,7 @@ export function ClassificationUpsertPage() {
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-classification", game.id, classificationId],
-        queryFn: () => classificationClient.getClassification(game.id, classificationId!),
+        queryFn: () => classificationClient.getClassification(game.id!, classificationId!),
         enabled: !!game && !!classificationId
     })
 
@@ -34,7 +34,7 @@ export function ClassificationUpsertPage() {
     return <PageContainer>
         <PageHeader title={classificationId ? t("leaderboards.upsert.edit") : t("leaderboards.upsert.new")}/>
         <Stack sx={{marginTop: 3}}>
-            <ClassificationForm gameId={game.id} classification={data}/>
+            <ClassificationForm gameId={game.id!} classification={data}/>
         </Stack>
     </PageContainer>
 

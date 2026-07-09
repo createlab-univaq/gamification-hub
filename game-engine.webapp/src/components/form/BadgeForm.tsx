@@ -1,10 +1,10 @@
 import {useFieldArray, useForm} from "react-hook-form";
-import {useEffect} from "react";
+import {useCallback, useEffect} from "react";
 import {useMutation} from "@tanstack/react-query";
 import {badgeClient} from "../../api";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {Add, Delete} from "@mui/icons-material";
@@ -39,11 +39,15 @@ export function BadgeForm({gameId, badge}: BadgeFormProps) {
 
     const badges = useFieldArray({control: form.control, name: "badges"})
 
+    const initForm = useCallback((badge?: BadgeCollectionDto) => {
+        form.reset(toFormValues(badge))
+    }, [form])
+
     useEffect(() => {
         if (badge) {
-            form.reset(toFormValues(badge))
+            initForm(badge)
         }
-    }, [badge]);
+    }, [badge, initForm]);
 
     const {mutate, isPending} = useMutation({
         mutationKey: ["upsert-badge", gameId, badge?.id],
@@ -74,7 +78,7 @@ export function BadgeForm({gameId, badge}: BadgeFormProps) {
     })
 
     return <Form form={form}
-                 onSubmit={(values) => mutate(values)}
+                 onSubmit={(values) => mutate(values as BadgeFormValues)}
                  readonly={isPending}
     >
         <Stack sx={{gap: 3}}>

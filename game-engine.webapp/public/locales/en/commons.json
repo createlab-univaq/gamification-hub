@@ -206,6 +206,11 @@
     "title": "Badge concepts",
     "empty_list": "No badge concept found",
     "search_placeholder": "Badge...",
+    "visibility": {
+      "label": "Visibility",
+      "hidden": "Hidden",
+      "visible": "Visibile"
+    },
     "deleted": {
       "title": "Badge concept deleted!",
       "message": "Badge concept has been successfully deleted"

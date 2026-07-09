@@ -5,7 +5,7 @@ import {GameForm} from "../../components/form/GameForm.tsx";
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {navigateTo} from "../../utils/navigation-utils.ts";
+import {type NavigateState, navigateTo} from "../../utils/navigation-utils.ts";
 import {Stack} from "@mui/material";
 
 export function GameUpsertPage() {
@@ -14,7 +14,7 @@ export function GameUpsertPage() {
 
     const {data, isError, error} = useQuery({
         queryKey: ["get-game", gameId],
-        queryFn: () => gameClient.getGame(gameId),
+        queryFn: () => gameClient.getGame(gameId!),
         enabled: !!gameId,
         retry: false
     })
@@ -23,7 +23,7 @@ export function GameUpsertPage() {
         const notification = translateApiErrorToNotification(getApiError(error))
         navigateTo("/dashboard", {
             state: {
-                ...notification
+                ...(notification as unknown as NavigateState)
             }
         })
         return <></>

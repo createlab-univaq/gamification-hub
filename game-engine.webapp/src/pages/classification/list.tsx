@@ -1,5 +1,5 @@
-import {useGame} from "../../components/GameContext.tsx";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useGame} from "../../hooks/use-game";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {useState} from "react";
 import {keepPreviousData, useMutation, useQuery} from "@tanstack/react-query";
 import {classificationClient, queryClient} from "../../api";
@@ -104,11 +104,15 @@ export function ClassificationListPage() {
                         width: layout === "grid" ? "100%" : undefined,
                         flexGrow: layout === "grid" ? 1 : 0,
                         justifyContent: "space-between",
-                        height:"100%"
+                        height: "100%"
                     }}
                 >
-                    <Stack sx={{gap:1}}>
-                        <Stack direction={"row"} sx={{gap: 1, alignItems: "center", justifyContent: layout === "grid" ? "space-between" : "center"}}>
+                    <Stack sx={{gap: 1}}>
+                        <Stack direction={"row"} sx={{
+                            gap: 1,
+                            alignItems: "center",
+                            justifyContent: layout === "grid" ? "space-between" : "center"
+                        }}>
                             <Typography sx={{fontWeight: "bold", fontSize: "1.2rem"}}>{classification.name}</Typography>
                             <Chip size={"small"}
                                   label={classification.type === "INCREMENTAL" ? t("leaderboards.types.incremental") : t("leaderboards.types.general")}
@@ -119,7 +123,7 @@ export function ClassificationListPage() {
                     {classification.type === "INCREMENTAL" &&
                         <Typography>{t("leaderboards.period")}: {classification.periodName}</Typography>}
                     <Button
-                        fullWidth={layout==="grid"}
+                        fullWidth={layout === "grid"}
                         size={"small"}
                         variant={"outlined"}
                         startIcon={<Leaderboard/>}

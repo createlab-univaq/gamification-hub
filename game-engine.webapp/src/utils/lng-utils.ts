@@ -10,6 +10,6 @@ export function translateMessage(code: string, options?: Record<string, unknown>
     return i18n.t(code, options)
 }
 
-export function translateButtonMessage(code:string) {
+export function translateButtonMessage(code: string) {
     return translateMessage(`buttons:${code}`)
 }

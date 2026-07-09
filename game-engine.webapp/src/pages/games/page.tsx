@@ -1,6 +1,6 @@
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import type {GridSize} from "@mui/material";
 import {Grid, Stack, Typography} from "@mui/material";
 import {LinkCard} from "../../components/LinkCard.tsx";
@@ -10,7 +10,7 @@ import {useMutation} from "@tanstack/react-query";
 import {gameClient} from "../../api";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {navigateTo} from "../../utils/navigation-utils.ts";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {GAME_STORAGE_KEY} from "../../utils/storage-utils.ts";
 import {downloadJson} from "../../utils/download-utils.ts";
 import {useState} from "react";
@@ -135,7 +135,7 @@ export function GamePage() {
                       element={deleteElement}
         />
         <Stack sx={{marginY: 2}}>
-            {user.id === game.owner && <Typography>{t("game.owner")}: {user.username}</Typography>}
+            {user?.id === game.owner && <Typography>{t("game.owner")}: {user?.username}</Typography>}
             <Typography>{t("game.domain")}: {game.domain}</Typography>
             {!!game.expiration && <Typography>{t("game.expiration")}: {formatDate(game.expiration)}</Typography>}
         </Stack>

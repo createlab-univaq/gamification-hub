@@ -1,4 +1,4 @@
-import {useGame} from "../../components/GameContext.tsx";
+import {useGame} from "../../hooks/use-game";
 import {Navigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {badgeClient} from "../../api";
@@ -16,7 +16,7 @@ export function BadgeUpsertPage() {
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-badge", game.id, badgeId],
-        queryFn: () => badgeClient.getBadge(game.id, badgeId),
+        queryFn: () => badgeClient.getBadge(game.id!, badgeId!),
         enabled: !!game && !!badgeId
     })
 
@@ -32,7 +32,7 @@ export function BadgeUpsertPage() {
     return <PageContainer>
         <PageHeader title={badgeId ? "Aggiorna collezione" : "Aggiungi collezione"}/>
         <Stack sx={{marginTop: 3}}>
-            <BadgeForm gameId={game.id} badge={data}/>
+            <BadgeForm gameId={game.id!} badge={data}/>
         </Stack>
     </PageContainer>
 

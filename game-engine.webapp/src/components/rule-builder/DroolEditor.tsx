@@ -6,7 +6,7 @@ import {java} from "@codemirror/lang-java";
 import {useThemeProvider} from "../../theme/ThemeProvider.tsx";
 
 interface DroolEditorProps {
-    sx?: SxProps
+    sx?: SxProps & { height?: string };
     drl?: string
     onChange?: (drl: string) => void
     readonly?: boolean
@@ -27,7 +27,7 @@ export function DroolEditor({readonly, onChange, drl, sx}: DroolEditorProps) {
     }}>
         <ReactCodeMirror
             readOnly={readonly}
-            height={sx.height}
+            height={sx?.height}
             value={code}
             onChange={(value) => {
                 onChange?.(value)

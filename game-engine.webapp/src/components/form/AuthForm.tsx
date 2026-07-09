@@ -8,7 +8,7 @@ import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
 import {authClient, queryClient} from "../../api";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 
 export interface AuthFormValues extends FieldValues {

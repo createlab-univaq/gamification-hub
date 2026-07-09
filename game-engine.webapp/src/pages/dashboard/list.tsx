@@ -8,7 +8,7 @@ import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useState} from "react";
 import type {GameDto} from "../../api/types";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Loading} from "../../components/Loading.tsx";
 import {ImportGameModal} from "../../components/ImportGameModal.tsx";
 import {PageList} from "../../components/PageList.tsx";
@@ -33,7 +33,7 @@ export function GamesListPage() {
 
     const {mutate} = useMutation({
         mutationKey: ["delete-game"],
-        mutationFn: (gameId) => gameClient.deleteGame(gameId),
+        mutationFn: (gameId: string) => gameClient.deleteGame(gameId),
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ["get-list"]})
             setNotification({
@@ -75,8 +75,8 @@ export function GamesListPage() {
 
     const toggleSelect = (game: GameDto) => setSelectedIds(prev => {
         const next = new Set(prev)
-        if (next.has(game.id)) next.delete(game.id)
-        else next.add(game.id)
+        if (next.has(game.id!)) next.delete(game.id!)
+        else next.add(game.id!)
         return next
     })
 
@@ -115,8 +115,12 @@ export function GamesListPage() {
                         }
                     ]}
         />
-        <DeleteDialog message={t("delete_message", {entity:deleteGame?.name})}
-                      deleteFn={() => mutate(deleteGame.id)}
+        <DeleteDialog message={t("delete_message", {entity: deleteGame?.name})}
+                      deleteFn={() => {
+                          if (deleteGame) {
+                              mutate(deleteGame.id!)
+                          }
+                      }}
                       setElement={setDeleteGame}
                       element={deleteGame}
         />
@@ -154,7 +158,7 @@ export function GamesListPage() {
                 setDeleteGame(game)
             }}
             selection={{
-                isSelected: (game) => selectedIds.has(game.id),
+                isSelected: (game) => selectedIds.has(game.id!),
                 onToggle: toggleSelect
             }}
             emptyListMessage={<Typography>No games found.</Typography>}

@@ -4,9 +4,9 @@ import {AccountCircle, Logout, Menu, Settings} from "@mui/icons-material"
 import {getCurrentUser} from "../../utils/auth-utils.ts";
 import {PopoverButton} from "../PopoverButton.tsx";
 import {ThemeSwitch} from "../ThemeSwitch.tsx";
-import {useSidebarContext} from "./SidebarLayout.tsx";
 import {LanguageSelector} from "../LanguageSelector.tsx";
 import {useTranslation} from "react-i18next";
+import {useSidebarContext} from "../../hooks/use-sidebar-context.ts";
 
 export function NavbarLayout() {
 
@@ -62,7 +62,7 @@ export function NavbarLayout() {
                                                        justifyContent: "space-between"
                                                    }}
                                            >
-                                              <Typography>{t("buttons:settings")}</Typography>
+                                               <Typography>{t("buttons:settings")}</Typography>
                                            </Button>
                                            <Button variant={"contained"}
                                                    color={"error"}

@@ -1,8 +1,8 @@
-import type {Dispatch, ReactNode, SetStateAction} from "react";
+import type {ReactNode} from "react";
 import type {SlideProps, SxProps, Theme} from '@mui/material';
 import {Card, CardContent, Dialog, DialogContent, DialogTitle, Slide, Snackbar, Stack, Typography} from "@mui/material";
 
-import {DoneAll, Error, Warning} from '@mui/icons-material'
+import {DoneAll, Error, ReportProblem, Warning} from '@mui/icons-material'
 
 
 export type NotificationType = "error" | "warning" | "success"
@@ -12,7 +12,7 @@ interface NotificationProps {
     message: ReactNode,
     type: NotificationType
     isOpen: boolean
-    setOpen: Dispatch<SetStateAction<boolean>>
+    setOpen: (isOpen: boolean) => void
 }
 
 interface NotificationIconProps {

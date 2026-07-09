@@ -6,8 +6,8 @@ import {Box, Button, Card, CardContent, Checkbox, Divider, Stack, Typography} fr
 import {useCallback, useEffect, useState} from "react";
 import {ImpactAnalysisNode} from "./ImpactAnalysisNode.tsx";
 import {computeImpactLayout, getEdgeParams, REACTIVITY_TYPES} from "../../utils/react-flow-utils.ts";
-import {useGame} from "../GameContext.tsx";
 import {useTranslation} from "react-i18next";
+import {useGame} from "../../hooks/use-game.ts";
 
 interface ImpactAnalysisGraphProps {
     impactAnalysis: RuleImpactDto[]
@@ -200,16 +200,16 @@ export function ImpactAnalysisGraph({impactAnalysis}: ImpactAnalysisGraphProps) 
                     <CardContent>
                         <Typography variant="subtitle2" sx={{fontWeight: 700}}>{selectedNode.ruleName}</Typography>
                         <Divider sx={{my: 1}}/>
-                        <Stack sx={{display: selectedNode.reads.length ? "flex" : "none"}}>
+                        <Stack sx={{display: selectedNode?.reads?.length ? "flex" : "none"}}>
                             <Typography sx={{fontWeight: "bold"}}>{t("rules.reads")}:</Typography>
-                            {selectedNode.reads.map((r, index) => {
+                            {selectedNode.reads?.map((r, index) => {
                                 return <Typography
                                     key={`impact-read-${index}`}>{r.conceptType} {r.conceptName} {r.field ?? "name"}</Typography>
                             })}
                         </Stack>
-                        <Stack sx={{display: selectedNode.writes.length ? "flex" : "none"}}>
+                        <Stack sx={{display: selectedNode.writes?.length ? "flex" : "none"}}>
                             <Typography sx={{fontWeight: "bold"}}>{t("rules.writes")}:</Typography>
-                            {selectedNode.writes.map((r, index) => {
+                            {selectedNode.writes?.map((r, index) => {
                                 return <Typography
                                     key={`impact-write-${index}`}>{r.conceptType} {r.field} {r.conceptName}</Typography>
                             })}

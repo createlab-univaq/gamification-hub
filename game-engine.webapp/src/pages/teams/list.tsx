@@ -1,5 +1,5 @@
-import {useGame} from "../../components/GameContext.tsx";
-import {useNotificationContext} from "../../components/notification/NotificationProvider.tsx";
+import {useGame} from "../../hooks/use-game";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {useState} from "react";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {queryClient, teamClient} from "../../api";
@@ -23,13 +23,13 @@ export function TeamListPage() {
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-teams", game.id],
-        queryFn: () => teamClient.getTeams(game.id),
+        queryFn: () => teamClient.getTeams(game.id!),
         enabled: !!game
     })
 
     const {mutate} = useMutation({
         mutationKey: ["delete-team", game.id],
-        mutationFn: (teamId: string) => teamClient.deleteTeam(game.id, teamId),
+        mutationFn: (teamId: string) => teamClient.deleteTeam(game.id!, teamId),
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ["get-teams", game.id]})
             setNotification({
@@ -92,7 +92,8 @@ export function TeamListPage() {
                     <Typography>Membri: {team.members?.length ?? 0}</Typography>
                 </Stack>
             }}
-            onItemUpdate={() => {}}
+            onItemUpdate={() => {
+            }}
             onItemDelete={(team) => {
                 setDeleteTeam(team)
             }}

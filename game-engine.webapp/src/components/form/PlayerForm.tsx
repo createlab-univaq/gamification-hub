@@ -3,10 +3,11 @@ import {useMutation} from "@tanstack/react-query";
 import {playerClient} from "../../api";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useNotificationContext} from "../notification/NotificationProvider.tsx";
+import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {Button, Stack, TextField} from "@mui/material";
+import type {PlayerDto} from "../../api/types";
 
 interface PlayerFormProps {
     gameId: string
@@ -21,7 +22,7 @@ export function PlayerForm({gameId}: PlayerFormProps) {
         }
     })
 
-    const {mutate, isPending} = useMutation({
+    const {mutate, isPending} = useMutation<PlayerDto, Error, { gameId: string, player: PlayerDto }>({
         mutationKey: ["create-player", gameId],
         mutationFn: ({gameId, player}) => playerClient.addPlayer(gameId, player),
         onSuccess: (data) => {
@@ -65,7 +66,8 @@ export function PlayerForm({gameId}: PlayerFormProps) {
                 <Button href={`/games/${gameId}/players`} variant={"contained"}>Indietro</Button>
                 <Stack direction={"row"} sx={{gap: 2}}>
                     <Button type={"submit"} variant={"contained"}>Salva</Button>
-                    <Button type={"reset"} onClick={() => form.reset({playerId: ""})} variant={"outlined"}>Reset</Button>
+                    <Button type={"reset"} onClick={() => form.reset({playerId: ""})}
+                            variant={"outlined"}>Reset</Button>
                 </Stack>
             </Stack>
         </Stack>

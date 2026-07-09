@@ -1,14 +1,14 @@
 import type {SeparatorProps} from "react-resizable-panels";
 import {Separator} from "react-resizable-panels";
-import {styled} from "@mui/material";
+import {styled, type SxProps} from "@mui/material";
 
-type PanelSeparatorProps = Omit<SeparatorProps, "style">
+type PanelSeparatorProps = Omit<SeparatorProps, "style"> & { sx?: SxProps }
 
 const StyledSeparator = styled(Separator)(({sx, theme}) => ({
-    ...sx,
+    ...(sx && {}),
     width: '2px',
-    color: theme.palette.background.secondary,
-    backgroundColor: theme.palette.background.secondary,
+    color: theme.palette.background.paper,
+    backgroundColor: theme.palette.background.paper,
     transition: 'background-color 0.2s',
     outlineColor: "unset",
     cursor: 'col-resize',
@@ -20,8 +20,8 @@ const StyledSeparator = styled(Separator)(({sx, theme}) => ({
         outlineColor: theme.palette.divider
     },
     '&[data-separator="inactive"]': {
-        outlineColor: theme.palette.background.secondary,
-        borderColor: theme.palette.background.secondary
+        outlineColor: theme.palette.background.paper,
+        borderColor: theme.palette.background.paper
     },
     '&[aria-orientation="horizontal"]': {
         width: "100%",
