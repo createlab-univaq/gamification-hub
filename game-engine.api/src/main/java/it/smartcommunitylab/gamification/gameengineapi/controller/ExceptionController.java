@@ -46,8 +46,8 @@ public class ExceptionController {
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ExceptionResponse> handleBadCredentialsException(BadCredentialsException ex) {
-        log.error("User authentication failed. Bad Credentials");
+    public ResponseEntity<ExceptionResponse> handleBadCredentialsException(AuthenticationException ex) {
+        log.error("User authentication failed. Bad Credentials, {}", ex.getLocalizedMessage());
         return buildResponseObject("Authentication failed", "Username or password incorrect", ErrorCodes.AUTHENTICATION_FAILED, List.of(), null, HttpStatus.UNAUTHORIZED);
     }
 

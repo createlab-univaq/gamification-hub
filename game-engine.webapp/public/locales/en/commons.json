@@ -1,5 +1,6 @@
 {
   "login_title": "Sign in",
+  "signup_title": "Sign up",
   "game_list_title": "My games",
   "search_placeholder": "Search...",
   "delete_title": "Are you sure?",
@@ -7,6 +8,27 @@
   "welcome": "Welcome {{name}}",
   "name": "Name",
   "required_field": "Required field!",
+  "confirm_password": "Confirm password",
+  "settings": {
+    "title": "Settings",
+    "subtitle": "WARNING! After changing the username or password you will need to login again afterwards",
+    "form": {
+      "username": "Change username",
+      "password": "Change password",
+      "success": {
+        "title": "Account updated!",
+        "message": "Sign in again to access your account information"
+      }
+    },
+    "deactivate_section": {
+      "title": "Deactivate account",
+      "message": "Once you deactivate the account you won't be able to go back"
+    }
+  },
+  "signup": {
+    "title": "Registration complete",
+    "message": "Login with your credentials to access the app"
+  },
   "form": {
     "labels": {
       "challenge_select":"Challenge model",
@@ -18,7 +40,8 @@
       "assign_challenge": "Assign challenge"
     },
     "password_validation": "Password must contain at least 4 characters, one or more uppercase and lowercase characters, one or more digit and a special character (@,$,!,%,*,?)",
-    "username_validation": "Username can contain only characters, digits and underscores!"
+    "username_validation": "Username can contain only characters, digits and underscores!",
+    "password_not_matches": "The password doesn't match!"
   },
   "sidebar": {
     "rules": "Rules",

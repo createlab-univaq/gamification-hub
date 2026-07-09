@@ -2,10 +2,11 @@ package it.smartcommunitylab.gamification.gameengineapi.service.impl;
 
 import it.smartcommunitylab.gamification.gameengineapi.config.security.DomainUserDetails;
 import it.smartcommunitylab.gamification.gameengineapi.config.security.JwtConfig;
-import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundException;
 import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.exception.RequestException;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.LoginRequestDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.UserDTO;
+import it.smartcommunitylab.gamification.gameengineapi.model.entity.User;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.UserMapper;
 import it.smartcommunitylab.gamification.gameengineapi.model.repository.UserRepository;
 import it.smartcommunitylab.gamification.gameengineapi.service.AuthenticationService;
@@ -19,6 +20,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -41,6 +43,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserMapper userMapper;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Value("${custom.jwt.expiration:86400}")
     private Long expiration;
 
@@ -58,6 +62,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, jwtClaimsSet)).getTokenValue();
     }
 
+    private User findUserOrThrow(String id) {
+        return userRepository.findUserByIdAndActive(id, true).orElseThrow(()->new UsernameNotFoundException("User not found"));
+    }
+
     @Override
     public String createToken(String username, String password) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
@@ -69,11 +77,49 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UserDTO getAuthUser() {
         DomainUserDetails userDetails = SecurityUtils.getCurrentUser();
-        if(Objects.isNull(userDetails)) {
+        if (Objects.isNull(userDetails)) {
             throw new RequestException("User not authenticated", "User is currently not authenticated", ErrorCodes.USER_NOT_AUTHENTICATED, HttpStatus.UNAUTHORIZED);
         }
-        String id = userDetails.getId();
-        return userMapper.toDTO(userRepository.findById(id).orElseThrow(()->new UsernameNotFoundException("User not found.")));
+        User user = findUserOrThrow(userDetails.getId());
+        return userMapper.toDTO(user);
+    }
+
+    @Override
+    public UserDTO registerUser(String username, String password) {
+        log.info("Request to create user {}", username);
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new RequestException("User already exists", "Username already taken", ErrorCodes.USERNAME_ALREADY_TAKEN, HttpStatus.BAD_REQUEST);
+        }
+        User user = new User();
+        user.setActive(true);
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password));
+        return userMapper.toDTO(userRepository.save(user));
+    }
+
+    @Override
+    public void deactivateUser(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        user.setActive(false);
+        userRepository.save(user);
+        log.info("User {} successfully deactivated", user.getUsername());
+    }
+
+    @Override
+    public UserDTO updateUser(LoginRequestDTO requestDTO) {
+        DomainUserDetails userDetails = SecurityUtils.getCurrentUser();
+        if (Objects.isNull(userDetails)) {
+            throw new RequestException("User not authenticated", "User is currently not authenticated", ErrorCodes.USER_NOT_AUTHENTICATED, HttpStatus.UNAUTHORIZED);
+        }
+        log.info("Request to update current user {}", userDetails.getUsername());
+        User currentUser = findUserOrThrow(userDetails.getId());
+        if(userRepository.findByUsername(requestDTO.getUsername()).isPresent() && !currentUser.getUsername().equals(requestDTO.getUsername())) {
+            throw new RequestException("User already exists", "Username already taken", ErrorCodes.USERNAME_ALREADY_TAKEN, HttpStatus.BAD_REQUEST);
+        }
+        String password = Objects.isNull(requestDTO.getPassword()) || requestDTO.getPassword().isBlank() ? currentUser.getPassword() : passwordEncoder.encode(requestDTO.getPassword());
+        currentUser.setUsername(Objects.requireNonNullElse(requestDTO.getUsername(), currentUser.getUsername()));
+        currentUser.setPassword(password);
+        return userMapper.toDTO(userRepository.save(currentUser));
     }
 
 }

@@ -15,6 +15,7 @@ public final class ErrorCodes {
     public static final String USER_NOT_AUTHENTICATED = "user_not_authenticated";
     public static final String USER_NOT_AUTHORIZED = "user_not_authorized";
     public static final String USER_NOT_ACTIVE = "user_not_active";
+    public static final String USERNAME_ALREADY_TAKEN = "username_already_taken";
 
     // Validation
     public static final String VALIDATION = "validation";

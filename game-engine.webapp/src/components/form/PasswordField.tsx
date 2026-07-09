@@ -1,6 +1,6 @@
 import {Button, InputAdornment, TextField} from "@mui/material";
 import {useState} from "react";
-import type {TextFieldProps} from "@mui/material/TextField/TextField";
+import type {TextFieldProps} from "@mui/material/TextField";
 import {Visibility, VisibilityOff} from '@mui/icons-material'
 
 interface PasswordFieldProps extends Omit<TextFieldProps, "type" | "slotProps"> {
@@ -14,7 +14,7 @@ export function PasswordField(props: PasswordFieldProps) {
                       type={visible ? "text" : "password"}
                       slotProps={{
                           input: {
-                              endAdornment: <InputAdornment sx={{borderLeft:"1px gray solid"}} position={"end"}>
+                              endAdornment: <InputAdornment sx={{borderLeft: "1px gray solid"}} position={"end"}>
                                   <Button size={"small"}
                                           onClick={() => setVisible(!visible)}
                                   >

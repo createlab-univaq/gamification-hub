@@ -20,6 +20,9 @@
   "user_not_active": "Your account is not active. Please contact an administrator.",
   "user_not_active_title": "Account not active!",
 
+  "username_already_taken": "Username is already taken",
+  "username_already_taken_title": "Signup failed!",
+
   "validation": "One or more values are not valid.",
   "validation_title": "Validation error!",
 

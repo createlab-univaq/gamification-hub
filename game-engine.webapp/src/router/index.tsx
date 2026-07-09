@@ -12,9 +12,6 @@ import {GameRoutes} from "./GameRoutes.tsx";
 import {GamePage} from "../pages/games/page.tsx";
 import {ErrorPage} from "../pages/error/page.tsx";
 import {RuleListPage} from "../pages/rules/list.tsx";
-const TestPage = lazy(() => import("../pages/TestPage.tsx").then(m => ({default: m.TestPage})));
-const BlocklyRuleUpsertPage = lazy(() => import("../pages/rules/upsert.tsx").then(m => ({default: m.BlocklyRuleUpsertPage})));
-const SimulationPage = lazy(() => import("../pages/scenarios/page.tsx").then(m => ({default: m.SimulationPage})));
 import {ScenarioListPage} from "../pages/scenarios/list.tsx";
 import {ChallengeListPage} from "../pages/challenges/list.tsx";
 import {ChallengeUpsertPage} from "../pages/challenges/upsert.tsx";
@@ -37,6 +34,11 @@ import {PointConceptDetailsPage} from "../pages/point-concept/details.tsx";
 import {PlayerListPage} from "../pages/players/list.tsx";
 import {PlayerUpsertPage} from "../pages/players/upsert.tsx";
 import {PlayerDetailsPage} from "../pages/players/details.tsx";
+import {UserSettingsPage} from "../pages/settings/page.tsx";
+
+const TestPage = lazy(() => import("../pages/TestPage.tsx").then(m => ({default: m.TestPage})));
+const BlocklyRuleUpsertPage = lazy(() => import("../pages/rules/upsert.tsx").then(m => ({default: m.BlocklyRuleUpsertPage})));
+const SimulationPage = lazy(() => import("../pages/scenarios/page.tsx").then(m => ({default: m.SimulationPage})));
 
 export const router = createBrowserRouter([
     {
@@ -86,6 +88,10 @@ export const router = createBrowserRouter([
                         element: <GameUpsertPage/>
                     },
                     {
+                        path: "/settings",
+                        element: <UserSettingsPage/>,
+                    },
+                    {
                         path: "/games/:gameId",
                         element: <GameRoutes/>,
                         children: [
@@ -100,11 +106,13 @@ export const router = createBrowserRouter([
                             },
                             {
                                 path: "rules/upsert",
-                                element: <Suspense fallback={<Loading fullScreen={true}/>}><BlocklyRuleUpsertPage/></Suspense>
+                                element: <Suspense
+                                    fallback={<Loading fullScreen={true}/>}><BlocklyRuleUpsertPage/></Suspense>
                             },
                             {
                                 path: "rules/upsert/:ruleId",
-                                element: <Suspense fallback={<Loading fullScreen={true}/>}><BlocklyRuleUpsertPage/></Suspense>
+                                element: <Suspense
+                                    fallback={<Loading fullScreen={true}/>}><BlocklyRuleUpsertPage/></Suspense>
                             },
                             // SIMULATIONS AND STATIC ANALYSIS
                             {

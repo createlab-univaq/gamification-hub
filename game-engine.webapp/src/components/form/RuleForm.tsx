@@ -7,7 +7,7 @@ import {ruleClient} from "../../api";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {useNotificationContext} from "../notification/NotificationProvider.tsx";
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import {Loading} from "../Loading.tsx";
 import {DroolEditor} from "../rule-builder/DroolEditor.tsx";
 import {Button, ButtonGroup, Stack, Typography} from "@mui/material";
@@ -165,8 +165,8 @@ export function RuleForm({rule, gameId}: RuleFormProps) {
             setInitialRule(regeneratedFile)
         } catch (e) {
             updateConsoleMessages([{
-                time:new Date(),
-                type:"warning",
+                time: new Date(),
+                type: "warning",
                 content: e
             }])
         }

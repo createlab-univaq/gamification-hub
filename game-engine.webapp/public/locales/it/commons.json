@@ -1,5 +1,6 @@
 {
   "login_title": "Accedi",
+  "signup_title": "Registrati",
   "game_list_title": "I miei giochi",
   "search_placeholder": "Cerca...",
   "delete_title": "Sei sicuro?",
@@ -7,6 +8,27 @@
   "welcome": "Bentornato {{name}}",
   "name": "Nome",
   "required_field": "Campo obbligatorio!",
+  "confirm_password": "Conferma password",
+  "settings": {
+    "title": "Impostazioni",
+    "subtitle": "ATTENZIONE! Dopo aver cambiato lo username o la password sarà necessario rieseguire l'accesso",
+    "form": {
+      "username": "Cambia username",
+      "password": "Cambia password",
+      "success": {
+        "title": "Aggiornamento completato",
+        "message": "Riesegui il login per riaccedere al tuo account"
+      }
+    },
+    "deactivate_section": {
+      "title": "Disattiva account",
+      "message": "Una volta disattivato l'account non sarà possibile recuperare i dati"
+    }
+  },
+  "signup": {
+    "title": "Registrazione completata!",
+    "message": "Accedi con le credenziali appena inserite"
+  },
   "form": {
     "labels": {
       "challenge_select":"Modello di sfida",
@@ -18,7 +40,8 @@
       "assign_challenge": "Assegna sfida"
     },
     "password_validation": "La password deve contenere almeno 4 caratteri, un carattere maiuscolo e minuscoolo, un numero ed un carattere speciale (@,$,!,%,*,?)",
-    "username_validation": "Lo username può contenere solo caratteri lettere e underscore."
+    "username_validation": "Lo username può contenere solo caratteri lettere e underscore.",
+    "password_not_matches": "La password non corrisponde!"
   },
   "sidebar": {
     "rules": "Regole",

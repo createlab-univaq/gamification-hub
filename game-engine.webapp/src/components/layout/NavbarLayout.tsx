@@ -1,6 +1,6 @@
 import {AppBar, Button, Divider, Stack, Typography} from "@mui/material";
 
-import {AccountCircle, Logout, Menu} from "@mui/icons-material"
+import {AccountCircle, Logout, Menu, Settings} from "@mui/icons-material"
 import {getCurrentUser} from "../../utils/auth-utils.ts";
 import {PopoverButton} from "../PopoverButton.tsx";
 import {ThemeSwitch} from "../ThemeSwitch.tsx";
@@ -50,12 +50,24 @@ export function NavbarLayout() {
                                    },
                                    children: <Stack sx={{zIndex: "10"}}>
                                        <Stack sx={{padding: "0.5rem"}}>
-                                           <Typography>{t("welcome", {name: user.username})}</Typography>
+                                           <Typography>{t("welcome", {name: user!.username})}</Typography>
                                        </Stack>
                                        <Stack divider={<Divider orientation={"horizontal"}/>}>
+                                           <Button variant={"text"}
+                                                   fullWidth={true}
+                                                   href={"/settings"}
+                                                   endIcon={<Settings/>}
+                                                   sx={{
+                                                       borderRadius: 0,
+                                                       justifyContent: "space-between"
+                                                   }}
+                                           >
+                                              <Typography>{t("buttons:settings")}</Typography>
+                                           </Button>
                                            <Button variant={"contained"}
                                                    color={"error"}
                                                    fullWidth={true}
+                                                   endIcon={<Logout/>}
                                                    href={"/logout"}
                                                    sx={{
                                                        borderRadius: 0,
@@ -63,7 +75,6 @@ export function NavbarLayout() {
                                                    }}
                                            >
                                                Logout
-                                               <Logout/>
                                            </Button>
                                        </Stack>
                                    </Stack>

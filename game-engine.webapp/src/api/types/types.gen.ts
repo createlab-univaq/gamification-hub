@@ -408,29 +408,29 @@ export type UserDto = {
 export type PagePlayerDto = {
     totalElements?: number;
     totalPages?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
     size?: number;
     content?: Array<PlayerDto>;
     number?: number;
     sort?: SortObject;
+    first?: boolean;
+    last?: boolean;
     numberOfElements?: number;
+    pageable?: PageableObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
-    pageNumber?: number;
-    pageSize?: number;
-    paged?: boolean;
     offset?: number;
     sort?: SortObject;
     unpaged?: boolean;
+    pageSize?: number;
+    pageNumber?: number;
+    paged?: boolean;
 };
 
 export type SortObject = {
-    sorted?: boolean;
     empty?: boolean;
+    sorted?: boolean;
     unsorted?: boolean;
 };
 
@@ -497,14 +497,14 @@ export type ClassificationPositionDto = {
 export type PageClassificationPositionDto = {
     totalElements?: number;
     totalPages?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
     size?: number;
     content?: Array<ClassificationPositionDto>;
     number?: number;
     sort?: SortObject;
+    first?: boolean;
+    last?: boolean;
     numberOfElements?: number;
+    pageable?: PageableObject;
     empty?: boolean;
 };
 
@@ -1664,6 +1664,22 @@ export type LoginResponses = {
 };
 
 export type LoginResponse = LoginResponses[keyof LoginResponses];
+
+export type RegisterData = {
+    body: LoginRequestDto;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/register';
+};
+
+export type RegisterResponses = {
+    /**
+     * OK
+     */
+    200: UserDto;
+};
+
+export type RegisterResponse = RegisterResponses[keyof RegisterResponses];
 
 export type LogoutData = {
     body?: never;

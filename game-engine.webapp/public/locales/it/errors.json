@@ -20,6 +20,9 @@
   "user_not_active": "Il tuo account non è attivo. Contatta un amministratore.",
   "user_not_active_title": "Account non attivo!",
 
+  "username_already_taken": "Lo username è già utilizzato",
+  "username_already_taken_title": "Registrazione fallita!",
+
   "validation": "Uno o più valori non sono validi.",
   "validation_title": "Errore di validazione!",
 

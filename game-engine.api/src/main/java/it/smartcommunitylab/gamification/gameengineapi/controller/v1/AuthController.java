@@ -4,6 +4,7 @@ import it.smartcommunitylab.gamification.gameengineapi.config.security.CookieTok
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.LoginRequestDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.UserDTO;
 import it.smartcommunitylab.gamification.gameengineapi.service.AuthenticationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +52,29 @@ public class AuthController {
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, buildAuthCookie("", 0).toString())
                 .build();
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserDTO> register(@Valid @RequestBody LoginRequestDTO signupRequestDTO) {
+        log.info("REST request to register user {}", signupRequestDTO.getUsername());
+        UserDTO userDTO = authenticationService.registerUser(signupRequestDTO.getUsername(), signupRequestDTO.getPassword());
+        log.info("User {} registered successfully", userDTO.getUsername());
+        return ResponseEntity.ok(userDTO);
+    }
+
+    @DeleteMapping("/deactivate")
+    public ResponseEntity<Void> deactivateUser() {
+        UserDTO loggedUser = authenticationService.getAuthUser();
+        log.info("REST request to deactivate user [{}] {}", loggedUser.getId(), loggedUser.getUsername());
+        authenticationService.deactivateUser(loggedUser.getId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/update-user")
+    public ResponseEntity<UserDTO> updateUser(@RequestBody LoginRequestDTO requestDTO) {
+        log.info("REST request to update currently logged user");
+        UserDTO userDTO = authenticationService.updateUser(requestDTO);
+        return ResponseEntity.ok(userDTO);
     }
 
     private ResponseCookie buildAuthCookie(String value, long maxAgeSeconds) {
