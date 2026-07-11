@@ -1,0 +1,46 @@
+/**
+ * Copyright 2015 Fondazione Bruno Kessler - Trento RISE
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
+package eu.trentorise.game.repo;
+
+import java.util.List;
+
+import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface GameRepo extends MongoRepository<GamePersistence, String> {
+
+    public GamePersistence findByActions(String action);
+
+    public List<GamePersistence> findByOwner(String user);
+
+    public List<GamePersistence> findByDomainAndOwner(String domain, String user);
+
+    public List<GamePersistence> findByDomain(String domain);
+
+    public List<GamePersistence> findByTerminated(boolean value);
+    
+    @Query("{'name': {'$regex': ?0, '$options': 'i'}, 'owner': ?1}")
+	public List<GamePersistence> findBySearchName(String title, String user);
+
+    @Aggregation(pipeline = {
+            "{ $match: { _id: ?0 } }",
+            "{ $project: { tasks: { $filter: { input: { $ifNull: ['$tasks', []] }, as: 'task', cond: { $regexMatch: { input: { $ifNull: ['$$task.obj.name', ''] }, regex: ?1, options: 'i' } } } } } }"
+    })
+    public GamePersistence findTasksByGameIdAndName(String gameId, String nameRegex);
+
+}

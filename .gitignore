@@ -1,0 +1,22 @@
+logs/
+*.iml
+*.class
+*node_modules
+*build
+
+.idea
+.idea/*
+.claude
+.claude/*
+
+# transient / scratch files (curl cookie jars, dumps) — never commit
+cj.txt
+cookies*.txt
+*.cookiejar
+
+.env
+.env.*
+*.env.*
+game-engine.webapp/*.env.*
+game-engine.api/*.env.*
+game-engine.core/*.env.*

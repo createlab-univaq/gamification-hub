@@ -1,0 +1,70 @@
+import type {LayoutListProps, LayoutType} from "./LayoutList.tsx";
+import {LayoutList} from "./LayoutList.tsx";
+import {Box, Divider, IconButton, Stack, TextField} from "@mui/material";
+import {GridOn, List} from "@mui/icons-material";
+import {type ChangeEvent, useState} from "react";
+
+interface SearchProps {
+    label?: string
+    placeholder?: string
+    onSearch?: (value: string, e: ChangeEvent) => void
+}
+
+interface PageListProps<T> extends Omit<LayoutListProps<T>, "layout"> {
+    search?: SearchProps
+}
+
+export function PageList<T>({search, ...props}: PageListProps<T>) {
+
+    const [layout, setLayout] = useState<LayoutType>("list")
+
+    return <Stack sx={{py: 2, flex: 1, minHeight: 0}}>
+        <Stack
+            direction={"row"}
+            sx={{
+                justifyContent: "space-between"
+            }}
+        >
+            <TextField
+                type={"text"}
+                label={search?.label}
+                placeholder={search?.placeholder}
+                sx={{
+                    minWidth: "30%"
+                }}
+                onChange={(e) => {
+                    search?.onSearch?.(e.target.value, e)
+                }}
+            />
+            <Stack direction={"row"} divider={<Divider orientation={"vertical"}/>}>
+                <IconButton
+                    color={layout === "list" ? "primary" : "default"}
+                    size={"small"}
+                    sx={{
+                        "&:hover": {
+                            backgroundColor: "unset"
+                        }
+                    }}
+                    onClick={() => setLayout("list")}
+                >
+                    <List/>
+                </IconButton>
+                <IconButton
+                    size={"small"}
+                    color={layout === "grid" ? "primary" : "default"}
+                    sx={{
+                        "&:hover": {
+                            backgroundColor: "unset"
+                        }
+                    }}
+                    onClick={() => setLayout("grid")}
+                >
+                    <GridOn/>
+                </IconButton>
+            </Stack>
+        </Stack>
+        <Box sx={{flex: 1, minHeight: 0, overflow: "auto"}}>
+            <LayoutList {...props} layout={layout}/>
+        </Box>
+    </Stack>
+}

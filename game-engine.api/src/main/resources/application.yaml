@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: Gamification-API
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  mongodb:
+    port: ${MONGODB_PORT:50000}
+    database: ${MONGODB_NAME:gamification-api-db}
+    username: ${MONGODB_USER:username}
+    password: ${MONGODB_PASSWORD:password}
+    authentication-database: admin
+    representation:
+      uuid: standard
+    host: ${MONGODB_HOST:localhost}
+
+  main:
+    allow-circular-references: true
+  data:
+    mongodb:
+      auto-index-creation: true
+
+# stats: one structured line per game event | perf: one line per timed operation
+# flip to INFO to enable; the engine.* Micrometer timers are always active regardless
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus

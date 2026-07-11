@@ -1,0 +1,103 @@
+{
+  "generic": "Qualcosa è andato storto. Riprova.",
+  "generic_title": "Errore!",
+
+  "data_access": "Si è verificato un errore di accesso ai dati.",
+  "data_access_title": "Errore dati!",
+
+  "duplicate_key": "Esiste già un elemento con lo stesso valore.",
+  "duplicate_key_title": "Valore duplicato!",
+
+  "authentication_failed": "Username o password errati.",
+  "authentication_failed_title": "Errore di autenticazione!",
+
+  "user_not_authenticated": "L'utente non è autenticato.",
+  "user_not_authenticated_title": "Errore di autenticazione!",
+
+  "user_not_authorized": "L'utente non è autorizzato ad accedere a questa risorsa.",
+  "user_not_authorized_title": "Accesso negato!",
+
+  "user_not_active": "Il tuo account non è attivo. Contatta un amministratore.",
+  "user_not_active_title": "Account non attivo!",
+
+  "username_already_taken": "Lo username è già utilizzato",
+  "username_already_taken_title": "Registrazione fallita!",
+
+  "validation": "Uno o più valori non sono validi.",
+  "validation_title": "Errore di validazione!",
+
+  "rule_validation": "La regola contiene uno o più errori.",
+  "rule_validation_title": "Regola non valida!",
+
+  "game_not_found": "Il gioco richiesto non è stato trovato.",
+  "game_not_found_title": "Non trovato!",
+
+  "rule_not_found": "La regola richiesta non è stata trovata.",
+  "rule_not_found_title": "Non trovato!",
+
+  "action_not_found": "L'azione richiesta non è stata trovata.",
+  "action_not_found_title": "Non trovato!",
+
+  "point_concept_not_found": "Il punteggio richiesto non è stato trovato.",
+  "point_concept_not_found_title": "Non trovato!",
+
+  "badge_not_found": "La collezione di medaglie richiesta non è stata trovata.",
+  "badge_not_found_title": "Non trovato!",
+
+  "challenge_not_found": "Il modello di sfida richiesto non è stato trovato.",
+  "challenge_not_found_title": "Non trovato!",
+
+  "player_not_found": "Il giocatore richiesto non è stato trovato.",
+  "player_not_found_title": "Non trovato!",
+
+  "team_not_found": "La squadra richiesta non è stata trovata.",
+  "team_not_found_title": "Non trovato!",
+
+  "scenario_not_found": "Lo scenario richiesto non è stato trovato.",
+  "scenario_not_found_title": "Non trovato!",
+
+  "classification_not_found": "La classifica richiesta non è stata trovata.",
+  "classification_not_found_title": "Non trovato!",
+
+  "game_creation": "Impossibile creare il gioco.",
+  "game_creation_title": "Creazione fallita!",
+
+  "action_creation": "Impossibile creare l'azione. Potrebbe già esistere.",
+  "action_creation_title": "Creazione fallita!",
+
+  "point_concept_creation": "Impossibile creare il punteggio.",
+  "point_concept_creation_title": "Creazione fallita!",
+
+  "badge_creation": "Impossibile creare la collezione di medaglie.",
+  "badge_creation_title": "Creazione fallita!",
+
+  "challenge_creation": "Impossibile creare il modello di sfida.",
+  "challenge_creation_title": "Creazione fallita!",
+
+  "team_creation": "Impossibile creare la squadra. Potrebbe già esistere.",
+  "team_creation_title": "Creazione fallita!",
+
+  "scenario_creation": "Esiste già uno scenario con questo nome nel gioco.",
+  "scenario_creation_title": "Creazione fallita!",
+
+  "classification_creation": "Esiste già una classifica con questo nome nel gioco.",
+  "classification_creation_title": "Creazione fallita!",
+
+  "game_execution_failed": "Impossibile eseguire l'azione di gioco.",
+  "game_execution_failed_title": "Esecuzione fallita!",
+
+  "rule_simulation": "Impossibile completare la simulazione.",
+  "rule_simulation_title": "Errore di simulazione!",
+
+  "import_error": "Impossibile completare l'importazione.",
+  "import_error_title": "Errore di importazione!",
+
+  "import_empty": "Devi fornire almeno un gioco da importare.",
+  "import_empty_title": "Errore di importazione!",
+
+  "export_forbidden": "Non sei autorizzato a esportare questo gioco.",
+  "export_forbidden_title": "Accesso negato!",
+
+  "invalid_team_members": "Uno o più giocatori selezionati non esistono.",
+  "invalid_team_members_title": "Membri non validi!"
+}

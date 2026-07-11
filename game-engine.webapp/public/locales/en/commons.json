@@ -1,0 +1,414 @@
+{
+  "login_title": "Sign in",
+  "signup_title": "Sign up",
+  "game_list_title": "My games",
+  "search_placeholder": "Search...",
+  "delete_title": "Are you sure?",
+  "delete_message": "Once you delete \"{{entity}}\" you won't be able to restore it forever",
+  "welcome": "Welcome {{name}}",
+  "name": "Name",
+  "required_field": "Required field!",
+  "confirm_password": "Confirm password",
+  "settings": {
+    "title": "Settings",
+    "subtitle": "WARNING! After changing the username or password you will need to login again afterwards",
+    "form": {
+      "username": "Change username",
+      "password": "Change password",
+      "success": {
+        "title": "Account updated!",
+        "message": "Sign in again to access your account information"
+      }
+    },
+    "deactivate_section": {
+      "title": "Deactivate account",
+      "message": "Once you deactivate the account you won't be able to go back"
+    }
+  },
+  "signup": {
+    "title": "Registration complete",
+    "message": "Login with your credentials to access the app"
+  },
+  "form": {
+    "labels": {
+      "challenge_select":"Challenge model",
+      "instance_name": "Instance name",
+      "initial_state": "Initial state",
+      "start": "Start",
+      "end": "End",
+      "hidden": "Hidden",
+      "assign_challenge": "Assign challenge"
+    },
+    "password_validation": "Password must contain at least 4 characters, one or more uppercase and lowercase characters, one or more digit and a special character (@,$,!,%,*,?)",
+    "username_validation": "Username can contain only characters, digits and underscores!",
+    "password_not_matches": "The password doesn't match!"
+  },
+  "sidebar": {
+    "rules": "Rules",
+    "games": "Games",
+    "actions": "Actions",
+    "points": "Point Concepts",
+    "players": "Players",
+    "teams": "Teams",
+    "classifications": "Leaderboards",
+    "badges": "Badges",
+    "levels": "Levels",
+    "scenarios": "Scenarios",
+    "challenges": "Challenge Models"
+  },
+  "total_amount": "Total {{entity, lowercase}}: {{number}}",
+  "game": {
+    "owner": "Owner",
+    "domain": "Domain",
+    "expiration": "Expiration",
+    "is_expired_label": "The game is not terminated",
+    "is_not_expired_label": "The game is terminated",
+    "terminated_label": "Terminated?",
+    "upsert": {
+      "title": "Save game"
+    },
+    "saved": {
+      "title": "Game saved!",
+      "message": "Game \"{{name}}\" has been saved successfully"
+    }
+  },
+  "rules": {
+    "list_title": "Available rules",
+    "search_placeholder": "Rule...",
+    "empty_list": "No rules found",
+    "deleted_message": "The rule has been deleted succesfully",
+    "deleted_title": "Rule deleted",
+    "reads": "Reads",
+    "writes": "Writes",
+    "save_title": "Rule saved",
+    "save_message": "Rule \"{{name}}\" saved succesfully"
+  },
+  "actions": {
+    "list_title": "Actions",
+    "search_placeholder": "Action...",
+    "empty_list": "No actions found",
+    "deleted_title": "Action deleted",
+    "deleted_message": "The action has been deleted successfully",
+    "save_title": "Action saved",
+    "save_message": "Action \"{{name}}\" saved successfully",
+    "upsert_title": "Add action",
+    "update_title": "Update action"
+  },
+  "impact_analysis": {
+    "title": "Rules static analysis",
+    "subtitle_warning": "WARNING! this is still an experimental feature and may be unstable.",
+    "links": {
+      "title": "Link types",
+      "types": {
+        "positive": {
+          "label": "Positive",
+          "desc": "The source causes the activation of the destination"
+        },
+        "negative": {
+          "label": "Negative",
+          "desc": "The source stops the activation of the destination"
+        },
+        "neutral": {
+          "label": "Ambiguous",
+          "desc": "It's not possible to assert the impact on the destination node"
+        }
+      }
+    }
+  },
+  "console": {
+    "saving": "Saving rule...",
+    "validation": {
+      "start":"Validating rule...",
+      "title": "Rule validation complete",
+      "success": "Validation completed successfully. No errors found",
+      "warning": "Rule compiled with warnings"
+    }
+  },
+  "leaderboards": {
+    "title": "Leaderboards",
+    "types": {
+      "general": "General",
+      "incremental": "Incremental"
+    },
+    "checkout": "Show",
+    "empty_list": "No leaderboard found",
+    "search_placeholder": "Leaderboard...",
+    "point_concept": "Point concept",
+    "period": "Period",
+    "upsert": {
+      "new": "Add leaderboard",
+      "edit": "Update leaderboard"
+    },
+    "saved": {
+      "title": "Leaderboard saved!",
+      "content": "Leaderboard {{name}} was saved successfully"
+    },
+    "deleted": {
+      "title": "Leaderboard deleted",
+      "content": "The leaderboard was deleted successfully"
+    },
+    "form": {
+      "name": "Leaderboard name",
+      "type": "Type",
+      "type_general": "General (all time)",
+      "type_incremental": "Incremental (per period)",
+      "point_concept": "Point concept",
+      "items_to_notify": "Positions to notify (top-N)",
+      "cron": "Cron (schedule)",
+      "cron_helper": "5-field cron expression for running the leaderboard",
+      "cron_invalid": "Invalid cron expression",
+      "period": "Period",
+      "period_required": "Required for incremental leaderboards!"
+    },
+    "board": {
+      "period_index": "Period index (0 = current)",
+      "player": "Player",
+      "score": "Score",
+      "empty": "No data in this leaderboard."
+    }
+  },
+  "scenarios": {
+    "title": "Scenarios",
+    "search_placeholder": "Scenario...",
+    "empty_list": "No scenario found",
+    "deleted": {
+      "title": "Scenario deleted!",
+      "message": "The scenario has been deleted successfully"
+    },
+    "form": {
+      "name_placeholder": "My simulation",
+      "save": {
+        "title": "Scenario saved",
+        "message": "The scenario \"{{name}}\" has been saved successfully"
+      },
+      "inputs": {
+        "title": "Simulation inputs"
+      },
+      "outputs": {
+        "title": "Expected outcome",
+        "placeholder": "Results will appear here",
+        "count": "Rules fired: {{count}}",
+        "no_rules_fired": "No rules fired",
+        "test": {
+          "success": {
+            "title": "Test successfull!",
+            "message": "The simulation's result matches the expected value"
+          },
+          "fail": {
+            "title": "Test failed!",
+            "message": "One or more values don't match with the expected result"
+          }
+        }
+      },
+      "graph": {
+        "details": "Click a node to see its details",
+        "nodes": {
+          "start": "Initial State",
+          "end": "Final State",
+          "caused_by": "Caused by {{rule}}",
+          "changes": "{{count}} changes"
+        }
+      }
+    }
+  },
+  "badges": {
+    "title": "Badge concepts",
+    "empty_list": "No badge concept found",
+    "search_placeholder": "Badge...",
+    "visibility": {
+      "label": "Visibility",
+      "hidden": "Hidden",
+      "visible": "Visibile"
+    },
+    "deleted": {
+      "title": "Badge concept deleted!",
+      "message": "Badge concept has been successfully deleted"
+    },
+    "saved": {
+      "title": "Badge concept saved!",
+      "message": "Badge concept \"{{name}}\" has been saved successfully"
+    },
+    "form": {
+      "collection_name": "Collection name",
+      "badges_title": "Badges",
+      "badge_name": "Badge name",
+      "add_badge": "Add badge"
+    }
+  },
+  "challenges": {
+    "title": "Challenge concepts",
+    "empty_list": "No challenges found",
+    "search_placeholder": "Challenge...",
+    "deleted": {
+      "title": "Challenge deleted!",
+      "message": "Challenge has been deleted successfully"
+    },
+    "saved": {
+      "title": "Challenge saved!",
+      "message": "Challenge \"{{name}}\" has been saved successfully"
+    },
+    "form": {
+      "variables_title": "Variables",
+      "variable_name": "Variable name",
+      "add_variable": "Add variable"
+    }
+  },
+  "levels": {
+    "title": "Levels",
+    "empty_list": "No level found",
+    "search_placeholder": "Level...",
+    "thresholds": "Thresholds",
+    "deleted": {
+      "title": "Level deleted!",
+      "message": "Level has been deleted successfully"
+    },
+    "saved": {
+      "title": "Level saved!",
+      "message": "Level \"{{name}}\" has been saved successfully"
+    },
+    "form": {
+      "point_concept": "Point concept name",
+      "thresholds_hint": "Define the level thresholds. Their order determines the threshold index.",
+      "threshold_name": "Threshold name",
+      "value": "Value",
+      "challenge_config": "Threshold challenge configuration",
+      "choices": "Number of choices",
+      "available_models": "Available models",
+      "active_models": "Active models",
+      "add_threshold": "Add threshold"
+    }
+  },
+  "players": {
+    "title": "Players",
+    "empty_list": "No player found",
+    "search_placeholder": "Player...",
+    "upsert_title": "Add player",
+    "form": {
+      "player_name": "Player name"
+    },
+    "deleted": {
+      "title": "Player deleted!",
+      "message": "Player has been deleted successfully"
+    },
+    "saved": {
+      "title": "Player saved!",
+      "message": "Player \"{{name}}\" has been saved successfully"
+    },
+    "challenges": {
+      "accepted": {
+        "title": "Challenge accepted!",
+        "message": "Challenge has been accepted successfully"
+      },
+      "assigned": {
+        "title": "Challenge assigned!",
+        "message": "Challenge as been assigned successfully"
+      }
+    },
+    "inventories": {
+      "title":"Inventory",
+      "available_choices": "Available activations: {{count}}" ,
+      "choices": {
+        "empty_list": "No choice found",
+        "forced": {
+          "title": "Choice forced!",
+          "message": "Challenge has been forced successfully"
+        },
+        "activated": {
+          "title": "Choice activated!",
+          "message": "Challenge has been activated successfully"
+        }
+      }
+    },
+    "groups": {
+      "challenges": {
+        "title": "Group challenges",
+        "empty_list": "No group challenge found",
+        "invites": {
+          "accepted": {
+            "title": "Invite accepted!",
+            "message": "Invite has been accepted successfully"
+          },
+          "denied": {
+            "title": "Invite declined!",
+            "message": "Invite has been declined successfully"
+          },
+          "cancelled": {
+            "title": "Invite cancelled!",
+            "message": "Invite has been cancelled successfully"
+          },
+          "created": {
+            "title": "Invite created",
+            "message": "The group challenge invite has been created"
+          }
+        },
+        "invite_form": {
+          "title": "Invite to a group challenge",
+          "guests": "Guests",
+          "guest_required": "Select at least one guest",
+          "model_name": "Group challenge model",
+          "point_concept": "Point concept",
+          "period": "Period",
+          "target": "Target",
+          "start": "Start",
+          "end": "End",
+          "reward": "Reward",
+          "percentage": "Percentage",
+          "threshold": "Threshold"
+        }
+      }
+    }
+  },
+  "teams": {
+    "title": "Teams",
+    "empty_list": "No team found",
+    "search_placeholder": "Team...",
+    "members_count": "Members: {{count}}",
+    "upsert_title": "Add team",
+    "update_title": "Update team",
+    "form": {
+      "team_name": "Team name",
+      "members": "Members",
+      "players": "Players"
+    },
+    "deleted": {
+      "title": "Team deleted!",
+      "message": "The team has been deleted successfully"
+    },
+    "saved": {
+      "title": "Team saved!",
+      "message": "Team \"{{name}}\" has been saved successfully"
+    }
+  },
+  "points": {
+    "title": "Point concepts",
+    "empty_list": "No point concept found",
+    "search_placeholder": "Point concept...",
+    "upsert_title": "Add point concept",
+    "update_title": "Update point concept",
+    "periods_count": "{{count}} periods",
+    "deleted": {
+      "title": "Point concept deleted!",
+      "message": "The point concept has been deleted successfully"
+    },
+    "saved": {
+      "title": "Point concept saved!",
+      "message": "Point concept \"{{name}}\" has been saved successfully"
+    },
+    "details": {
+      "validity": "Validity",
+      "duration": "Duration",
+      "kept_instances": "Kept instances",
+      "no_periods": "No period defined."
+    },
+    "form": {
+      "periods_title": "Periods",
+      "periods_hint": "Define the score calculation periods (e.g. weekly, monthly).",
+      "period_name": "Period name",
+      "start": "Start",
+      "end": "End",
+      "period_days": "Period (days)",
+      "capacity": "Capacity",
+      "add_period": "Add period"
+    }
+  }
+}

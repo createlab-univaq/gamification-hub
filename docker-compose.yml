@@ -1,0 +1,75 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: gamification-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: gamification-api
+      MONGO_INITDB_ROOT_PASSWORD: my_password
+    ports:
+      - "50000:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: gamification-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${PROMETHEUS_TARGETS:-./monitoring/prometheus/targets}:/etc/prometheus/targets:ro
+      - prometheus-data:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: gamification-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+  loki:
+    image: grafana/loki:3.0.0
+    command: -config.file=/etc/loki/config.yaml
+    volumes:
+      - ./monitoring/loki/config.yaml:/etc/loki/config.yaml
+      - loki-data:/loki
+    ports:
+      - "3100:3100"
+
+  alloy:
+    image: grafana/alloy:latest
+    command: run /etc/alloy/config.alloy
+    volumes:
+      - ./monitoring/grafana/alloy/config.alloy:/etc/alloy/config.alloy
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - loki
+
+  gamification-api:
+    container_name: "gamification-api"
+    env_file:
+      - game-engine.api/.env.prod
+    build:
+      dockerfile: game-engine.api/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  mongo-data:
+  prometheus-data:
+  grafana-data:
+  loki-data:

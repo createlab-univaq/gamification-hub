@@ -1,0 +1,414 @@
+{
+  "login_title": "Accedi",
+  "signup_title": "Registrati",
+  "game_list_title": "I miei giochi",
+  "search_placeholder": "Cerca...",
+  "delete_title": "Sei sicuro?",
+  "delete_message": "Una volta eliminato \"{{entity}}\" non potrà più essere recuperato",
+  "welcome": "Bentornato {{name}}",
+  "name": "Nome",
+  "required_field": "Campo obbligatorio!",
+  "confirm_password": "Conferma password",
+  "settings": {
+    "title": "Impostazioni",
+    "subtitle": "ATTENZIONE! Dopo aver cambiato lo username o la password sarà necessario rieseguire l'accesso",
+    "form": {
+      "username": "Cambia username",
+      "password": "Cambia password",
+      "success": {
+        "title": "Aggiornamento completato",
+        "message": "Riesegui il login per riaccedere al tuo account"
+      }
+    },
+    "deactivate_section": {
+      "title": "Disattiva account",
+      "message": "Una volta disattivato l'account non sarà possibile recuperare i dati"
+    }
+  },
+  "signup": {
+    "title": "Registrazione completata!",
+    "message": "Accedi con le credenziali appena inserite"
+  },
+  "form": {
+    "labels": {
+      "challenge_select":"Modello di sfida",
+      "instance_name": "Nome istanza",
+      "initial_state": "Stato iniziale",
+      "start": "Inizio",
+      "end": "Fine",
+      "hidden": "Nascosto",
+      "assign_challenge": "Assegna sfida"
+    },
+    "password_validation": "La password deve contenere almeno 4 caratteri, un carattere maiuscolo e minuscoolo, un numero ed un carattere speciale (@,$,!,%,*,?)",
+    "username_validation": "Lo username può contenere solo caratteri lettere e underscore.",
+    "password_not_matches": "La password non corrisponde!"
+  },
+  "sidebar": {
+    "rules": "Regole",
+    "games": "Giochi",
+    "actions": "Azioni",
+    "points": "Punteggi",
+    "players": "Giocatori",
+    "teams": "Squadre",
+    "classifications": "Classifiche",
+    "badges": "Medaglie",
+    "levels": "Livelli",
+    "scenarios": "Scenari",
+    "challenges": "Modelli di sfida"
+  },
+  "total_amount": "{{entity, capitalize}} totali: {{number}}",
+  "game": {
+    "owner": "Responsbile",
+    "domain": "Dominio",
+    "expiration": "Scadenza",
+    "is_expired_label": "Il gioco è terminato",
+    "is_not_expired_label": "Il gioco non è terminato",
+    "terminated_label": "Terminato?",
+    "upsert": {
+      "title": "Salva gioco"
+    },
+    "saved": {
+      "title": "Gioco salvato!",
+      "message": "Il gioco \"{{name}}\" è stato salvato con successo"
+    }
+  },
+  "rules": {
+    "list_title": "Regole salvate",
+    "search_placeholder": "Regola...",
+    "empty_list": "Nessuna regola trovata",
+    "deleted_message": "La regola è stata eliminata con successo",
+    "deleted_title": "Regola eliminata",
+    "reads": "Legge",
+    "writes": "Scrive",
+    "save_title": "Regola salvata",
+    "save_message": "Regola \"{{name}}\" salvata con successo"
+  },
+  "actions": {
+    "list_title": "Azioni",
+    "search_placeholder": "Azione...",
+    "empty_list": "Nessuna azione trovata",
+    "deleted_title": "Azione eliminata",
+    "deleted_message": "L'azione è stata eliminata con successo",
+    "save_title": "Azione salvata",
+    "save_message": "L'azione \"{{name}}\" è stata salvata con successo",
+    "upsert_title": "Aggiungi azione",
+    "update_title": "Aggiorna azione"
+  },
+  "impact_analysis": {
+    "title": "Analisi statica delle regole",
+    "subtitle_warning": "ATTENZIONE! Questa feature è attualmente in fase di sperimentazione.",
+    "links": {
+      "title": "Tipologia di link",
+      "types": {
+        "positive": {
+          "label": "Positivo",
+          "desc": "La sorgente causa l'attivazione del nodo di arrivo"
+        },
+        "negative": {
+          "label": "Negativa",
+          "desc": "La sorgente evita l'attivazione del nodo di arrivo"
+        },
+        "neutral": {
+          "label": "Ambigua",
+          "desc": "Non è possibile definire l'impatto sul nodo di arrivo"
+        }
+      }
+    }
+  },
+  "console": {
+    "saving": "Salvataggio in corso...",
+    "validation": {
+      "start":"Validazione in corso...",
+      "title": "Validazione completata",
+      "success": "La regola è stata compilata con successo. Nessun errore trovato",
+      "warning": "Regola compilata con avvisi"
+    }
+  },
+  "leaderboards": {
+    "title": "Classifiche",
+    "types": {
+      "general": "Generale",
+      "incremental": "Incrementale"
+    },
+    "checkout": "Vedi classifica",
+    "empty_list": "Nessuna classifica trovata",
+    "search_placeholder": "Classifica...",
+    "point_concept": "Punteggio",
+    "period": "Periodo",
+    "upsert": {
+      "new": "Aggiungi classifica",
+      "edit": "Aggiorna classifica"
+    },
+    "saved": {
+      "title": "Classifica salvata!",
+      "content": "La classifica {{name}} è stata salvata con successo"
+    },
+    "deleted": {
+      "title": "Classifica eliminata",
+      "content": "La classifica è stata eliminata con successo"
+    },
+    "form": {
+      "name": "Nome classifica",
+      "type": "Tipo",
+      "type_general": "Generale (tutto il tempo)",
+      "type_incremental": "Incrementale (per periodo)",
+      "point_concept": "Punteggio",
+      "items_to_notify": "Posizioni da notificare (top-N)",
+      "cron": "Cron (schedulazione)",
+      "cron_helper": "Espressione cron a 5 campi per l'esecuzione della classifica",
+      "cron_invalid": "Espressione cron non valida",
+      "period": "Periodo",
+      "period_required": "Campo obbligatorio per le classifiche incrementali!"
+    },
+    "board": {
+      "period_index": "Indice periodo (0 = corrente)",
+      "player": "Giocatore",
+      "score": "Punteggio",
+      "empty": "Nessun dato in classifica."
+    }
+  },
+  "scenarios": {
+    "title": "Scenari",
+    "search_placeholder": "Scenario...",
+    "empty_list": "Nessun scenario trovato",
+    "deleted": {
+      "title": "Scenario eliminato!",
+      "message": "Lo scenario è eliminato con successo"
+    },
+    "form": {
+      "name_placeholder": "La mia simulazione",
+      "save": {
+        "title": "Scenario salvato!",
+        "message": "Lo scenario \"{{name}}\" è stato salvato con successo"
+      },
+      "inputs": {
+        "title": "Input simulazione"
+      },
+      "outputs": {
+        "title": "Risultato aspettato",
+        "placeholder": "I risultati verranno mostrati qui",
+        "count": "Regole eseguite: {{count}}",
+        "no_rules_fired": "Nessuna regola eseguita",
+        "test": {
+          "success": {
+            "title": "Test passato!",
+            "message": "Il risultato della simulazione corrisponde con i valori aspettati"
+          },
+          "fail": {
+            "title": "Test fallito!",
+            "message": "Uno o più valori non corrispondono con i risultati aspettati"
+          }
+        }
+      },
+      "graph": {
+        "details": "Clicca un nodo per vedere i dettagli",
+        "nodes": {
+          "start": "Stato Iniziale",
+          "end": "Stato Finale",
+          "caused_by": "Causata da {{rule}}",
+          "changes": "{{count}} cambiamenti"
+        }
+      }
+    }
+  },
+  "badges": {
+    "title": "Modelli di medaglia",
+    "empty_list": "Nessuna medaglia trovata",
+    "search_placeholder": "Medaglia...",
+    "visibility": {
+      "label": "Visibilità",
+      "hidden": "Nascosta",
+      "visible": "Visibile"
+    },
+    "deleted": {
+      "title": "Medaglia eliminata!",
+      "message": "La medaglia è stata rimossa con successo"
+    },
+    "saved": {
+      "title": "Medaglia salvata!",
+      "message": "La medaglia \"{{name}}\" è stata salvata con successo"
+    },
+    "form": {
+      "collection_name": "Nome collezione",
+      "badges_title": "Medaglie",
+      "badge_name": "Nome medaglia",
+      "add_badge": "Aggiungi medaglia"
+    }
+  },
+  "challenges": {
+    "title": "Modelli di sfida",
+    "empty_list": "Nessuna sfida trovata",
+    "search_placeholder": "Sfida...",
+    "deleted": {
+      "title": "Sfida eliminata!",
+      "message": "La sfida è stata rimossa con successo"
+    },
+    "saved": {
+      "title": "Sfida salvata!",
+      "message": "La sfida \"{{name}}\" è stata salvata con successo"
+    },
+    "form": {
+      "variables_title": "Variabili",
+      "variable_name": "Nome variabile",
+      "add_variable": "Aggiungi variabile"
+    }
+  },
+  "levels": {
+    "title": "Livelli",
+    "empty_list": "Nessun livello trovato",
+    "search_placeholder": "Livello...",
+    "thresholds": "Soglie",
+    "deleted": {
+      "title": "Livello eliminato!",
+      "message": "Il livello è stato rimosso con successo"
+    },
+    "saved": {
+      "title": "Livello salvato!",
+      "message": "Il livello \"{{name}}\" è stata salvata con successo"
+    },
+    "form": {
+      "point_concept": "Nome punteggio",
+      "thresholds_hint": "Definisci le soglie del livello. L'ordine determina l'indice della soglia.",
+      "threshold_name": "Nome soglia",
+      "value": "Valore",
+      "challenge_config": "Configurazione sfide della soglia",
+      "choices": "Numero scelte",
+      "available_models": "Modelli disponibili",
+      "active_models": "Modelli attivi",
+      "add_threshold": "Aggiungi soglia"
+    }
+  },
+  "players": {
+    "title": "Giocatori",
+    "empty_list": "Nessun giocatore trovato",
+    "search_placeholder": "Giocatore...",
+    "upsert_title": "Aggiungi giocatore",
+    "form": {
+      "player_name": "Nome giocatore"
+    },
+    "deleted": {
+      "title": "Giocatore eliminato!",
+      "message": "Il giocatore è stato eliminato con successo"
+    },
+    "saved": {
+      "title": "Giocatore salvato!",
+      "message": "Il giocatore \"{{name}}\" è stato salvato con successo"
+    },
+    "challenges": {
+      "accepted": {
+        "title": "Sfida accettata!",
+        "message": "La sfida è stata accettata"
+      },
+      "assigned": {
+        "title": "Sfida assegnata!",
+        "message": "La sfida è stata assegnata con successo"
+      }
+    },
+    "inventories": {
+      "title":"Inventario",
+      "available_choices": "Azioni di attivazione disponibili: {{count}}" ,
+      "choices": {
+        "empty_list": "Nessuna scelta disponibile",
+        "forced": {
+          "title": "Scelta forzata!",
+          "message": "La scelta della sfida è stata forzata con successo"
+        },
+        "activated": {
+          "title": "Scelta attivata!",
+          "message": "Il modello di sfida è stato attivato"
+        }
+      }
+    },
+    "groups": {
+      "challenges": {
+        "title": "Sfide di gruppo",
+        "empty_list": "Nessuna sfida di gruppo trovata",
+        "invites": {
+          "accepted": {
+            "title": "Invito accettato!",
+            "message": "L'invito è stato accettato con successo"
+          },
+          "denied": {
+            "title": "Invito rifiutato!",
+            "message": "L'invito è stato rifiutato con successo"
+          },
+          "cancelled": {
+            "title": "Invito annullato!",
+            "message": "L'invito è stato annullato con successo"
+          },
+          "created": {
+            "title": "Invito creato",
+            "message": "L'invito alla sfida di gruppo è stato creato"
+          }
+        },
+        "invite_form": {
+          "title": "Invita a una sfida di gruppo",
+          "guests": "Ospiti",
+          "guest_required": "Seleziona almeno un ospite",
+          "model_name": "Modello sfida di gruppo",
+          "point_concept": "Punteggio",
+          "period": "Periodo",
+          "target": "Obiettivo",
+          "start": "Inizio",
+          "end": "Fine",
+          "reward": "Ricompensa",
+          "percentage": "Percentuale",
+          "threshold": "Soglia"
+        }
+      }
+    }
+  },
+  "teams": {
+    "title": "Squadre",
+    "empty_list": "Nessuna squadra trovata",
+    "search_placeholder": "Squadra...",
+    "members_count": "Membri: {{count}}",
+    "upsert_title": "Aggiungi squadra",
+    "update_title": "Aggiorna squadra",
+    "form": {
+      "team_name": "Nome squadra",
+      "members": "Membri",
+      "players": "Giocatori"
+    },
+    "deleted": {
+      "title": "Squadra eliminata!",
+      "message": "La squadra è stata eliminata con successo"
+    },
+    "saved": {
+      "title": "Squadra salvata!",
+      "message": "La squadra \"{{name}}\" è stata salvata con successo"
+    }
+  },
+  "points": {
+    "title": "Punteggi",
+    "empty_list": "Nessun punteggio trovato",
+    "search_placeholder": "Punteggio...",
+    "upsert_title": "Aggiungi punteggio",
+    "update_title": "Aggiorna punteggio",
+    "periods_count": "{{count}} periodi",
+    "deleted": {
+      "title": "Punteggio eliminato!",
+      "message": "Il punteggio è stato eliminato con successo"
+    },
+    "saved": {
+      "title": "Punteggio salvato!",
+      "message": "Il punteggio \"{{name}}\" è stato salvato con successo"
+    },
+    "details": {
+      "validity": "Validità",
+      "duration": "Durata",
+      "kept_instances": "Istanze mantenute",
+      "no_periods": "Nessun periodo definito."
+    },
+    "form": {
+      "periods_title": "Periodi",
+      "periods_hint": "Definisci i periodi di calcolo del punteggio (es. settimanale, mensile).",
+      "period_name": "Nome periodo",
+      "start": "Inizio",
+      "end": "Fine",
+      "period_days": "Periodo (giorni)",
+      "capacity": "Capacità",
+      "add_period": "Aggiungi periodo"
+    }
+  }
+}

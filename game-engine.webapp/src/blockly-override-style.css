@@ -1,0 +1,104 @@
+:root {
+    --sb-bg: #FFFFFF;
+    --sb-border: #E5E7EB;
+    --sb-hover: #F7F9FC;
+    --sb-selected: #EEF4FF;
+    --sb-text: #111827;
+    --sb-accent: #1A56DB;
+    --sb-paper: #FFFFFF;
+    --sb-default: #F7F9FC;
+}
+
+[data-mui-color-scheme="dark"] {
+    --sb-bg: #1E293B;
+    --sb-border: #334155;
+    --sb-hover: rgba(255, 255, 255, 0.06);
+    --sb-selected: rgba(255, 255, 255, 0.10);
+    --sb-text: #F1F5F9;
+    --sb-accent: #3B82F6;
+    --sb-paper: #1E293B;
+    --sb-default: #0F172A;
+}
+
+
+/* ── Toolbox container ──────────────────────────────────── */
+.blocklyToolbox {
+    padding-top: 0 !important;
+    width: fit-content !important;
+    background-color: var(--sb-paper) !important;
+    border-right: 1px solid var(--sb-border) !important;
+    box-sizing: border-box !important;
+}
+
+.blocklyMainBackground {
+    stroke: var(--sb-border) !important;
+}
+
+.blocklyToolboxCategoryGroup {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* ── Category rows — match MUI ListItemButton ───────────── */
+.blocklyToolboxCategoryContainer {
+    width: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    transition: background-color 0.15s !important;
+    margin: 0 !important;
+    background-color: var(--sb-paper) !important;
+}
+
+.blocklyToolboxCategory {
+    width: 100%;
+    margin: 0 !important;
+    padding: 0.5rem 0.5rem 0.5rem 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    height: fit-content !important;
+}
+
+/* ── Hover ──────────────────────────────────────────────── */
+.blocklyToolboxCategoryContainer:hover {
+    background-color: var(--sb-hover) !important;
+}
+
+.blocklyToolboxSelected {
+    transition: background-color ease-out 0.1s;
+    width: 100%;
+    padding-right: 0.5rem !important;
+    color: var(--sb-text) !important;
+}
+
+.blocklyToolboxSelected .blocklyToolboxCategoryLabel  {
+    font-weight: bold !important;
+}
+
+.blocklyScrollbarHandle,
+.blocklyScrollbarBackground {
+    fill-opacity: 0 !important;
+}
+
+.blocklyMainBackground {
+    cursor: grab;
+}
+
+.blocklyMainBackground:active {
+    cursor: grabbing;
+}
+
+/* ── Flyout — paper background ───────────────────────────── */
+.blocklyFlyoutBackground {
+    fill: var(--sb-paper) !important;
+}
+
+/* ── Field text input — prevent tiny edit box ────────────── */
+.blocklyHtmlInput {
+    min-width: 2rem !important;
+}
