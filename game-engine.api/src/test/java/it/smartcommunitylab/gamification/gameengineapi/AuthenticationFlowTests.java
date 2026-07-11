@@ -1,6 +1,6 @@
 package it.smartcommunitylab.gamification.gameengineapi;
 
-import it.smartcommunitylab.gamification.gameengineapi.config.security.CookieTokenResolver;
+import it.smartcommunitylab.gamification.gameengineapi.config.security.AuthTokenResolver;
 import it.smartcommunitylab.gamification.gameengineapi.model.entity.User;
 import it.smartcommunitylab.gamification.gameengineapi.model.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -72,10 +72,10 @@ class AuthenticationFlowTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"%s\",\"password\":\"%s\"}".formatted(USERNAME, PASSWORD)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value(USERNAME))
+                .andExpect(jsonPath("$.user.username").value(USERNAME))
                 .andReturn();
 
-        Cookie authCookie = login.getResponse().getCookie(CookieTokenResolver.AUTH_COOKIE_NAME);
+        Cookie authCookie = login.getResponse().getCookie(AuthTokenResolver.AUTH_COOKIE_NAME);
         assertThat(authCookie).isNotNull();
         assertThat(authCookie.getValue()).isNotBlank();
         assertThat(authCookie.isHttpOnly()).isTrue();

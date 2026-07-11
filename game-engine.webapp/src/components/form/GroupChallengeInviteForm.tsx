@@ -8,6 +8,7 @@ import {FormInput} from "./FormInput.tsx";
 import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
 import {Button, Dialog, DialogContent, DialogTitle, Divider, Stack, TextField, Typography} from "@mui/material";
 import type {ChallengeInvitationDto, GroupChallengeDto} from "../../api/types";
+import {useTranslation} from "react-i18next";
 
 interface GroupChallengeInviteFormProps {
     gameId: string
@@ -35,6 +36,7 @@ function toIso(value: string): string | undefined {
 export function GroupChallengeInviteForm({gameId, playerId, open, onClose}: GroupChallengeInviteFormProps) {
 
     const {setNotification} = useNotificationContext()
+    const [t] = useTranslation()
     const form = useForm<InviteFormValues>({
         defaultValues: {
             guestIds: [], challengeModelName: "", challengeStart: "", challengeEnd: "",
@@ -91,8 +93,8 @@ export function GroupChallengeInviteForm({gameId, playerId, open, onClose}: Grou
             setNotification({
                 notification: {
                     type: "success",
-                    title: "Invito creato",
-                    content: "L'invito alla sfida di gruppo è stato creato"
+                    title: t("players.groups.challenges.invites.created.title"),
+                    content: t("players.groups.challenges.invites.created.message")
                 },
                 isSnack: true
             })
@@ -106,70 +108,70 @@ export function GroupChallengeInviteForm({gameId, playerId, open, onClose}: Grou
     })
 
     return <Dialog open={open} onClose={onClose} fullWidth={true} maxWidth={"sm"}>
-        <DialogTitle>Invita a una sfida di gruppo</DialogTitle>
+        <DialogTitle>{t("players.groups.challenges.invite_form.title")}</DialogTitle>
         <DialogContent>
             <Form form={form} onSubmit={(values) => mutate(values as InviteFormValues)} readonly={isPending}>
                 <Stack sx={{gap: 3, pt: 1}}>
                     <AutocompleteFormItem
                         name={"guestIds"}
-                        label={"Ospiti"}
+                        label={t("players.groups.challenges.invite_form.guests")}
                         multiple={true}
                         options={guestOptions}
                         getOptionLabel={(p) => p}
                         getOptionValue={(p) => p}
                         loading={playersLoading}
-                        rules={{validate: (v) => (Array.isArray(v) && v.length > 0) || "Seleziona almeno un ospite"}}
+                        rules={{validate: (v) => (Array.isArray(v) && v.length > 0) || t("players.groups.challenges.invite_form.guest_required")}}
                     />
-                    <FormInput name={"challengeModelName"} rules={{required: "Campo obbligatorio"}}>
-                        <TextField label={"Modello sfida di gruppo"} fullWidth={true} type={"text"} required={true}/>
+                    <FormInput name={"challengeModelName"} rules={{required: t("required_field")}}>
+                        <TextField label={t("players.groups.challenges.invite_form.model_name")} fullWidth={true} type={"text"} required={true}/>
                     </FormInput>
                     <AutocompleteFormItem
                         name={"pointConceptName"}
-                        label={"Punteggio"}
+                        label={t("players.groups.challenges.invite_form.point_concept")}
                         options={pointConcepts ?? []}
                         getOptionLabel={(pc) => pc.name ?? ""}
                         getOptionValue={(pc) => pc.name}
                         loading={pointConceptsLoading}
-                        rules={{required: "Campo obbligatorio"}}
+                        rules={{required: t("required_field")}}
                     />
                     <AutocompleteFormItem
                         name={"periodName"}
-                        label={"Periodo"}
+                        label={t("players.groups.challenges.invite_form.period")}
                         options={periods}
                         getOptionLabel={(p) => p}
                         getOptionValue={(p) => p}
                     />
                     <FormInput name={"challengeTarget"} rules={{min: 0}}>
-                        <TextField label={"Obiettivo"} fullWidth={true} type={"number"}
+                        <TextField label={t("players.groups.challenges.invite_form.target")} fullWidth={true} type={"number"}
                                    slotProps={{htmlInput: {min: 0, step: "any"}}}/>
                     </FormInput>
                     <Stack direction={"row"} sx={{gap: 2}}>
                         <FormInput name={"challengeStart"}>
-                            <TextField label={"Inizio"} fullWidth={true} type={"datetime-local"}
+                            <TextField label={t("players.groups.challenges.invite_form.start")} fullWidth={true} type={"datetime-local"}
                                        slotProps={{inputLabel: {shrink: true}}}/>
                         </FormInput>
                         <FormInput name={"challengeEnd"}>
-                            <TextField label={"Fine"} fullWidth={true} type={"datetime-local"}
+                            <TextField label={t("players.groups.challenges.invite_form.end")} fullWidth={true} type={"datetime-local"}
                                        slotProps={{inputLabel: {shrink: true}}}/>
                         </FormInput>
                     </Stack>
 
                     <Divider/>
-                    <Typography variant={"subtitle2"} sx={{fontWeight: 600}}>Ricompensa</Typography>
+                    <Typography variant={"subtitle2"} sx={{fontWeight: 600}}>{t("players.groups.challenges.invite_form.reward")}</Typography>
                     <Stack direction={"row"} sx={{gap: 2}}>
                         <FormInput name={"percentage"} rules={{min: 0}}>
-                            <TextField label={"Percentuale"} fullWidth={true} type={"number"}
+                            <TextField label={t("players.groups.challenges.invite_form.percentage")} fullWidth={true} type={"number"}
                                        slotProps={{htmlInput: {min: 0, step: "any"}}}/>
                         </FormInput>
                         <FormInput name={"threshold"} rules={{min: 0}}>
-                            <TextField label={"Soglia"} fullWidth={true} type={"number"}
+                            <TextField label={t("players.groups.challenges.invite_form.threshold")} fullWidth={true} type={"number"}
                                        slotProps={{htmlInput: {min: 0, step: "any"}}}/>
                         </FormInput>
                     </Stack>
 
                     <Stack direction={"row"} sx={{justifyContent: "flex-end", gap: 2}}>
-                        <Button variant={"outlined"} onClick={onClose}>Annulla</Button>
-                        <Button type={"submit"} variant={"contained"} loading={isPending}>Invita</Button>
+                        <Button variant={"outlined"} onClick={onClose}>{t("buttons:cancel")}</Button>
+                        <Button type={"submit"} variant={"contained"} loading={isPending}>{t("buttons:invite")}</Button>
                     </Stack>
                 </Stack>
             </Form>

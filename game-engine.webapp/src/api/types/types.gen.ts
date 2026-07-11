@@ -140,6 +140,7 @@ export type ActionDto = {
 export type LoginRequestDto = {
     username: string;
     password: string;
+    origin: 'WEBAPP' | 'GAME';
 };
 
 export type UserDto = {
@@ -405,26 +406,31 @@ export type SimulationResultDto = {
     changes?: Array<ConceptChangeDto>;
 };
 
+export type LoginResponseDto = {
+    user: UserDto;
+    token?: string;
+};
+
 export type PagePlayerDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<PlayerDto>;
     number?: number;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    sort?: SortObject;
     pageable?: PageableObject;
+    sort?: SortObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
     offset?: number;
-    paged?: boolean;
-    sort?: SortObject;
     pageSize?: number;
     pageNumber?: number;
+    sort?: SortObject;
+    paged?: boolean;
     unpaged?: boolean;
 };
 
@@ -495,16 +501,16 @@ export type ClassificationPositionDto = {
 };
 
 export type PageClassificationPositionDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<ClassificationPositionDto>;
     number?: number;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    sort?: SortObject;
     pageable?: PageableObject;
+    sort?: SortObject;
     empty?: boolean;
 };
 
@@ -1676,7 +1682,7 @@ export type LoginResponses = {
     /**
      * OK
      */
-    200: UserDto;
+    200: LoginResponseDto;
 };
 
 export type LoginResponse = LoginResponses[keyof LoginResponses];

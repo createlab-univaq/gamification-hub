@@ -1,5 +1,7 @@
 package it.smartcommunitylab.gamification.gameengineapi.controller.v1.games;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ChallengeInvitationDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.GroupChallengeDTO;
 import it.smartcommunitylab.gamification.gameengineapi.service.GroupChallengeService;
@@ -15,11 +17,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/games/{gameId}/players/{playerId}/group-challenges")
 @Slf4j
+@Tag(name = "Group Challenges", description = "List, get, handle all group challenges invitations of a given player")
 @RequiredArgsConstructor
 public class GroupChallengeController {
 
     private final GroupChallengeService groupChallengeService;
 
+    @Operation(summary = "Get all group challenges", description = "Lists the group challenges of the player.")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @GetMapping
     public ResponseEntity<List<GroupChallengeDTO>> getGroupChallenges(@PathVariable String gameId,
@@ -28,6 +32,7 @@ public class GroupChallengeController {
         return ResponseEntity.ok(groupChallengeService.list(gameId, playerId));
     }
 
+    @Operation(summary = "Invite player", description = "Sends an invite to player for a group challenge")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @PostMapping("/invitations")
     public ResponseEntity<GroupChallengeDTO> invite(@PathVariable String gameId,
@@ -36,6 +41,7 @@ public class GroupChallengeController {
         return new ResponseEntity<>(groupChallengeService.invite(gameId, playerId, invitation), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Accept invitation", description = "Accepts a pending invitation for a group challenge")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @PostMapping("/{challengeName}/accept")
     public ResponseEntity<GroupChallengeDTO> acceptInvitation(@PathVariable String gameId,
@@ -44,6 +50,7 @@ public class GroupChallengeController {
         return ResponseEntity.ok(groupChallengeService.acceptInvitation(gameId, playerId, challengeName));
     }
 
+    @Operation(summary = "Refuse invitation", description = "Refuse a pending invitation for a group challenge")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @PostMapping("/{challengeName}/refuse")
     public ResponseEntity<GroupChallengeDTO> refuseInvitation(@PathVariable String gameId,
@@ -52,6 +59,7 @@ public class GroupChallengeController {
         return ResponseEntity.ok(groupChallengeService.refuseInvitation(gameId, playerId, challengeName));
     }
 
+    @Operation(summary = "Cancel invitation", description = "Removes a pending invitation for a group challenge")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @PostMapping("/{challengeName}/cancel")
     public ResponseEntity<GroupChallengeDTO> cancelInvitation(@PathVariable String gameId,

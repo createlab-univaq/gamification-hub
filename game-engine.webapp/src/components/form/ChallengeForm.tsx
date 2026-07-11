@@ -10,6 +10,7 @@ import {FormInput} from "./FormInput.tsx";
 import {Add, Delete} from "@mui/icons-material";
 import {Button, IconButton, Stack, TextField, Typography} from "@mui/material";
 import type {ChallengeDto} from "../../api/types";
+import {useTranslation} from "react-i18next";
 
 interface ChallengeFormProps {
     gameId: string
@@ -31,6 +32,7 @@ function toFormValues(challenge?: ChallengeDto): ChallengeFormValues {
 export function ChallengeForm({gameId, challenge}: ChallengeFormProps) {
 
     const {setNotification} = useNotificationContext()
+    const [t] = useTranslation()
     const form = useForm<ChallengeFormValues>({
         defaultValues: toFormValues(challenge)
     })
@@ -58,8 +60,8 @@ export function ChallengeForm({gameId, challenge}: ChallengeFormProps) {
             navigateTo(`/games/${gameId}/challenges`, {
                 state: {
                     type: "success",
-                    title: "Modello di sfida salvato!",
-                    content: `Il modello di sfida ${data.name} è stato salvato con successo`
+                    title: t("challenges.saved.title"),
+                    content: t("challenges.saved.message", {name: data.name})
                 }
             })
         },
@@ -77,16 +79,16 @@ export function ChallengeForm({gameId, challenge}: ChallengeFormProps) {
         <Stack sx={{gap: 3}}>
             <FormInput
                 name={"name"}
-                rules={{required: "Campo obbligatorio!"}}
+                rules={{required: t("required_field")}}
             >
-                <TextField required={true} type={"text"} fullWidth={true} label={"Nome"}/>
+                <TextField required={true} type={"text"} fullWidth={true} label={t("name")}/>
             </FormInput>
 
             <Stack sx={{gap: 1}}>
-                <Typography sx={{fontWeight: 600}}>Variabili</Typography>
+                <Typography sx={{fontWeight: 600}}>{t("challenges.form.variables_title")}</Typography>
                 {variables.fields.map((field, i) => (
                     <Stack key={field.id} direction={"row"} sx={{gap: 1, alignItems: "center"}}>
-                        <TextField size={"small"} fullWidth={true} placeholder={"Nome variabile"}
+                        <TextField size={"small"} fullWidth={true} placeholder={t("challenges.form.variable_name")}
                                    {...form.register(`variables.${i}.value`)}/>
                         <IconButton size={"small"} color={"error"} onClick={() => variables.remove(i)}>
                             <Delete fontSize={"small"}/>
@@ -95,16 +97,16 @@ export function ChallengeForm({gameId, challenge}: ChallengeFormProps) {
                 ))}
                 <Button size={"small"} startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                         onClick={() => variables.append({value: ""})}>
-                    Aggiungi variabile
+                    {t("challenges.form.add_variable")}
                 </Button>
             </Stack>
 
             <Stack direction={"row"} sx={{justifyContent: "space-between", alignItems: "center"}}>
-                <Button href={`/games/${gameId}/challenges`} variant={"contained"}>Indietro</Button>
+                <Button href={`/games/${gameId}/challenges`} variant={"contained"}>{t("buttons:turn_back")}</Button>
                 <Stack direction={"row"} sx={{gap: 2}}>
-                    <Button type={"submit"} variant={"contained"}>Salva</Button>
+                    <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
                     <Button type={"reset"} onClick={() => form.reset(toFormValues(challenge))}
-                            variant={"outlined"}>Reset</Button>
+                            variant={"outlined"}>{t("buttons:reset")}</Button>
                 </Stack>
             </Stack>
         </Stack>

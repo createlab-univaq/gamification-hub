@@ -138,7 +138,7 @@ export function GamesListPage() {
                 })
                 queryClient.invalidateQueries({queryKey: ["get-list"]})
             }}
-            onError={(error) => setNotification(translateApiErrorToNotification(getApiError(error)))}
+            onError={(error) => setNotification({notification: translateApiErrorToNotification(getApiError(error)), isSnack: true})}
         />
         <PageList
             items={games}

@@ -1,4 +1,4 @@
-import {ChevronRight, Settings} from "@mui/icons-material";
+import {ChevronRight, MoreVertTwoTone} from "@mui/icons-material";
 import {Breadcrumbs, Button, type ButtonProps, Divider, Stack, Typography} from "@mui/material"
 import type {ReactNode} from "react";
 import {useWindowSize} from "../../hooks/use-window-size.ts";
@@ -23,7 +23,7 @@ export function PageHeader({buttons, subTitle, title, breadcrumbs}: PageHeaderPr
     const SubTitle = typeof subTitle === "string" ? <Typography variant={"body1"}>{subTitle}</Typography> : subTitle
     const {width} = useWindowSize()
     const MIN_WIDTH_FOR_BUTTONS = 760
-    const requiresPopoverButton = width < MIN_WIDTH_FOR_BUTTONS && (buttons?.length ?? 0) > 3
+    const requiresPopoverButton = (width < MIN_WIDTH_FOR_BUTTONS && (buttons?.length ?? 0) > 3) || width < 450
 
     return <Stack sx={{gap: 2}}>
         {(breadcrumbs && breadcrumbs.length) &&
@@ -50,7 +50,7 @@ export function PageHeader({buttons, subTitle, title, breadcrumbs}: PageHeaderPr
             {Title}
             {requiresPopoverButton &&
                 <PopoverButton id={"header-popover-buttons"}
-                               buttonLabel={<Settings sx={{fontSize: "2rem", cursor: "pointer"}}/>}
+                               buttonLabel={<MoreVertTwoTone sx={{fontSize: "2rem", cursor: "pointer"}}/>}
                                button={{
                                    variant: "text",
                                    sx: {
@@ -82,7 +82,7 @@ export function PageHeader({buttons, subTitle, title, breadcrumbs}: PageHeaderPr
             }
             {!requiresPopoverButton &&
                 <Stack direction={"row"} sx={{gap: 2}}>
-                    {buttons?.map((b, index) => <Button {...b} key={`page-header-btn-${index}`}/>)}
+                    {buttons?.map((b, index) => <Button sx={{height:"fit-content"}} {...b} key={`page-header-btn-${index}`}/>)}
                 </Stack>
             }
         </Stack>

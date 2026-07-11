@@ -22,4 +22,8 @@ public interface TimeMapper {
         return date != null ? date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : null;
     }
 
+    default Date toDate(LocalDate localDate) {
+        return localDate != null ? Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()) : null;
+    }
+
 }

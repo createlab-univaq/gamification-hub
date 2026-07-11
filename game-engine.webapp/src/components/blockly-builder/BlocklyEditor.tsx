@@ -6,7 +6,6 @@ import {registerBlockDefinitions} from './blocks-definition.ts'
 import {TOOLBOX} from './toolbox'
 import {useThemeProvider} from '../../theme/ThemeProvider'
 import {useTheme} from "@mui/material";
-import type {Abstract} from "blockly/core/events/events_abstract";
 import {blocklyDarkTheme, blocklyLightTheme} from "../../theme/blockly-theme.ts";
 import {registerFields} from "./fields";
 import {layoutWorkspace} from '../../utils/builder-utils.ts';
@@ -15,7 +14,7 @@ import {layoutWorkspace} from '../../utils/builder-utils.ts';
 const BLOCKLY_CONTAINER_ID = 'blockly-editor-root'
 
 interface BlocklyEditorProps {
-    onChange?: (workspace: WorkspaceSvg, event?: Abstract) => void
+    onChange?: (workspace: WorkspaceSvg, event?: Blockly.Events.Abstract) => void
     initialState?: object
 }
 

@@ -1,4 +1,7 @@
-import type {ClassDeclaration, Condition, Consequence, Constraint, DroolsFile, FunctionDefinition} from 'drools-builder'
+import type {Condition, Consequence, Constraint, DroolsFile} from 'drools-builder'
+
+type ClassDeclaration = NonNullable<DroolsFile['declarations']>[number]
+type FunctionDefinition = NonNullable<DroolsFile['functions']>[number]
 
 // ─── Public entry point ───────────────────────────────────────────────────────
 
@@ -131,13 +134,13 @@ function conditionToBlock(condition: Condition): object | null {
         case 'And':
             return {
                 type: 'drool_and_group',
-                inputs: chainInput(condition.conditions, conditionToBlock),
+                inputs: chainInputKey('CONDITIONS', condition.conditions, conditionToBlock),
             }
 
         case 'Or':
             return {
                 type: 'drool_or_group',
-                inputs: chainInput(condition.conditions, conditionToBlock),
+                inputs: chainInputKey('CONDITIONS', condition.conditions, conditionToBlock),
             }
 
         case 'From':

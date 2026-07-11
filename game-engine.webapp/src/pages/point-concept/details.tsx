@@ -14,6 +14,7 @@ import {navigateTo} from "../../utils/navigation-utils.ts";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useState} from "react";
 import type {PointConceptDto} from "../../api/types";
+import {useTranslation} from "react-i18next";
 
 export function PointConceptDetailsPage() {
 
@@ -21,6 +22,7 @@ export function PointConceptDetailsPage() {
     const {pcId} = useParams()
     const {setNotification} = useNotificationContext()
     const [deleteElement, setDeleteElement] = useState<PointConceptDto>()
+    const [t] = useTranslation()
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-pc", pcId],
@@ -35,8 +37,8 @@ export function PointConceptDetailsPage() {
             navigateTo(`/games/${game.id}/points`, {
                 state: {
                     type: "success",
-                    title: "Punteggio Eliminato",
-                    content: `Punteggio eliminato con successo!`
+                    title: t("points.deleted.title"),
+                    content: t("points.deleted.message")
                 }
             })
         },
@@ -60,7 +62,7 @@ export function PointConceptDetailsPage() {
     }
 
     return <PageContainer>
-        <DeleteDialog message={`Vuoi davvero eliminare il punteggio ${data?.name}`}
+        <DeleteDialog message={t("delete_message", {entity: data?.name})}
                       deleteFn={() => mutate({gameId: game.id!, pcId: pcId!})}
                       setElement={setDeleteElement}
                       element={deleteElement}
@@ -71,7 +73,7 @@ export function PointConceptDetailsPage() {
                 {
                     disabled: isPending,
                     loading: isPending,
-                    children: "Modifica",
+                    children: t("buttons:update"),
                     variant: "contained",
                     href: `/games/${game.id}/points/upsert/${pcId}`,
                     endIcon: <Edit/>
@@ -79,7 +81,7 @@ export function PointConceptDetailsPage() {
                 {
                     disabled: isPending,
                     loading: isPending,
-                    children: "Delete",
+                    children: t("buttons:delete"),
                     color: "error",
                     variant: "contained",
                     endIcon: <Delete/>,
@@ -102,15 +104,14 @@ export function PointConceptDetailsPage() {
                     <CardHeader title={period.identifier}/>
                     <CardContent>
                         <Stack sx={{gap: 2}}>
-                            <Typography>Valido
-                                da: <b>{formatDate(period.start!)}</b> a <b>{formatDate(period.end!)}</b></Typography>
-                            <Typography><b>Durata:</b> {formatMilliseconds(period.period!)}</Typography>
-                            <Typography><b>Istanze mantenute:</b> {period.capacity}</Typography>
+                            <Typography>{t("points.details.validity")}: <b>{formatDate(period.start!)}</b> — <b>{formatDate(period.end!)}</b></Typography>
+                            <Typography><b>{t("points.details.duration")}:</b> {formatMilliseconds(period.period!)}</Typography>
+                            <Typography><b>{t("points.details.kept_instances")}:</b> {period.capacity}</Typography>
                         </Stack>
                     </CardContent>
                 </Card>
             })}
-            {!Array.from(Object.values(data!.periods!)).length && <Typography>Nessun periodo definito.</Typography>}
+            {!Array.from(Object.values(data!.periods!)).length && <Typography>{t("points.details.no_periods")}</Typography>}
         </Stack>
     </PageContainer>
 

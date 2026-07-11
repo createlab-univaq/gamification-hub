@@ -14,12 +14,14 @@ import {Stack, Typography} from "@mui/material";
 import {PageList} from "../../components/PageList.tsx";
 import {useDebounced} from "../../hooks/use-debounced.ts";
 import type {TeamDto} from "../../api/types";
+import {useTranslation} from "react-i18next";
 
 export function TeamListPage() {
     const game = useGame()
     const {setNotification} = useNotificationContext()
     const [deleteTeam, setDeleteTeam] = useState<TeamDto>()
     const [search, setSearch] = useState<string>("")
+    const [t] = useTranslation()
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-teams", game.id],
@@ -35,8 +37,8 @@ export function TeamListPage() {
             setNotification({
                 notification: {
                     type: "success",
-                    title: "Squadra eliminata",
-                    content: `La squadra è stata eliminata con successo`
+                    title: t("teams.deleted.title"),
+                    content: t("teams.deleted.message")
                 },
                 isSnack: true
             })
@@ -68,17 +70,17 @@ export function TeamListPage() {
 
     return <PageContainer>
         <PageHeader
-            title={"Squadre"}
+            title={t("teams.title")}
             buttons={[
                 {
-                    children: "Aggiungi",
+                    children: t("buttons:add"),
                     variant: "contained",
                     endIcon: <Add/>,
                     href: `/games/${game.id}/teams/upsert`
                 }
             ]}
         />
-        <DeleteDialog message={`Vuoi davvero eliminare la squadra "${deleteTeam?.name ?? deleteTeam?.id}" per sempre?`}
+        <DeleteDialog message={t("delete_message", {entity: deleteTeam?.name ?? deleteTeam?.id})}
                       deleteFn={() => mutate(deleteTeam!.id!)}
                       setElement={setDeleteTeam}
                       element={deleteTeam}
@@ -89,7 +91,7 @@ export function TeamListPage() {
             renderItem={(team) => {
                 return <Stack sx={{gap: 1}}>
                     <Typography sx={{fontWeight: "bold", fontSize: "1.2rem"}}>{team.name ?? team.id}</Typography>
-                    <Typography>Membri: {team.members?.length ?? 0}</Typography>
+                    <Typography>{t("teams.members_count", {count: team.members?.length ?? 0})}</Typography>
                 </Stack>
             }}
             onItemUpdate={() => {
@@ -97,10 +99,10 @@ export function TeamListPage() {
             onItemDelete={(team) => {
                 setDeleteTeam(team)
             }}
-            emptyListMessage={"Nessuna squadra trovata."}
+            emptyListMessage={t("teams.empty_list")}
             search={{
-                label: "Cerca",
-                placeholder: "Squadra...",
+                label: t("search_placeholder"),
+                placeholder: t("teams.search_placeholder"),
                 onSearch: (value) => {
                     filter(value)
                 }

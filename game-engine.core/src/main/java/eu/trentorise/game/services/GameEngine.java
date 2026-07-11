@@ -59,5 +59,5 @@ public interface GameEngine {
 	 * @param content  the rule content being validated
 	 * @param ruleName the candidate's name — peers with the same name are skipped
 	 */
-	public Map<String, Message> validateGame(String gameId, String content, String ruleName);
+	public Map<String, Message> validateGame(String gameId, String content, String excludeRuleUrl);
 }

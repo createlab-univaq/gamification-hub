@@ -12,6 +12,7 @@ import it.smartcommunitylab.gamification.gameengineapi.model.dto.BadgeCollection
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.PointConceptDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.*;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.SimulationResultMapper;
+import it.smartcommunitylab.gamification.gameengineapi.model.mapper.TimeMapper;
 import it.smartcommunitylab.gamification.gameengineapi.service.SimulationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -31,6 +31,8 @@ public class SimulationServiceImpl implements SimulationService {
     private final Workflow workflow;
 
     private final SimulationResultMapper simulationResultMapper;
+
+    private final TimeMapper timeMapper;
 
     private PlayerState buildSyntheticState(String gameId, SyntheticStateDTO dto) {
         if (Objects.isNull(dto) || Objects.isNull(gameId) || gameId.isBlank()) {
@@ -69,10 +71,10 @@ public class SimulationServiceImpl implements SimulationService {
                     challenge.setFields(cc.getFields());
                 }
                 if (cc.getStart() != null) {
-                    challenge.setStart(new Date(String.valueOf(cc.getStart())));
+                    challenge.setStart(timeMapper.toDate(cc.getStart()));
                 }
                 if (cc.getEnd() != null) {
-                    challenge.setEnd(new Date(String.valueOf(cc.getEnd())));
+                    challenge.setEnd(timeMapper.toDate(cc.getEnd()));
                 }
                 state.getState().add(challenge);
             }

@@ -98,7 +98,7 @@ export function UserSettingsPage() {
                       element={deactivateModalOpen}
         />
         <Form form={form}
-              onSubmit={(values) => updateUserMutation({username: values.username, password: values.password})}>
+              onSubmit={(values) => updateUserMutation({...values} as LoginRequestDto)}>
             <Stack sx={{gap: 2, mt: 3}}>
                 <Stack sx={{gap: 1}}>
                     <Typography variant={"h5"}>{t("settings.form.username")}</Typography>

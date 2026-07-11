@@ -9,8 +9,8 @@ export function AuthRoutes() {
     if (!isAuthenticated()) {
         return <Navigate to={"/login"} state={{
             type: "error",
-            title: t("user_not_authorized_title"),
-            content: t("user_not_authorized")
+            title: t("errors:user_not_authorized_title"),
+            content: t("errors:user_not_authorized")
         }}/>
     }
 

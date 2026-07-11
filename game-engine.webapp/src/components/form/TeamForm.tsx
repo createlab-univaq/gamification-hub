@@ -10,6 +10,7 @@ import {FormInput} from "./FormInput.tsx";
 import {Button, Stack, TextField, Typography} from "@mui/material";
 import type {TeamDto} from "../../api/types";
 import {PlayersAutocomplete} from "./PlayersAutocomplete.tsx";
+import {useTranslation} from "react-i18next";
 
 interface TeamFormProps {
     gameId: string
@@ -31,6 +32,7 @@ function toFormValues(team?: TeamDto): TeamFormValues {
 export function TeamForm({gameId, team}: TeamFormProps) {
 
     const {setNotification} = useNotificationContext()
+    const [t] = useTranslation()
     const form = useForm<TeamFormValues>({
         defaultValues: toFormValues(team)
     })
@@ -56,8 +58,8 @@ export function TeamForm({gameId, team}: TeamFormProps) {
             navigateTo(`/games/${gameId}/teams`, {
                 state: {
                     type: "success",
-                    title: "Squadra salvata!",
-                    content: `La squadra ${data.name ?? data.id} è stata salvata con successo`
+                    title: t("teams.saved.title"),
+                    content: t("teams.saved.message", {name: data.name ?? data.id})
                 }
             })
         },
@@ -75,23 +77,23 @@ export function TeamForm({gameId, team}: TeamFormProps) {
         <Stack sx={{gap: 3}}>
             <FormInput
                 name={"id"}
-                rules={{required: "Campo obbligatorio!"}}
+                rules={{required: t("required_field")}}
             >
-                <TextField required={true} type={"text"} fullWidth={true} label={"Nome squadra"}
+                <TextField required={true} type={"text"} fullWidth={true} label={t("teams.form.team_name")}
                            disabled={!!team}/>
             </FormInput>
 
             <Stack sx={{gap: 1}}>
-                <Typography sx={{fontWeight: 600}}>Membri</Typography>
-                <PlayersAutocomplete name={"members"} gameId={gameId} label={"Giocatori"}/>
+                <Typography sx={{fontWeight: 600}}>{t("teams.form.members")}</Typography>
+                <PlayersAutocomplete name={"members"} gameId={gameId} label={t("teams.form.players")}/>
             </Stack>
 
             <Stack direction={"row"} sx={{justifyContent: "space-between", alignItems: "center"}}>
-                <Button href={`/games/${gameId}/teams`} variant={"contained"}>Indietro</Button>
+                <Button href={`/games/${gameId}/teams`} variant={"contained"}>{t("buttons:turn_back")}</Button>
                 <Stack direction={"row"} sx={{gap: 2}}>
-                    <Button type={"submit"} variant={"contained"}>Salva</Button>
+                    <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
                     <Button type={"reset"} onClick={() => form.reset(toFormValues(team))}
-                            variant={"outlined"}>Reset</Button>
+                            variant={"outlined"}>{t("buttons:reset")}</Button>
                 </Stack>
             </Stack>
         </Stack>

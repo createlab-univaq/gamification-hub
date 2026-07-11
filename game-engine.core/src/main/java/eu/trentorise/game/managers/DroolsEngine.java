@@ -720,7 +720,7 @@ public class DroolsEngine implements GameEngine {
     }
 
     @Override
-    public Map<String, Message> validateGame(String gameId, String content, String ruleName) {
+    public Map<String, Message> validateGame(String gameId, String content, String excludeRuleUrl) {
         if (content == null) {
             return new HashMap<>();
         }
@@ -743,7 +743,7 @@ public class DroolsEngine implements GameEngine {
                 Rule peer = gameSrv.loadRule(gameId, ruleUrl);
                 if (peer == null || peer.getName() == null) continue;
                 if (peer.getName().equals("constants")) continue;
-                if (peer.getName().equals(ruleName)) continue;
+                if (ruleUrl.equals(excludeRuleUrl)) continue;
                 String peerContent;
                 try (InputStream is = peer.getInputStream()) {
                     peerContent = new String(is.readAllBytes());

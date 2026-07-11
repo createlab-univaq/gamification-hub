@@ -1,5 +1,7 @@
 package it.smartcommunitylab.gamification.gameengineapi.controller.v1.games;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.InventoryDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ItemChoiceDTO;
 import it.smartcommunitylab.gamification.gameengineapi.service.PlayerInventoryService;
@@ -13,10 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/games/{gameId}/players/{playerId}/inventory")
 @Slf4j
 @RequiredArgsConstructor
+@Tag(name = "Player Inventory", description = "Handle players inventories")
 public class PlayerInventoryController {
 
     private final PlayerInventoryService playerInventoryService;
 
+    @Operation(summary = "Get inventory", description = "Retrieves a player's inventory")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @GetMapping
     public ResponseEntity<InventoryDTO> getInventory(@PathVariable String gameId,
@@ -25,6 +29,7 @@ public class PlayerInventoryController {
         return ResponseEntity.ok(playerInventoryService.getInventory(gameId, playerId));
     }
 
+    @Operation(summary = "Activate choice", description = "Enable the player to chose challenges in its inventory")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @PostMapping("/activations")
     public ResponseEntity<InventoryDTO> activateChoice(@PathVariable String gameId,

@@ -62,7 +62,15 @@
     "domain": "Domain",
     "expiration": "Expiration",
     "is_expired_label": "The game is not terminated",
-    "is_not_expired_label": "The game is terminated"
+    "is_not_expired_label": "The game is terminated",
+    "terminated_label": "Terminated?",
+    "upsert": {
+      "title": "Save game"
+    },
+    "saved": {
+      "title": "Game saved!",
+      "message": "Game \"{{name}}\" has been saved successfully"
+    }
   },
   "rules": {
     "list_title": "Available rules",
@@ -197,6 +205,7 @@
         "nodes": {
           "start": "Initial State",
           "end": "Final State",
+          "caused_by": "Caused by {{rule}}",
           "changes": "{{count}} changes"
         }
       }
@@ -218,6 +227,12 @@
     "saved": {
       "title": "Badge concept saved!",
       "message": "Badge concept \"{{name}}\" has been saved successfully"
+    },
+    "form": {
+      "collection_name": "Collection name",
+      "badges_title": "Badges",
+      "badge_name": "Badge name",
+      "add_badge": "Add badge"
     }
   },
   "challenges": {
@@ -231,6 +246,11 @@
     "saved": {
       "title": "Challenge saved!",
       "message": "Challenge \"{{name}}\" has been saved successfully"
+    },
+    "form": {
+      "variables_title": "Variables",
+      "variable_name": "Variable name",
+      "add_variable": "Add variable"
     }
   },
   "levels": {
@@ -245,12 +265,27 @@
     "saved": {
       "title": "Level saved!",
       "message": "Level \"{{name}}\" has been saved successfully"
+    },
+    "form": {
+      "point_concept": "Point concept name",
+      "thresholds_hint": "Define the level thresholds. Their order determines the threshold index.",
+      "threshold_name": "Threshold name",
+      "value": "Value",
+      "challenge_config": "Threshold challenge configuration",
+      "choices": "Number of choices",
+      "available_models": "Available models",
+      "active_models": "Active models",
+      "add_threshold": "Add threshold"
     }
   },
   "players": {
     "title": "Players",
     "empty_list": "No player found",
     "search_placeholder": "Player...",
+    "upsert_title": "Add player",
+    "form": {
+      "player_name": "Player name"
+    },
     "deleted": {
       "title": "Player deleted!",
       "message": "Player has been deleted successfully"
@@ -300,9 +335,80 @@
           "cancelled": {
             "title": "Invite cancelled!",
             "message": "Invite has been cancelled successfully"
+          },
+          "created": {
+            "title": "Invite created",
+            "message": "The group challenge invite has been created"
           }
+        },
+        "invite_form": {
+          "title": "Invite to a group challenge",
+          "guests": "Guests",
+          "guest_required": "Select at least one guest",
+          "model_name": "Group challenge model",
+          "point_concept": "Point concept",
+          "period": "Period",
+          "target": "Target",
+          "start": "Start",
+          "end": "End",
+          "reward": "Reward",
+          "percentage": "Percentage",
+          "threshold": "Threshold"
         }
       }
+    }
+  },
+  "teams": {
+    "title": "Teams",
+    "empty_list": "No team found",
+    "search_placeholder": "Team...",
+    "members_count": "Members: {{count}}",
+    "upsert_title": "Add team",
+    "update_title": "Update team",
+    "form": {
+      "team_name": "Team name",
+      "members": "Members",
+      "players": "Players"
+    },
+    "deleted": {
+      "title": "Team deleted!",
+      "message": "The team has been deleted successfully"
+    },
+    "saved": {
+      "title": "Team saved!",
+      "message": "Team \"{{name}}\" has been saved successfully"
+    }
+  },
+  "points": {
+    "title": "Point concepts",
+    "empty_list": "No point concept found",
+    "search_placeholder": "Point concept...",
+    "upsert_title": "Add point concept",
+    "update_title": "Update point concept",
+    "periods_count": "{{count}} periods",
+    "deleted": {
+      "title": "Point concept deleted!",
+      "message": "The point concept has been deleted successfully"
+    },
+    "saved": {
+      "title": "Point concept saved!",
+      "message": "Point concept \"{{name}}\" has been saved successfully"
+    },
+    "details": {
+      "validity": "Validity",
+      "duration": "Duration",
+      "kept_instances": "Kept instances",
+      "no_periods": "No period defined."
+    },
+    "form": {
+      "periods_title": "Periods",
+      "periods_hint": "Define the score calculation periods (e.g. weekly, monthly).",
+      "period_name": "Period name",
+      "start": "Start",
+      "end": "End",
+      "period_days": "Period (days)",
+      "capacity": "Capacity",
+      "add_period": "Add period"
     }
   }
 }

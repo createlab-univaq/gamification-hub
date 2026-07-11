@@ -10,6 +10,7 @@ import {FormInput} from "./FormInput.tsx";
 import {Add, Delete} from "@mui/icons-material";
 import {Button, Checkbox, FormControlLabel, IconButton, Stack, TextField, Typography} from "@mui/material";
 import type {BadgeCollectionDto} from "../../api/types";
+import {useTranslation} from "react-i18next";
 
 interface BadgeFormProps {
     gameId: string
@@ -33,6 +34,7 @@ function toFormValues(badge?: BadgeCollectionDto): BadgeFormValues {
 export function BadgeForm({gameId, badge}: BadgeFormProps) {
 
     const {setNotification} = useNotificationContext()
+    const [t] = useTranslation()
     const form = useForm<BadgeFormValues>({
         defaultValues: toFormValues(badge)
     })
@@ -65,8 +67,8 @@ export function BadgeForm({gameId, badge}: BadgeFormProps) {
             navigateTo(`/games/${gameId}/badges`, {
                 state: {
                     type: "success",
-                    title: "Collezione di medaglie salvata!",
-                    content: `La collezione ${data.name} è stata salvata con successo`
+                    title: t("badges.saved.title"),
+                    content: t("badges.saved.message", {name: data.name})
                 }
             })
         },
@@ -84,21 +86,21 @@ export function BadgeForm({gameId, badge}: BadgeFormProps) {
         <Stack sx={{gap: 3}}>
             <FormInput
                 name={"name"}
-                rules={{required: "Campo obbligatorio!"}}
+                rules={{required: t("required_field")}}
             >
-                <TextField required={true} type={"text"} fullWidth={true} label={"Nome collezione"}/>
+                <TextField required={true} type={"text"} fullWidth={true} label={t("badges.form.collection_name")}/>
             </FormInput>
 
             <FormControlLabel
                 control={<Checkbox {...form.register("hidden")} defaultChecked={badge?.hidden ?? false}/>}
-                label={"Nascosta"}
+                label={t("badges.visibility.hidden")}
             />
 
             <Stack sx={{gap: 1}}>
-                <Typography sx={{fontWeight: 600}}>Medaglie</Typography>
+                <Typography sx={{fontWeight: 600}}>{t("badges.form.badges_title")}</Typography>
                 {badges.fields.map((field, i) => (
                     <Stack key={field.id} direction={"row"} sx={{gap: 1, alignItems: "center"}}>
-                        <TextField size={"small"} fullWidth={true} placeholder={"Nome medaglia"}
+                        <TextField size={"small"} fullWidth={true} placeholder={t("badges.form.badge_name")}
                                    {...form.register(`badges.${i}.value`)}/>
                         <IconButton size={"small"} color={"error"} onClick={() => badges.remove(i)}>
                             <Delete fontSize={"small"}/>
@@ -107,16 +109,16 @@ export function BadgeForm({gameId, badge}: BadgeFormProps) {
                 ))}
                 <Button size={"small"} startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                         onClick={() => badges.append({value: ""})}>
-                    Aggiungi medaglia
+                    {t("badges.form.add_badge")}
                 </Button>
             </Stack>
 
             <Stack direction={"row"} sx={{justifyContent: "space-between", alignItems: "center"}}>
-                <Button href={`/games/${gameId}/badges`} variant={"contained"}>Indietro</Button>
+                <Button href={`/games/${gameId}/badges`} variant={"contained"}>{t("buttons:turn_back")}</Button>
                 <Stack direction={"row"} sx={{gap: 2}}>
-                    <Button type={"submit"} variant={"contained"}>Salva</Button>
+                    <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
                     <Button type={"reset"} onClick={() => form.reset(toFormValues(badge))}
-                            variant={"outlined"}>Reset</Button>
+                            variant={"outlined"}>{t("buttons:reset")}</Button>
                 </Stack>
             </Stack>
         </Stack>

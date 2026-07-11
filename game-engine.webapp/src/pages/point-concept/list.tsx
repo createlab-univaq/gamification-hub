@@ -16,12 +16,14 @@ import {PageList} from "../../components/PageList.tsx";
 import {useDebounced} from "../../hooks/use-debounced.ts";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import type {GetFilter} from "../../api/filters/filters.ts";
+import {useTranslation} from "react-i18next";
 
 export function PointConceptListPage() {
     const game = useGame()
     const {setNotification} = useNotificationContext()
     const [deletePc, setDeletePc] = useState<PointConceptDto>()
     const [filters, setFilters] = useState<GetFilter<PointConceptDto>[]>([])
+    const [t] = useTranslation()
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-pcs", game.id, filters],
         queryFn: () => pointConceptClient.getPointConcepts(game.id!, filters),
@@ -37,8 +39,8 @@ export function PointConceptListPage() {
             setNotification({
                 notification: {
                     type: "success",
-                    title: "Punteggio Eliminato",
-                    content: `Il punteggio è stato eliminato con successo`
+                    title: t("points.deleted.title"),
+                    content: t("points.deleted.message")
                 },
                 isSnack: true
             })
@@ -70,17 +72,17 @@ export function PointConceptListPage() {
 
     return <PageContainer>
         <PageHeader
-            title={"Punteggi"}
+            title={t("points.title")}
             buttons={[
                 {
-                    children: "Aggiungi",
+                    children: t("buttons:add"),
                     variant: "contained",
                     endIcon: <Add/>,
                     href: `/games/${game.id}/points/upsert`
                 }
             ]}
         />
-        <DeleteDialog message={`Vuoi davvero eliminare il punteggio "${deletePc?.name}" per sempre?`}
+        <DeleteDialog message={t("delete_message", {entity: deletePc?.name})}
                       deleteFn={() => mutate({gameId: game.id!, pcId: deletePc!.id!})}
                       setElement={setDeletePc}
                       element={deletePc}
@@ -91,7 +93,7 @@ export function PointConceptListPage() {
                 const periodNumber = Array.from(Object.values(item.periods!)).length
                 return <Stack>
                     <Typography sx={{fontWeight: "bold", fontSize: "1.2rem"}}>{item.name}</Typography>
-                    <Typography>{periodNumber} periodi</Typography>
+                    <Typography>{t("points.periods_count", {count: periodNumber})}</Typography>
                 </Stack>
             }}
             itemHref={(item) => {
@@ -105,10 +107,10 @@ export function PointConceptListPage() {
             onItemDelete={(item) => {
                 setDeletePc(item)
             }}
-            emptyListMessage={<Typography>Nessun punteggio trovato.</Typography>}
+            emptyListMessage={<Typography>{t("points.empty_list")}</Typography>}
             search={{
-                placeholder: "Nome...",
-                label: "Cerca",
+                placeholder: t("points.search_placeholder"),
+                label: t("search_placeholder"),
                 onSearch: (value) => {
                     filter(value)
                 }

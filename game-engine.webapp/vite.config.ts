@@ -16,6 +16,11 @@ export default defineConfig({
         }
       })
   ],
+  server: {
+    proxy: {
+      '/api': {target: 'http://localhost:8080', changeOrigin: true},
+    },
+  },
   optimizeDeps: {
     // This forces Vite to pre-bundle these correctly on the first load
     include: [

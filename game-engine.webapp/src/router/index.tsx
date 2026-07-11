@@ -72,8 +72,7 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         path: "/dashboard",
-                        element: <GamesListPage/>,
-                        index: true
+                        element: <GamesListPage/>
                     },
                     {
                         path: "/upsert-game",

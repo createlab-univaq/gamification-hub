@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import type {LoginRequestDto, UserDto} from "../../types";
+import type {LoginRequestDto, LoginResponseDto, UserDto} from "../../types";
 import type {BaseApiClient} from "../base-client.ts";
 import {USER_KEY} from "../../../utils/storage-utils.ts";
 
@@ -19,9 +19,10 @@ export class AuthClient {
     }
 
     public async login(request: LoginRequestDto) {
-        const user = await this.baseClient.post<UserDto>(`/auth`, request)
-        Cookies.set(USER_KEY, JSON.stringify(user), USER_COOKIE_OPTIONS)
-        return user
+        request.origin = "WEBAPP"
+        const response = await this.baseClient.post<LoginResponseDto>(`/auth`, request)
+        Cookies.set(USER_KEY, JSON.stringify(response.user), USER_COOKIE_OPTIONS)
+        return response.user
     }
 
 

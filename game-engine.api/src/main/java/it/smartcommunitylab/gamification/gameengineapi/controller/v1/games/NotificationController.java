@@ -5,6 +5,8 @@ import it.smartcommunitylab.gamification.gameengineapi.model.criteria.Notificati
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.NotificationDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
 import it.smartcommunitylab.gamification.gameengineapi.service.NotificationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/games/{gameId}/notifications")
+@Tag(name = "Notifications", description = "Read the notifications emitted by a game")
 @Slf4j
 public class NotificationController extends BaseGameController {
 
@@ -26,6 +29,7 @@ public class NotificationController extends BaseGameController {
         this.notificationService = notificationService;
     }
 
+    @Operation(summary = "List notifications", description = "Returns a paged list of the game's notifications, filtered by the given criteria.")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @GetMapping
     public ResponseEntity<List<NotificationDTO>> getNotifications(@PathVariable String gameId,

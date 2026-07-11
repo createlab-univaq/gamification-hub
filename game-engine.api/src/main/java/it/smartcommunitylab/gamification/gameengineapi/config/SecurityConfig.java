@@ -1,6 +1,6 @@
 package it.smartcommunitylab.gamification.gameengineapi.config;
 
-import it.smartcommunitylab.gamification.gameengineapi.config.security.CookieTokenResolver;
+import it.smartcommunitylab.gamification.gameengineapi.config.security.AuthTokenResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,14 +40,13 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(oauth2 -> {
                     oauth2.jwt(Customizer.withDefaults())
-                            .bearerTokenResolver(new CookieTokenResolver());
+                            .bearerTokenResolver(new AuthTokenResolver());
                 })
                 .authorizeHttpRequests(authorize ->
                         authorize
-                                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth", "/api/v1/auth/logout", "/api/v1/auth/register").permitAll()
-                                // TODO secure actuator endpoints before production (Prometheus scrapers cannot use the auth cookie)
-                                .requestMatchers("/actuator/**").permitAll()
+                                .requestMatchers("/actuator/health/**", "/actuator/prometheus").permitAll()
                                 .anyRequest().authenticated()
                 )
         ;

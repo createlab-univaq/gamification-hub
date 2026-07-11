@@ -16,6 +16,8 @@ import it.smartcommunitylab.gamification.gameengineapi.model.dto.simulation.Simu
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.PlayerStateMapper;
 import it.smartcommunitylab.gamification.gameengineapi.service.SimulationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/executions")
+@Tag(name = "Execution", description = "Execute game actions and run simulations")
 @Slf4j
 public class ExecutionController extends BaseGameController {
 
@@ -44,6 +47,7 @@ public class ExecutionController extends BaseGameController {
         this.playerStateMapper = playerStateMapper;
     }
 
+    @Operation(summary = "Execute a game action", description = "Applies an action for a player and returns the updated player state. Runs synchronously.")
     @PostMapping
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#executionDTO.gameId)")
     public ResponseEntity<PlayerStateDTO> executeGame(@RequestBody @Valid ExecutionDTO executionDTO) {
@@ -73,6 +77,7 @@ public class ExecutionController extends BaseGameController {
         }
     }
 
+    @Operation(summary = "Simulate", description = "Runs a simulation against a synthetic player state without persisting anything.")
     @PostMapping("/simulations")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#request.gameId)")
     public ResponseEntity<SimulationResultDTO> simulate(@RequestBody @Valid SimulationRequestDTO request) {

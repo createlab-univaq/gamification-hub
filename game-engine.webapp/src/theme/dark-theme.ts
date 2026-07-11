@@ -18,8 +18,7 @@ export const darkTheme = createTheme({
         },
         background: {
             default: '#0F172A',
-            paper: '#1E293B',
-            secondary:'#1d2838'
+            paper: '#1E293B'
         },
         text: {
             primary: '#F1F5F9',
@@ -66,11 +65,13 @@ export const darkTheme = createTheme({
             },
             styleOverrides: {
                 root: {borderRadius: 6, padding: '6px 16px'},
-                containedPrimary: {
-                    boxShadow: 'none',
-                    '&:hover': {boxShadow: 'none'},
-                },
             },
+            variants: [
+                {
+                    props: {variant: 'contained', color: 'primary'},
+                    style: {boxShadow: 'none', '&:hover': {boxShadow: 'none'}},
+                },
+            ],
         },
         MuiCard: {
             styleOverrides: {

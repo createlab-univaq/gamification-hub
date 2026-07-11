@@ -9,11 +9,14 @@ import it.smartcommunitylab.gamification.gameengineapi.exception.EntityNotFoundE
 import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.BadgeCollectionDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Builder;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +27,9 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/games/{gameId}/badges")
+@Tag(name = "Badges", description = "Manage a game's badge collections")
 @Slf4j
+@PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
 public class BadgeCollectionConceptController extends BaseGameController {
 
     protected final BadgeCollectionMapper badgeCollectionMapper;
@@ -34,6 +39,7 @@ public class BadgeCollectionConceptController extends BaseGameController {
         this.badgeCollectionMapper = badgeCollectionMapper;
     }
 
+    @Operation(summary = "List badge collections", description = "Lists the game's badge collection concepts.")
     @GetMapping
     public ResponseEntity<List<BadgeCollectionDTO>> getBadgeCollections(
             @PathVariable String gameId) {
@@ -47,6 +53,7 @@ public class BadgeCollectionConceptController extends BaseGameController {
         return ResponseEntity.ok(badges);
     }
 
+    @Operation(summary = "Get a badge collection", description = "Returns a single badge collection concept by id.")
     @GetMapping("/{collectionId}")
     public ResponseEntity<BadgeCollectionDTO> getBadgeCollection(
             @PathVariable String gameId, @PathVariable String collectionId) {
@@ -60,6 +67,7 @@ public class BadgeCollectionConceptController extends BaseGameController {
                 .orElseThrow(() -> new EntityNotFoundException("BadgeCollectionConcept", collectionId, ErrorCodes.BADGE_NOT_FOUND));
     }
 
+    @Operation(summary = "Add a badge collection", description = "Creates a new badge collection concept.")
     @PostMapping
     public ResponseEntity<BadgeCollectionDTO> addBadgeCollection(
             @PathVariable String gameId, @RequestBody BadgeCollectionDTO dto) {
@@ -74,6 +82,7 @@ public class BadgeCollectionConceptController extends BaseGameController {
         return ResponseEntity.status(HttpStatus.CREATED).body(badgeCollectionMapper.toDTO(badge));
     }
 
+    @Operation(summary = "Update a badge collection", description = "Updates an existing badge collection concept.")
     @PutMapping("/{collectionId}")
     public ResponseEntity<BadgeCollectionDTO> updateBadgeCollection(
             @PathVariable String gameId, @PathVariable String collectionId, @RequestBody BadgeCollectionDTO dto) {
@@ -99,6 +108,7 @@ public class BadgeCollectionConceptController extends BaseGameController {
         return ResponseEntity.ok(badgeCollectionMapper.toDTO(badge));
     }
 
+    @Operation(summary = "Delete a badge collection", description = "Removes a badge collection concept from the game.")
     @DeleteMapping("/{collectionId}")
     public ResponseEntity<Void> deleteBadgeCollection(
             @PathVariable String gameId, @PathVariable String collectionId) {

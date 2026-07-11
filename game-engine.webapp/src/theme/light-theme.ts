@@ -18,8 +18,7 @@ export const lightTheme = createTheme({
         },
         background: {
             default: '#F7F9FC',
-            paper: '#FFFFFF',
-            secondary: '#d2d2d2'
+            paper: '#FFFFFF'
         },
         text: {
             primary: '#111827',
@@ -66,11 +65,13 @@ export const lightTheme = createTheme({
             },
             styleOverrides: {
                 root: {borderRadius: 6, padding: '6px 16px'},
-                containedPrimary: {
-                    boxShadow: 'none',
-                    '&:hover': {boxShadow: 'none'},
-                },
             },
+            variants: [
+                {
+                    props: {variant: 'contained', color: 'primary'},
+                    style: {boxShadow: 'none', '&:hover': {boxShadow: 'none'}},
+                },
+            ],
         },
         MuiCard: {
             styleOverrides: {

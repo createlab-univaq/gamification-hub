@@ -11,6 +11,7 @@ import {Form} from "./Form.tsx";
 import {Button, Card, CardContent, Divider, IconButton, Stack, TextField, Typography} from "@mui/material";
 import {Add, Delete} from "@mui/icons-material";
 import {FormInput} from "./FormInput.tsx";
+import {useTranslation} from "react-i18next";
 
 interface PointConceptFormProps {
     gameId: string,
@@ -37,6 +38,7 @@ const fromDateInput = (value: string) => value ? new Date(value).getTime() : und
 
 export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) {
     const {setNotification} = useNotificationContext()
+    const [t] = useTranslation()
     const form = useForm<PointConceptFormValues>({
         defaultValues: {
             name: "",
@@ -59,8 +61,8 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
             navigateTo(`/games/${gameId}/points`, {
                 state: {
                     type: "success",
-                    title: `Punteggio Salvato!`,
-                    content: `Il punteggio ${data.name} è stato salvato con successo`
+                    title: t("points.saved.title"),
+                    content: t("points.saved.message", {name: data.name})
                 }
             })
         },
@@ -123,17 +125,17 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
                 <FormInput
                     name={"name"}
                     rules={{
-                        required: "Campo obbligatorio!"
+                        required: t("required_field")
                     }}
                 >
-                    <TextField required={true} type={"text"} fullWidth={true} label={"Nome"}/>
+                    <TextField required={true} type={"text"} fullWidth={true} label={t("name")}/>
                 </FormInput>
             </Stack>
             <Stack sx={{gap: 1}}>
                 <Divider/>
-                <Typography variant={"subtitle1"} sx={{fontWeight: 600}}>Periodi</Typography>
+                <Typography variant={"subtitle1"} sx={{fontWeight: 600}}>{t("points.form.periods_title")}</Typography>
                 <Typography variant={"caption"} color={"text.secondary"}>
-                    Definisci i periodi di calcolo del punteggio (es. settimanale, mensile).
+                    {t("points.form.periods_hint")}
                 </Typography>
                 {periods.fields.map((field, i) => (
                     <Card key={field.id} variant={"outlined"}>
@@ -142,19 +144,19 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
                                 <FormInput
                                     name={`periods.${i}.identifier`}
                                     rules={{
-                                        required: "Campo obbligatorio!"
+                                        required: t("required_field")
                                     }}
                                 >
-                                    <TextField label={"Nome periodo"} fullWidth={true} required={true}/>
+                                    <TextField label={t("points.form.period_name")} fullWidth={true} required={true}/>
                                 </FormInput>
                                 <Stack direction={"row"} sx={{gap: 2, width: "100%"}}>
                                     <FormInput name={`periods.${i}.start`}>
-                                        <TextField label={"Inizio"} type={"date"}
+                                        <TextField label={t("points.form.start")} type={"date"}
                                                    fullWidth={true}
                                                    slotProps={{inputLabel: {shrink: true}}}/>
                                     </FormInput>
                                     <FormInput name={`periods.${i}.end`}>
-                                        <TextField label={"Fine"} type={"date"}
+                                        <TextField label={t("points.form.end")} type={"date"}
                                                    fullWidth={true}
                                                    slotProps={{inputLabel: {shrink: true}}}/>
                                     </FormInput>
@@ -162,17 +164,17 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
                                 <Stack direction={"row"} sx={{gap: 2, width: "100%"}}>
                                     <FormInput
                                         name={`periods.${i}.periodDays`}
-                                        rules={{valueAsNumber: true, min: 0}}
+                                        rules={{min: 0}}
                                     >
-                                        <TextField label={"Periodo (giorni)"} type={"number"}
+                                        <TextField label={t("points.form.period_days")} type={"number"}
                                                    fullWidth={true}
                                                    slotProps={{htmlInput: {min: 0}}}/>
                                     </FormInput>
                                     <FormInput
                                         name={`periods.${i}.capacity`}
-                                        rules={{valueAsNumber: true, min: 0}}
+                                        rules={{min: 0}}
                                     >
-                                        <TextField label={"Capacità"} type={"number"}
+                                        <TextField label={t("points.form.capacity")} type={"number"}
                                                    fullWidth={true}
                                                    slotProps={{htmlInput: {min: 0}}}/>
                                     </FormInput>
@@ -192,7 +194,7 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
                             periodDays: 0,
                             capacity: 0
                         })}>
-                    Aggiungi periodo
+                    {t("points.form.add_period")}
                 </Button>
             </Stack>
 
@@ -202,10 +204,10 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
                        alignItems: "center"
                    }}
             >
-                <Button href={`/games/${gameId}/points`} variant={"contained"}>Indietro</Button>
+                <Button href={`/games/${gameId}/points`} variant={"contained"}>{t("buttons:turn_back")}</Button>
                 <Stack direction={"row"} sx={{gap: 2}}>
-                    <Button type={"submit"} variant={"contained"}>Salva</Button>
-                    <Button type={"reset"} onClick={() => initForm(pointConcept)} variant={"outlined"}>Reset</Button>
+                    <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
+                    <Button type={"reset"} onClick={() => initForm(pointConcept)} variant={"outlined"}>{t("buttons:reset")}</Button>
                 </Stack>
             </Stack>
         </Stack>

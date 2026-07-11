@@ -7,12 +7,17 @@ import {ThemeSwitch} from "../ThemeSwitch.tsx";
 import {LanguageSelector} from "../LanguageSelector.tsx";
 import {useTranslation} from "react-i18next";
 import {useSidebarContext} from "../../hooks/use-sidebar-context.ts";
+import {AppLogo} from "../logo/AppLogo.tsx";
+import {UnivaqLogo} from "../logo/UnivaqLogo.tsx";
+import {useWindowSize} from "../../hooks/use-window-size.ts";
+import {AppIcon} from "../logo/AppIcon.tsx";
 
 export function NavbarLayout() {
 
     const user = getCurrentUser()
     const {setOpen, isOpen} = useSidebarContext()
     const {t} = useTranslation()
+    const {width} = useWindowSize()
 
     return <AppBar
         position="fixed"
@@ -29,8 +34,12 @@ export function NavbarLayout() {
                }}
         >
             <Stack direction={"row"}>
-                <LanguageSelector defaultLanguage={"en"}/>
-                <ThemeSwitch/>
+                {width >= 400 &&
+                    <>
+                        <LanguageSelector defaultLanguage={"en"}/>
+                        <ThemeSwitch/>
+                    </>
+                }
                 <PopoverButton id={"account-popover"}
                                buttonLabel={<AccountCircle sx={{fontSize: "2.5rem", cursor: "pointer"}}/>}
                                button={{
@@ -52,6 +61,14 @@ export function NavbarLayout() {
                                        <Stack sx={{padding: "0.5rem"}}>
                                            <Typography>{t("welcome", {name: user!.username})}</Typography>
                                        </Stack>
+                                       {width < 400 &&
+                                           <>
+                                               <Stack direction={"row"} sx={{width:"fit-content", px:2}}>
+                                                   <LanguageSelector defaultLanguage={"en"}/>
+                                                   <ThemeSwitch/>
+                                               </Stack>
+                                           </>
+                                       }
                                        <Stack divider={<Divider orientation={"horizontal"}/>}>
                                            <Button variant={"text"}
                                                    fullWidth={true}
@@ -81,7 +98,37 @@ export function NavbarLayout() {
                                }}
                 />
             </Stack>
-            <Button variant={"text"} onClick={() => setOpen(!isOpen)}><Menu/></Button>
+            <Stack direction={"row"} >
+                <Button variant={"text"} onClick={() => setOpen(!isOpen)}><Menu/></Button>
+                <a href={"/dashboard"} style={{display: "flex", justifyContent:"center", alignItems:"center"}}  >
+                    <UnivaqLogo
+                        sx={{
+                            width: "3.5rem"
+                        }}
+                    />
+                    <AppIcon
+                        sx={{
+                            width: "3rem"
+                        }}
+                    />
+                    <AppLogo
+                        sx={{
+                            width: {
+                                lg: "15rem",
+                                md: "15rem",
+                                sm: "15rem",
+                                xs: "0"
+                            },
+                            height:{
+                                lg: "2rem",
+                                md: "2rem",
+                                sm: "2rem",
+                                xs: "0"
+                            }
+                        }}
+                    />
+                </a>
+            </Stack>
         </Stack>
     </AppBar>
 

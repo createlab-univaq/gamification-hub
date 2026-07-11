@@ -11,6 +11,8 @@ import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.PlayerMapper;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.PlayerStateMapper;
 import it.smartcommunitylab.gamification.gameengineapi.service.GroupChallengeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.annotations.ParameterObject;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/games/{gameId}/players")
+@Tag(name = "Players", description = "Manage the players of a game and their state")
 @Slf4j
 public class PlayerController extends BaseGameController {
 
@@ -38,6 +41,7 @@ public class PlayerController extends BaseGameController {
         this.groupChallengeService = groupChallengeService;
     }
 
+    @Operation(summary = "List players", description = "Returns a paged list of player states, optionally filtered by playerId.")
     @GetMapping
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     public ResponseEntity<Page<PlayerDTO>> getPlayers(
@@ -54,6 +58,7 @@ public class PlayerController extends BaseGameController {
         return ResponseEntity.ok(statesDTO);
     }
 
+    @Operation(summary = "Get a player", description = "Returns a single player's state, enriched with group challenges.")
     @GetMapping("/{playerId}")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     public ResponseEntity<PlayerStateDTO> getPlayer(@PathVariable String gameId, @PathVariable String playerId) {
@@ -68,15 +73,19 @@ public class PlayerController extends BaseGameController {
         return ResponseEntity.ok(dto);
     }
 
+    @Operation(summary = "Add a player", description = "Creates or saves a player state.")
     @PostMapping
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     public ResponseEntity<PlayerDTO> addPlayer(@PathVariable String gameId, @RequestBody PlayerDTO player) {
-        log.info("REST request to add player {} to game {}", gameId, player);
+        log.info("REST request to add player {} to game {}", player, gameId);
+        findGameByIdOrThrow(gameId);
+        player.setGameId(gameId);
         PlayerState playerState = playerMapper.toEntity(player);
         playerState = playerService.saveState(playerState);
         return ResponseEntity.ok(playerMapper.toDTO(playerState));
     }
 
+    @Operation(summary = "Delete a player", description = "Deletes a player's state.")
     @DeleteMapping("/{playerId}")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     public ResponseEntity<Void> deletePlayer(@PathVariable String gameId, @PathVariable String playerId) {

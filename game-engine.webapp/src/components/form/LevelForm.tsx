@@ -12,6 +12,7 @@ import {Add, Delete, Settings} from "@mui/icons-material";
 import {FormInput} from "./FormInput.tsx";
 import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
 import {useEffect, useState} from "react";
+import {useTranslation} from "react-i18next";
 
 interface LevelFormProps {
     gameId: string,
@@ -35,6 +36,7 @@ const emptyConfig = (): ThresholdConfig => ({choices: 0, availableModels: [], ac
 export function LevelForm({level, gameId}: LevelFormProps) {
 
     const {setNotification} = useNotificationContext()
+    const [t] = useTranslation()
     const [openConfigs, setOpenConfigs] = useState<Set<string>>(new Set())
     const form = useForm<LevelFormValues>({
         defaultValues: {
@@ -69,8 +71,8 @@ export function LevelForm({level, gameId}: LevelFormProps) {
             navigateTo(`/games/${gameId}/levels`, {
                 state: {
                     type: "success",
-                    title: `Livello salvato!`,
-                    content: `Il livello ${data.name} è stato salvato con successo`
+                    title: t("levels.saved.title"),
+                    content: t("levels.saved.message", {name: data.name})
                 }
             })
         },
@@ -118,26 +120,26 @@ export function LevelForm({level, gameId}: LevelFormProps) {
             <FormInput
                 name={"name"}
                 rules={{
-                    required: "Campo obbligatorio!"
+                    required: t("required_field")
                 }}
             >
-                <TextField label={"Nome"} required={true} fullWidth={true} type={"text"}/>
+                <TextField label={t("name")} required={true} fullWidth={true} type={"text"}/>
             </FormInput>
             <AutocompleteFormItem
                 name={"pointConceptName"}
-                label={"Nome punteggio"}
+                label={t("levels.form.point_concept")}
                 options={pointConcepts ?? []}
                 getOptionLabel={(pc) => pc.name ?? ""}
                 getOptionValue={(pc) => pc.name}
-                rules={{required: "Campo obbligatorio!"}}
+                rules={{required: t("required_field")}}
                 loading={pointConceptsLoading}
             />
 
             <Stack sx={{gap: 1}}>
                 <Divider/>
-                <Typography variant={"subtitle1"} sx={{fontWeight: 600}}>Soglie</Typography>
+                <Typography variant={"subtitle1"} sx={{fontWeight: 600}}>{t("levels.thresholds")}</Typography>
                 <Typography variant={"caption"} color={"text.secondary"}>
-                    Definisci le soglie del livello. L'ordine determina l'indice della soglia.
+                    {t("levels.form.thresholds_hint")}
                 </Typography>
                 {thresholds.fields.map((field, i) => {
                     const open = openConfigs.has(field.id)
@@ -148,20 +150,19 @@ export function LevelForm({level, gameId}: LevelFormProps) {
                                     <FormInput
                                         name={`thresholds.${i}.name`}
                                         rules={{
-                                            required: "Campo obbligatorio!"
+                                            required: t("required_field")
                                         }}
                                     >
-                                        <TextField label={"Nome soglia"} fullWidth={true} required={true}/>
+                                        <TextField label={t("levels.form.threshold_name")} fullWidth={true} required={true}/>
                                     </FormInput>
                                     <FormInput
                                         name={`thresholds.${i}.value`}
                                         rules={{
-                                            required: "Campo obbligatorio",
-                                            valueAsNumber: true,
+                                            required: t("required_field"),
                                             min: 0
                                         }}
                                     >
-                                        <TextField label={"Valore"} type={"number"} required={true}
+                                        <TextField label={t("levels.form.value")} type={"number"} required={true}
                                                    slotProps={{htmlInput: {min: 0}}}/>
                                     </FormInput>
                                     <IconButton color={open ? "primary" : "default"}
@@ -175,21 +176,20 @@ export function LevelForm({level, gameId}: LevelFormProps) {
                                 <Collapse in={open}>
                                     <Stack sx={{gap: 2, mt: 2}}>
                                         <Typography variant={"caption"} color={"text.secondary"}>
-                                            Configurazione sfide della soglia
+                                            {t("levels.form.challenge_config")}
                                         </Typography>
                                         <FormInput
                                             name={`thresholds.${i}.config.choices`}
                                             rules={{
-                                                valueAsNumber: true,
                                                 min: 0
                                             }}
                                         >
-                                            <TextField label={"Numero scelte"} type={"number"}
+                                            <TextField label={t("levels.form.choices")} type={"number"}
                                                        slotProps={{htmlInput: {min: 0}}}/>
                                         </FormInput>
                                         <AutocompleteFormItem
                                             name={`thresholds.${i}.config.availableModels`}
-                                            label={"Modelli disponibili"}
+                                            label={t("levels.form.available_models")}
                                             multiple={true}
                                             options={challengeModels ?? []}
                                             getOptionLabel={(c) => c.name ?? ""}
@@ -198,7 +198,7 @@ export function LevelForm({level, gameId}: LevelFormProps) {
                                         />
                                         <AutocompleteFormItem
                                             name={`thresholds.${i}.config.activeModels`}
-                                            label={"Modelli attivi"}
+                                            label={t("levels.form.active_models")}
                                             multiple={true}
                                             options={challengeModels ?? []}
                                             getOptionLabel={(c) => c.name ?? ""}
@@ -213,7 +213,7 @@ export function LevelForm({level, gameId}: LevelFormProps) {
                 })}
                 <Button size={"small"} startIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                         onClick={() => thresholds.append({name: "", value: 0, config: emptyConfig()})}>
-                    Aggiungi soglia
+                    {t("levels.form.add_threshold")}
                 </Button>
             </Stack>
 
@@ -223,10 +223,10 @@ export function LevelForm({level, gameId}: LevelFormProps) {
                        alignItems: "center"
                    }}
             >
-                <Button href={`/games/${gameId}/levels`} variant={"contained"}>Indietro</Button>
+                <Button href={`/games/${gameId}/levels`} variant={"contained"}>{t("buttons:turn_back")}</Button>
                 <Stack direction={"row"} sx={{gap: 2}}>
-                    <Button type={"submit"} variant={"contained"}>Salva</Button>
-                    <Button type={"reset"} onClick={() => initForm(level)} variant={"outlined"}>Reset</Button>
+                    <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
+                    <Button type={"reset"} onClick={() => initForm(level)} variant={"outlined"}>{t("buttons:reset")}</Button>
                 </Stack>
             </Stack>
         </Stack>

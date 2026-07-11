@@ -10,11 +10,14 @@ import it.smartcommunitylab.gamification.gameengineapi.exception.ErrorCodes;
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.PointConceptCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.PointConceptDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +28,9 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/games/{gameId}/point-concepts")
+@Tag(name = "Point Concepts", description = "Manage a game's point concepts")
 @Slf4j
+@PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
 public class PointConceptController extends BaseGameController {
 
     protected final PointConceptMapper pointConceptMapper;
@@ -35,6 +40,7 @@ public class PointConceptController extends BaseGameController {
         this.pointConceptMapper = pointConceptMapper;
     }
 
+    @Operation(summary = "List point concepts", description = "Lists the game's point concepts, filtered by the given criteria.")
     @GetMapping
     public ResponseEntity<List<PointConceptDTO>> getPoints(@PathVariable String gameId, @ParameterObject PointConceptCriteria criteria) {
         log.info("Get points for game={} by criteria={}", gameId, criteria);
@@ -47,6 +53,7 @@ public class PointConceptController extends BaseGameController {
         return ResponseEntity.ok(PointConceptCriteria.filter(criteria, points));
     }
 
+    @Operation(summary = "Get a point concept", description = "Returns a single point concept by id.")
     @GetMapping("/{pointId}")
     public ResponseEntity<PointConceptDTO> getPoint(@PathVariable String gameId,
                                                     @PathVariable String pointId) {
@@ -60,6 +67,7 @@ public class PointConceptController extends BaseGameController {
                 .orElseThrow(() -> new EntityNotFoundException("PointConcept", pointId, ErrorCodes.POINT_CONCEPT_NOT_FOUND));
     }
 
+    @Operation(summary = "Add a point concept", description = "Creates a new point concept (score initialized to 0).")
     @PostMapping
     public ResponseEntity<PointConceptDTO> addPoint(@PathVariable String gameId,
                                                     @RequestBody PointConceptDTO dto) {
@@ -75,6 +83,7 @@ public class PointConceptController extends BaseGameController {
         return ResponseEntity.status(HttpStatus.CREATED).body(pointConceptMapper.toDTO(point));
     }
 
+    @Operation(summary = "Update a point concept", description = "Updates an existing point concept.")
     @PatchMapping("/{pointId}")
     public ResponseEntity<PointConceptDTO> updatePoint(@PathVariable String gameId, @PathVariable String pointId, @RequestBody PointConceptDTO pointConceptDTO) {
         log.info("REST request to update point={} of game={} with={}", pointId, gameId, pointConceptDTO);
@@ -105,6 +114,7 @@ public class PointConceptController extends BaseGameController {
         return ResponseEntity.ok(pointConceptMapper.toDTO(pc));
     }
 
+    @Operation(summary = "Delete a point concept", description = "Removes a point concept from the game.")
     @DeleteMapping("/{pointId}")
     public ResponseEntity<Void> deletePoint(@PathVariable String gameId,
                                             @PathVariable String pointId) {

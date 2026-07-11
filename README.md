@@ -1,24 +1,78 @@
-Gamification Engine is a platform that permits to define and execute score based games.
+<div>
+<img src="./game-engine.webapp/public/univaq-logo-dark.png" style="width:6rem"/>
+<img src="./game-engine.webapp/public/logo-dark.png" style="width:5rem"/>
+<img src="./game-engine.webapp/public/app-logo-dark.png" style="width:30rem"/>
+</div>
 
-Platform is developed in Java using Apache Maven as build tool.
+GamificationHub is a platform that permits to define and execute score based games.
+## Tech Stack
+
+**Backend**
+
+![Java](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4-6DB33F?logo=springboot&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-C71A36?logo=apachemaven&logoColor=white)
+![Drools](https://img.shields.io/badge/Drools-Rule%20Engine-A30000?logo=redhat&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white)
+
+**Frontend**
+
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![MUI](https://img.shields.io/badge/MUI-9-007FFF?logo=mui&logoColor=white)
+
+**Infrastructure & Observability**
+
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-F46800?logo=grafana&logoColor=white)
+![Loki](https://img.shields.io/badge/Loki-F5A800?logo=grafana&logoColor=white)
 
 ## Components
-* [game-engine.core](game-engine.core): it contains Drools engine implementation and models
-* [game-engine.web](game-engine.web): REST API, admin web interface and security layer
-* [game-engine.test](game-engine.test): junit test environment to test a new game definition
-* [game-engine.games](game-engine.games): collection of production games.
-* [game-engine.tools](game-engine.tools): a collection of tools to manage gamification operations 
-* [gamification-java-client](gamification-java-client): a java client library that wraps the gamification-engine APIs
-* [run-configs](run-configs): folder used by docker
+* [game-engine.core](game-engine.core): Drools rule engine implementation and domain models
+* [game-engine.api](game-engine.api): Spring Boot REST API and security layer
+* [game-engine.webapp](game-engine.webapp): React + Vite admin web interface
+* [monitoring](monitoring): Prometheus, Grafana, Loki and Alloy configuration for observability
+* [documentation](documentation): project documentation and API migration notes
 
 
-## Installation
+## Running the application
 
-Follow instructions of [Setup](https://github.com/smartcommunitylab/smartcampus.gamification/wiki/Setup) wiki page.
+The application has three parts: MongoDB (plus optional monitoring), the `game-engine.api` backend and the `game-engine.webapp` frontend.
 
+### Prerequisites
+* JDK 25 and Maven 3.9+
+* Node.js 20+ and npm
+* Docker and Docker Compose
 
-## Documentation
-Read the project [wiki](https://github.com/smartcommunitylab/smartcampus.gamification/wiki) for all details about the project
+### 1. Start the infrastructure
+From the repository root, bring up MongoDB (and the monitoring stack):
+```
+docker compose up -d mongo
+```
+MongoDB is exposed on `localhost:50000`.
 
-## Licence
-Project is licensed under the Apache License Version 2.0
+### 2. Start the backend API
+From `game-engine.api`, run the Spring Boot app (defaults to the `local` profile, listens on port `8080`):
+```
+cd game-engine.api
+mvn spring-boot:run
+```
+
+### 3. Start the frontend webapp
+From `game-engine.webapp`, install dependencies and start the Vite dev server:
+```
+cd game-engine.webapp
+npm install
+npm run dev
+```
+The dev server runs on `http://localhost:5173` and proxies `/api` requests to the backend on port `8080`.
+
+### Running everything with Docker
+Alternatively, build and run the full stack (MongoDB, API and monitoring) with Docker Compose:
+```
+docker compose up --build
+```
+
+The API takes a .env.prod file to run. Ask the administrator to provid the file as it contains sensitive information.

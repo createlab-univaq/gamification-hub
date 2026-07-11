@@ -1,4 +1,4 @@
-import {createContext, PropsWithChildren, useContext, useMemo, useState} from "react";
+import {createContext, type PropsWithChildren, useContext, useMemo, useState} from "react";
 import {lightTheme} from "./light-theme";
 import {darkTheme} from "./dark-theme";
 import {CssBaseline, ThemeProvider} from "@mui/material";
@@ -13,11 +13,11 @@ interface ThemeProviderProps {
 const defaultTheme = {
     mode: "light",
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    switchTheme: (type) => {
+    switchTheme: (_type) => {
     }
 } satisfies ThemeProviderProps
 
-const ThemeProviderContext = createContext(defaultTheme)
+const ThemeProviderContext = createContext<ThemeProviderProps>(defaultTheme)
 
 const useThemeProvider = () => useContext(ThemeProviderContext)
 

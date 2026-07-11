@@ -4,6 +4,8 @@ import it.smartcommunitylab.gamification.gameengineapi.model.criteria.Classifica
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationBoardDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationDTO;
 import it.smartcommunitylab.gamification.gameengineapi.service.ClassificationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/games/{gameId}/classifications")
+@Tag(name = "Leaderboards", description = "Manage leaderboards and read their computed boards")
 @Slf4j
 @RequiredArgsConstructor
 public class ClassificationController {
@@ -25,6 +28,7 @@ public class ClassificationController {
     private final ClassificationService classificationService;
 
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
+    @Operation(summary = "List leaderboards", description = "Lists the game's leaderboards, filtered by the given criteria.")
     @GetMapping
     public ResponseEntity<List<ClassificationDTO>> getClassifications(@PathVariable String gameId,
             @ParameterObject ClassificationCriteria criteria) {
@@ -33,6 +37,7 @@ public class ClassificationController {
     }
 
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
+    @Operation(summary = "Get a leaderboard", description = "Returns a single leaderboard definition by id.")
     @GetMapping("/{classificationId}")
     public ResponseEntity<ClassificationDTO> getClassification(@PathVariable String gameId,
             @PathVariable String classificationId) {
@@ -41,6 +46,7 @@ public class ClassificationController {
     }
 
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
+    @Operation(summary = "Create a leaderboard", description = "Creates a new leaderboard.")
     @PostMapping
     public ResponseEntity<ClassificationDTO> createClassification(@PathVariable String gameId,
             @RequestBody @Valid ClassificationDTO classificationDTO) {
@@ -50,6 +56,7 @@ public class ClassificationController {
     }
 
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
+    @Operation(summary = "Update a leaderboard", description = "Updates an existing leaderboard.")
     @PutMapping("/{classificationId}")
     public ResponseEntity<ClassificationDTO> updateClassification(@PathVariable String gameId,
             @PathVariable String classificationId, @RequestBody @Valid ClassificationDTO classificationDTO) {
@@ -60,6 +67,7 @@ public class ClassificationController {
     }
 
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
+    @Operation(summary = "Delete a leaderboard", description = "Removes a leaderboard and unschedules its recurring job.")
     @DeleteMapping("/{classificationId}")
     public ResponseEntity<Void> deleteClassification(@PathVariable String gameId,
             @PathVariable String classificationId) {
@@ -69,6 +77,7 @@ public class ClassificationController {
     }
 
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
+    @Operation(summary = "Get leaderboard board", description = "Returns the ranked board for a leaderboard (general or incremental).")
     @GetMapping("/{classificationId}/board")
     public ResponseEntity<ClassificationBoardDTO> getClassificationBoard(@PathVariable String gameId,
             @PathVariable String classificationId,

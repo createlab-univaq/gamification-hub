@@ -1,3 +1,5 @@
+import {HttpError} from "../http-error.ts";
+
 interface BaseApiClientProps {
     baseUrl: string
 }
@@ -16,22 +18,22 @@ export class BaseApiClient {
         return headers
     }
 
-    private async sendRequest(url: RequestInfo | URL, options?: RequestInit) {
+    private async sendRequest<T>(url: RequestInfo | URL, options?: RequestInit): Promise<T> {
         const result = await fetch(url, {credentials: "include", ...options})
-        try {
-            if (result.status === 204) {
-                return Promise.resolve()
-            }
-            const message = await result.json()
-            if (!result.ok) {
-                return Promise.reject(message)
-            }
-            return Promise.resolve(message)
-        } catch (error) {
-            // message is not a JSON
-            const message = await result.text()
-            return Promise.reject(message ?? `An error has occured: ${error}`)
+        if (result.status === 204) {
+            return undefined as T
         }
+        const raw = await result.text()
+        let body: unknown
+        try {
+            body = raw ? JSON.parse(raw) : null
+        } catch {
+            body = raw
+        }
+        if (!result.ok) {
+            throw new HttpError(result.status, body)
+        }
+        return body as T
     }
 
     public async get<T>(resource: string): Promise<T> {

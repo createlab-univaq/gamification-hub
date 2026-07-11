@@ -2,25 +2,28 @@ import type {NotificationMessage} from "../components/notification/NotificationP
 import {Stack, Typography} from "@mui/material";
 import React from "react";
 import {translateErrorMessage} from "./lng-utils.ts";
+import {HttpError} from "../api/http-error.ts";
 
 interface ApiError {
     title: string
     message: string
-    details?: Record<string, string>
+    details?: Record<string, Record<string, string>>
     timestamp?: string
     errorCode: string,
     params: unknown[]
 }
 
-export function getApiError(error: object): ApiError {
-    if ("title" in error) {
-        return error as ApiError
+export function getApiError(error: unknown): ApiError {
+    const body = error instanceof HttpError ? error.body : error
+    if (body && typeof body === "object" && "title" in body) {
+        return body as ApiError
     }
+    const partial = (body && typeof body === "object" ? body : {}) as Partial<ApiError>
     return {
         title: "Errore generico!",
-        message: JSON.stringify(error),
-        details: error.details ?? undefined,
-        timestamp: error.timestamp ?? "",
+        message: typeof body === "string" ? body : JSON.stringify(body),
+        details: partial.details ?? undefined,
+        timestamp: partial.timestamp ?? "",
         errorCode: "generic",
         params: []
     } satisfies ApiError
@@ -33,7 +36,7 @@ export function translateApiErrorToNotification(error: ApiError) {
     const contentChildren = [message]
     if (error.details) {
         Object.entries(error.details).map(e => {
-            contentChildren.push(React.createElement(Typography, {}, `${e[0]}: ${e[1]}`))
+            contentChildren.push(React.createElement(Typography, {}, `${e[0]}: ${e[1].text}`))
         })
     }
     const content = React.createElement(Stack, {sx: {gap: 1}}, contentChildren)

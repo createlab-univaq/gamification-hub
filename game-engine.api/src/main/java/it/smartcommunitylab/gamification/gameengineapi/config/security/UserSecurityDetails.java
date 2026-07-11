@@ -23,11 +23,8 @@ public class UserSecurityDetails implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isEmpty()) {
-            throw new UsernameNotFoundException("User %s not found".formatted(username));
-        }
-        return createSpringSecurityUser(user.get());
+        User user = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("User %s not found".formatted(username)));
+        return createSpringSecurityUser(user);
     }
 
     private DomainUserDetails createSpringSecurityUser(User user) {

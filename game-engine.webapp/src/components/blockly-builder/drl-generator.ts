@@ -296,7 +296,7 @@ drlGenerator.forBlock['drool_case'] = function (block: Block): string {
     return `${II}${I}case ${value}: // (place inside a switch block)`
 }
 
-drlGenerator.forBlock['drool_default'] = function (block: Block): string {
+drlGenerator.forBlock['drool_default'] = function (): string {
     // Consumed by drool_switch — stub for orphaned blocks
     return `${II}${I}default: // (place inside a switch block)`
 }

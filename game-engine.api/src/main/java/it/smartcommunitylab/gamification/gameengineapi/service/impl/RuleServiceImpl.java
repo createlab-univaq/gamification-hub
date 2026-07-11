@@ -44,7 +44,7 @@ public class RuleServiceImpl implements RuleService {
             return validateProperties(ruleDTO.getContent());
         }
         Map<String, Message> errors = KieErrorUtil.parseErrors(
-                gameEngine.validateGame(ruleDTO.getGameId(), ruleDTO.getContent(), ruleDTO.getName())
+                gameEngine.validateGame(ruleDTO.getGameId(), ruleDTO.getContent(), resolveExcludeUrl(ruleDTO))
         );
         for(Message m : errors.values()) {
             log.info("[{}, {}] : {}", m.getLevel(), m.getClass(), m.getText());
@@ -73,6 +73,10 @@ public class RuleServiceImpl implements RuleService {
             );
         }
         return errors;
+    }
+
+    private String resolveExcludeUrl(RuleDTO ruleDTO) {
+        return ruleDTO.getId() != null ? DBRule.URL_PROTOCOL + ruleDTO.getId() : null;
     }
 
     private void validateOrThrow(RuleDTO ruleDTO) {

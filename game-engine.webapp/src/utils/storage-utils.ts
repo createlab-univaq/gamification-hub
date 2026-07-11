@@ -1,5 +1,4 @@
 export const GAME_STORAGE_KEY = "gamification-engine.ui.game"
-export const TOKEN_KEY = 'gamification-api-token'
 export const USER_KEY = 'gamification-api-user'
 export const SIDEBAR_OPEN_KEY = "game-engine.ui.sidebar-open"
 
@@ -8,6 +7,7 @@ export function getObjectFromLocalStorage<T>(key: string) {
     try {
         return item ? JSON.parse(item) as T : undefined
     } catch (error) {
+        console.debug(`Could not find object from local storage: ${key}\n ${error}`)
         return undefined
     }
 }

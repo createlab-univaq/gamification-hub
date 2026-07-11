@@ -7,10 +7,12 @@ import {PageHeader} from "../../components/layout/PageHeader.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {type NavigateState, navigateTo} from "../../utils/navigation-utils.ts";
 import {Stack} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 export function GameUpsertPage() {
 
     const {gameId} = useParams()
+    const [t] = useTranslation();
 
     const {data, isError, error} = useQuery({
         queryKey: ["get-game", gameId],
@@ -30,7 +32,7 @@ export function GameUpsertPage() {
     }
 
     return <PageContainer>
-        <PageHeader title={data ? "Update Game" : "Add new game"}/>
+        <PageHeader title={t("game.upsert.title")}/>
         <Stack sx={{marginTop: 3}}>
             <GameForm game={data}/>
         </Stack>

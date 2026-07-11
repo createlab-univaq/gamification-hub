@@ -9,7 +9,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -58,10 +59,22 @@ public class ExceptionController {
         return buildResponseObject(e.getTitle(), e.getMessage(), e.getCode(), e.getParams(), null, e.getStatus());
     }
 
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ExceptionResponse> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        log.error("Access denied!\n{}", e.toString());
+        return buildResponseObject("Access denied!", e.getMessage(), ErrorCodes.USER_NOT_AUTHORIZED, List.of(), null, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ExceptionResponse> handleIllegalArgumentException(IllegalArgumentException e) {
         log.error("Invalid argument!\n{}", e.getMessage());
         return buildResponseObject("Validation Error!", e.getMessage(), ErrorCodes.VALIDATION, List.of(), null, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ExceptionResponse> handleRequestNotReadableException(HttpMessageNotReadableException e) {
+        log.error("Invalid argument!\n{}", e.getMessage());
+        return buildResponseObject("Validation Error!", "Malformed or unreadable request", ErrorCodes.VALIDATION, List.of(), null, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(DataAccessException.class)
@@ -69,7 +82,7 @@ public class ExceptionController {
         log.error("Mongo Error!\n{}", e.getLocalizedMessage());
         String message = e.getMessage();
         String code = ErrorCodes.DATA_ACCESS;
-        if(e instanceof DuplicateKeyException dke) {
+        if (e instanceof DuplicateKeyException dke) {
             message = "Duplicated value found!";
             code = ErrorCodes.DUPLICATE_KEY;
         }

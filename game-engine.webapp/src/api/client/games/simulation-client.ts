@@ -1,5 +1,5 @@
 import {BaseApiClient} from "../base-client.ts";
-import type {RuleImpactDto, SimulationRequestDto, SimulationResultDto} from "../../types";
+import type {SimulationRequestDto, SimulationResultDto} from "../../types";
 
 export class SimulationClient {
     private client: BaseApiClient;

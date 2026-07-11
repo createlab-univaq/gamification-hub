@@ -1,7 +1,7 @@
 # ==========================
 # Build stage
 # ==========================
-FROM maven:3.9.9-eclipse-temurin-21 AS builder
+FROM maven:3.9.11-eclipse-temurin-25 AS builder
 
 WORKDIR /app
 
@@ -26,7 +26,9 @@ RUN mvn clean package -DskipTests
 # ==========================
 # Runtime stage
 # ==========================
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

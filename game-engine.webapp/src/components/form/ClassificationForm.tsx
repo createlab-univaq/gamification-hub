@@ -152,7 +152,7 @@ export function ClassificationForm({gameId, classification}: ClassificationFormP
                 loading={pointConceptsLoading}
             />
 
-            <FormInput name={"itemsToNotificate"} rules={{valueAsNumber: true, min: 0}}>
+            <FormInput name={"itemsToNotificate"} rules={{min: 0}}>
                 <TextField label={t("leaderboards.form.items_to_notify")} type={"number"} fullWidth={true}
                            slotProps={{htmlInput: {min: 0}}}/>
             </FormInput>

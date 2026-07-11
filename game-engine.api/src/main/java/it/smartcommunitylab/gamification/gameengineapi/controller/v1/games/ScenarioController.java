@@ -1,6 +1,8 @@
 package it.smartcommunitylab.gamification.gameengineapi.controller.v1.games;
 
 import eu.trentorise.game.services.GameService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.ScenarioCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.SimulationScenarioDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.GameMapper;
@@ -17,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/games/{gameId}/scenarios")
 @Slf4j
+@Tag(name = "Scenarios", description = "Manage test scenarios of a game")
 public class ScenarioController extends BaseGameController {
 
     private final ScenarioService scenarioService;
@@ -26,6 +29,7 @@ public class ScenarioController extends BaseGameController {
         this.scenarioService = scenarioService;
     }
 
+    @Operation(summary = "Get scenarios", description = "List all of the scenarios of a game filtered by the given criteria")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @GetMapping
     public ResponseEntity<List<SimulationScenarioDTO>> getScenarios(@PathVariable String gameId, @ParameterObject ScenarioCriteria criteria) {
@@ -35,6 +39,7 @@ public class ScenarioController extends BaseGameController {
         return ResponseEntity.ok(scenarioService.get(criteria));
     }
 
+    @Operation(summary = "Get scenario", description = "Retrieve a particular scenario")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @GetMapping("/{scenarioId}")
     public ResponseEntity<SimulationScenarioDTO> getScenario(@PathVariable String gameId, @PathVariable String scenarioId) {
@@ -43,6 +48,7 @@ public class ScenarioController extends BaseGameController {
         return ResponseEntity.ok(scenarioService.get(scenarioId));
     }
 
+    @Operation(summary = "Create scenario", description = "Save a new game scenario")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @PostMapping
     public ResponseEntity<SimulationScenarioDTO> createScenario(@PathVariable String gameId, @RequestBody SimulationScenarioDTO scenarioDTO) {
@@ -53,6 +59,7 @@ public class ScenarioController extends BaseGameController {
         return ResponseEntity.status(HttpStatus.CREATED).body(scenarioService.create(scenarioDTO));
     }
 
+    @Operation(summary = "Edit scenario", description = "Update an existing scenario")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @PutMapping("/{scenarioId}")
     public ResponseEntity<SimulationScenarioDTO> updateScenario(@PathVariable String gameId, @PathVariable String scenarioId, @RequestBody SimulationScenarioDTO scenarioDTO) {
@@ -63,6 +70,7 @@ public class ScenarioController extends BaseGameController {
         return ResponseEntity.ok(scenarioService.update(scenarioDTO));
     }
 
+    @Operation(summary = "Delete scenario", description = "Remove a scenario permanently")
     @PreAuthorize("@methodSecurityDetails.canAccessGame(#gameId)")
     @DeleteMapping("/{scenarioId}")
     public ResponseEntity<Void> deleteScenario(@PathVariable String gameId, @PathVariable String scenarioId) {

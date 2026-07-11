@@ -1,7 +1,8 @@
 import {AuthClient} from "./client/auth/auth-client.ts";
 import {BaseApiClient} from "./client/base-client.ts";
 import {appConfig} from "../config";
-import {QueryClient} from "@tanstack/react-query";
+import {MutationCache, QueryCache, QueryClient} from "@tanstack/react-query";
+import {HttpError} from "./http-error.ts";
 import {GameClient} from "./client/games/game-client.ts";
 import {RuleClient} from "./client/games/rule-client.ts";
 import {SimulationClient} from "./client/games/simulation-client.ts";
@@ -21,7 +22,28 @@ import {GroupChallengeClient} from "./client/games/group-challenge-client.ts";
 const apiBaseClient = new BaseApiClient({
     baseUrl: appConfig.baseApiUrl
 })
-export const queryClient = new QueryClient()
+let unauthorizedHandler: (() => void) | undefined
+
+export function setUnauthorizedHandler(handler: () => void) {
+    unauthorizedHandler = handler
+}
+
+function handleUnauthorized(error: unknown) {
+    if (error instanceof HttpError && error.status === 401) {
+        unauthorizedHandler?.()
+    }
+}
+
+export const queryClient = new QueryClient({
+    queryCache: new QueryCache({onError: handleUnauthorized}),
+    mutationCache: new MutationCache({onError: handleUnauthorized}),
+    defaultOptions: {
+        queries: {
+            retry: (failureCount, error) =>
+                !(error instanceof HttpError && error.status === 401) && failureCount < 3,
+        },
+    },
+})
 export const authClient = new AuthClient(apiBaseClient)
 export const gameClient = new GameClient(apiBaseClient)
 export const ruleClient = new RuleClient(apiBaseClient)

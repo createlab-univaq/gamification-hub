@@ -17,11 +17,11 @@ import type {WorkspaceSvg} from "blockly";
 import {generateDrlFromWorkspace} from "../blockly-builder/drl-generator.ts";
 import type {RuleDto, ValidationMessageDto} from "../../api/types";
 import {useMutation} from "@tanstack/react-query";
-import {ruleClient} from "../../api";
+import {queryClient, ruleClient} from "../../api";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {Loading} from "../Loading.tsx";
-import {getRuleNameFromBlock, isUpdateEvent} from "../../utils/builder-utils.ts";
+import {isUpdateEvent} from "../../utils/builder-utils.ts";
 import {useTranslation} from "react-i18next";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -58,6 +58,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
             return ruleClient.addRule(request)
         },
         onSuccess: (data) => {
+            queryClient.invalidateQueries({queryKey:["get-rule", rule?.id]})
             navigateTo(`/games/${gameId}/rules`, {
                 state: {
                     type: "success",
@@ -66,7 +67,8 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                 }
             })
         },
-        onError: handleErrors
+        onError: handleErrors,
+        mutationKey:["save-rule", rule?.id]
     })
 
     const {
@@ -74,6 +76,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
         isPending: validateIsPending,
         reset: validateReset
     } = useMutation<ValidationMessageDto[], Error, RuleDto>({
+        mutationKey:["validate-rule"],
         mutationFn: (request) => {
             pushMessage([{
                 content: t("console.validation.start"),
@@ -125,12 +128,6 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
         onError: handleErrors
     })
 
-    function updateRuleName(name: string) {
-        setRuleName((prev) => {
-            return !prev ? name : prev
-        })
-    }
-
     function handleErrors(errors: Error) {
         console.error(errors)
         const apiError = getApiError(errors)
@@ -139,7 +136,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                 .map(error => {
                     return {
                         type: "error",
-                        content: error,
+                        content: error.text,
                         time: new Date()
                     } satisfies ConsoleMessage
                 })
@@ -168,7 +165,6 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
         }
         try {
             const drools = generateDrlFromWorkspace(workspace)
-            updateRuleName(getRuleNameFromBlock(workspace))
             setDrl(drools)
         } catch (e) {
             pushMessage([{
@@ -182,7 +178,6 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
     const handleDrlChange = useDebounced((rawDrl: string) => {
         try {
             const file = DRLToMetaTransformer.parse(rawDrl)
-            updateRuleName(file.name)
             setDrl(rawDrl)
             setBlocklyState(droolsFileToBlocklyState(file))
         } catch (e) {
@@ -230,7 +225,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                         {
                             children: t("buttons:save"),
                             variant: "contained",
-                            disabled: validateIsPending || !drl.length || upsertRulePending,
+                            disabled: validateIsPending || !drl.length || upsertRulePending || !ruleName,
                             endIcon: <Save/>,
                             onClick: handleSave
                         },
@@ -242,6 +237,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                             onClick: () => {
                                 validateReset()
                                 const tmpRule = {
+                                    id: rule?.id,
                                     content: drl,
                                     name: ruleName ?? "validate-rule",
                                     gameId: gameId

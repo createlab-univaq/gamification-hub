@@ -3,19 +3,19 @@ import {Controller, useFormContext} from "react-hook-form";
 import React, {type ReactElement} from "react";
 
 
-export interface FormInputProps<T extends FieldValues> extends Omit<ControllerProps<T>, "render" | "control"> {
-    children: ReactElement;
+export interface FormInputProps<T extends FieldValues = FieldValues> extends Omit<ControllerProps<T>, "render" | "control"> {
+    children: ReactElement<Record<string, unknown>>;
 }
 
-export function FormInput<T extends FieldValues>({
-                                                     name,
-                                                     defaultValue,
-                                                     rules,
-                                                     children,
-                                                     ...rest
-                                                 }: FormInputProps<T>) {
+export function FormInput({
+                              name,
+                              defaultValue,
+                              rules,
+                              children,
+                              ...rest
+                          }: FormInputProps) {
 
-    const {control} = useFormContext<T>()
+    const {control} = useFormContext()
 
     return <Controller name={name}
                        control={control}

@@ -1,17 +1,18 @@
 import {Stack} from "@mui/material";
 import type {PropsWithChildren} from "react";
-import {useEffect} from "react";
+import {useEffect, useRef} from "react";
 import {useLocation} from "react-router-dom";
 import {useNotificationContext} from "../../hooks/use-notification-context";
-import {navigateTo} from "../../utils/navigation-utils.ts";
 
 export function PageContainer({children}: PropsWithChildren) {
 
     const location = useLocation()
     const {setNotification} = useNotificationContext()
+    const consumedKey = useRef<string | null>(null)
 
     useEffect(() => {
-        if (location.state && location.state.type) {
+        if (location.state && location.state.type && consumedKey.current !== location.key) {
+            consumedKey.current = location.key
             setNotification({
                 notification: {
                     title: location.state.title ?? "",
@@ -20,7 +21,7 @@ export function PageContainer({children}: PropsWithChildren) {
                 },
                 isSnack: true
             })
-            navigateTo(location.pathname, {replace: true, state: undefined})
+            window.history.replaceState({...window.history.state, usr: null}, "")
         }
     }, [location]);
 

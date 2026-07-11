@@ -62,7 +62,15 @@
     "domain": "Dominio",
     "expiration": "Scadenza",
     "is_expired_label": "Il gioco è terminato",
-    "is_not_expired_label": "Il gioco non è terminato"
+    "is_not_expired_label": "Il gioco non è terminato",
+    "terminated_label": "Terminato?",
+    "upsert": {
+      "title": "Salva gioco"
+    },
+    "saved": {
+      "title": "Gioco salvato!",
+      "message": "Il gioco \"{{name}}\" è stato salvato con successo"
+    }
   },
   "rules": {
     "list_title": "Regole salvate",
@@ -219,6 +227,12 @@
     "saved": {
       "title": "Medaglia salvata!",
       "message": "La medaglia \"{{name}}\" è stata salvata con successo"
+    },
+    "form": {
+      "collection_name": "Nome collezione",
+      "badges_title": "Medaglie",
+      "badge_name": "Nome medaglia",
+      "add_badge": "Aggiungi medaglia"
     }
   },
   "challenges": {
@@ -232,6 +246,11 @@
     "saved": {
       "title": "Sfida salvata!",
       "message": "La sfida \"{{name}}\" è stata salvata con successo"
+    },
+    "form": {
+      "variables_title": "Variabili",
+      "variable_name": "Nome variabile",
+      "add_variable": "Aggiungi variabile"
     }
   },
   "levels": {
@@ -246,12 +265,27 @@
     "saved": {
       "title": "Livello salvato!",
       "message": "Il livello \"{{name}}\" è stata salvata con successo"
+    },
+    "form": {
+      "point_concept": "Nome punteggio",
+      "thresholds_hint": "Definisci le soglie del livello. L'ordine determina l'indice della soglia.",
+      "threshold_name": "Nome soglia",
+      "value": "Valore",
+      "challenge_config": "Configurazione sfide della soglia",
+      "choices": "Numero scelte",
+      "available_models": "Modelli disponibili",
+      "active_models": "Modelli attivi",
+      "add_threshold": "Aggiungi soglia"
     }
   },
   "players": {
     "title": "Giocatori",
     "empty_list": "Nessun giocatore trovato",
     "search_placeholder": "Giocatore...",
+    "upsert_title": "Aggiungi giocatore",
+    "form": {
+      "player_name": "Nome giocatore"
+    },
     "deleted": {
       "title": "Giocatore eliminato!",
       "message": "Il giocatore è stato eliminato con successo"
@@ -301,9 +335,80 @@
           "cancelled": {
             "title": "Invito annullato!",
             "message": "L'invito è stato annullato con successo"
+          },
+          "created": {
+            "title": "Invito creato",
+            "message": "L'invito alla sfida di gruppo è stato creato"
           }
+        },
+        "invite_form": {
+          "title": "Invita a una sfida di gruppo",
+          "guests": "Ospiti",
+          "guest_required": "Seleziona almeno un ospite",
+          "model_name": "Modello sfida di gruppo",
+          "point_concept": "Punteggio",
+          "period": "Periodo",
+          "target": "Obiettivo",
+          "start": "Inizio",
+          "end": "Fine",
+          "reward": "Ricompensa",
+          "percentage": "Percentuale",
+          "threshold": "Soglia"
         }
       }
+    }
+  },
+  "teams": {
+    "title": "Squadre",
+    "empty_list": "Nessuna squadra trovata",
+    "search_placeholder": "Squadra...",
+    "members_count": "Membri: {{count}}",
+    "upsert_title": "Aggiungi squadra",
+    "update_title": "Aggiorna squadra",
+    "form": {
+      "team_name": "Nome squadra",
+      "members": "Membri",
+      "players": "Giocatori"
+    },
+    "deleted": {
+      "title": "Squadra eliminata!",
+      "message": "La squadra è stata eliminata con successo"
+    },
+    "saved": {
+      "title": "Squadra salvata!",
+      "message": "La squadra \"{{name}}\" è stata salvata con successo"
+    }
+  },
+  "points": {
+    "title": "Punteggi",
+    "empty_list": "Nessun punteggio trovato",
+    "search_placeholder": "Punteggio...",
+    "upsert_title": "Aggiungi punteggio",
+    "update_title": "Aggiorna punteggio",
+    "periods_count": "{{count}} periodi",
+    "deleted": {
+      "title": "Punteggio eliminato!",
+      "message": "Il punteggio è stato eliminato con successo"
+    },
+    "saved": {
+      "title": "Punteggio salvato!",
+      "message": "Il punteggio \"{{name}}\" è stato salvato con successo"
+    },
+    "details": {
+      "validity": "Validità",
+      "duration": "Durata",
+      "kept_instances": "Istanze mantenute",
+      "no_periods": "Nessun periodo definito."
+    },
+    "form": {
+      "periods_title": "Periodi",
+      "periods_hint": "Definisci i periodi di calcolo del punteggio (es. settimanale, mensile).",
+      "period_name": "Nome periodo",
+      "start": "Inizio",
+      "end": "Fine",
+      "period_days": "Periodo (giorni)",
+      "capacity": "Capacità",
+      "add_period": "Aggiungi periodo"
     }
   }
 }

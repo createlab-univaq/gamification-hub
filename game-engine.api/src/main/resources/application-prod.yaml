@@ -7,6 +7,7 @@ custom:
   cors:
     allowed-origin-patterns:
       - "http://localhost:[*]"
+      - '*'
     allowed-methods: '*'
     allowed-headers: '*'
     exposed-headers: 'Authorization,Link,X-Total-Count,X-${spring.application.name}-alert,X-${spring.application.name}-error,X-${spring.application.name}-params'

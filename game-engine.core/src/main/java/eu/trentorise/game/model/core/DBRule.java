@@ -21,9 +21,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "rule")
+@CompoundIndex(name = "unique_game_rule", def = "{'gameId': 1, 'name': 1}", unique = true)
 public class DBRule extends Rule {
 
 	public static final String URL_PROTOCOL = "db://";
