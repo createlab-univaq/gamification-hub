@@ -5,6 +5,7 @@ logs/
 *build
 
 .idea
+.idea/*
 
 # transient / scratch files (curl cookie jars, dumps) — never commit
 cj.txt
