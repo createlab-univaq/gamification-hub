@@ -6,6 +6,8 @@ logs/
 
 .idea
 .idea/*
+.claude
+.claude/*
 
 # transient / scratch files (curl cookie jars, dumps) — never commit
 cj.txt
