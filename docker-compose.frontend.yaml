@@ -1,0 +1,17 @@
+services:
+  gamification-webapp:
+    container_name: "gamification-webapp"
+    build:
+      context: game-engine.webapp
+    environment:
+      API_UPSTREAM: "http://host.docker.internal:18080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "5173:5173"
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://127.0.0.1:5173/" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

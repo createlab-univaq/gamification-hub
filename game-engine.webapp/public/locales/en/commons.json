@@ -54,7 +54,12 @@
     "badges": "Badges",
     "levels": "Levels",
     "scenarios": "Scenarios",
-    "challenges": "Challenge Models"
+    "challenges": "Challenge Models",
+    "guide": "API Guide"
+  },
+  "guide": {
+    "back_to_app": "Back to app",
+    "load_error": "Could not load the guide. Please try again later."
   },
   "total_amount": "Total {{entity, lowercase}}: {{number}}",
   "game": {
@@ -355,6 +360,22 @@
           "percentage": "Percentage",
           "threshold": "Threshold"
         }
+      }
+    },
+    "blacklist": {
+      "title": "Blocked players",
+      "empty_list": "No blocked players",
+      "blocked": {
+        "title": "Player blocked!",
+        "message": "The player has been blocked successfully"
+      },
+      "unblocked": {
+        "title": "Player unblocked!",
+        "message": "The player has been unblocked successfully"
+      },
+      "block_form": {
+        "title": "Block a player",
+        "player": "Player"
       }
     }
   },

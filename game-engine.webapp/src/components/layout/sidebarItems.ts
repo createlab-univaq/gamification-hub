@@ -5,6 +5,7 @@ import {
     Games,
     Layers,
     Leaderboard,
+    MenuBook,
     MilitaryTech,
     People,
     Rule,
@@ -25,6 +26,11 @@ const dashboardItems = [
         title: "sidebar.games",
         icon: Games,
         href: "/dashboard"
+    },
+    {
+        title: "sidebar.guide",
+        icon: MenuBook,
+        href: "/guide"
     }
 ] satisfies SidebarItem[]
 

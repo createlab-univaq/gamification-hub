@@ -32,5 +32,7 @@
   "cancel": "Annulla",
   "assign": "Assegna",
   "copy": "Copia",
-  "clear": "Pulisci"
+  "clear": "Pulisci",
+  "block": "Blocca",
+  "unblock": "Sblocca"
 }

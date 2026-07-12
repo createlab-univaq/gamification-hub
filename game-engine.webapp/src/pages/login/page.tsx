@@ -97,6 +97,9 @@ export function LoginPage() {
                     </Button>
                 </CardContent>
             </Card>
+            <Button href={"/guide"} variant={"text"} size={"small"} sx={{mt: 1}}>
+                {t("sidebar.guide")}
+            </Button>
         </Stack>
     </PageContainer>
 }

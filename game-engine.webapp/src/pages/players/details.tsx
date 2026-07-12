@@ -4,16 +4,17 @@ import {useGame} from "../../hooks/use-game";
 import {Navigate, useParams} from "react-router-dom";
 import {useNotificationContext} from "../../hooks/use-notification-context";
 import {useMutation, useQuery} from "@tanstack/react-query";
-import {groupChallengeClient, playerChallengeClient, playerClient, playerInventoryClient, queryClient} from "../../api";
+import {groupChallengeClient, playerBlackListClient, playerChallengeClient, playerClient, playerInventoryClient, queryClient} from "../../api";
 import {Loading} from "../../components/Loading.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {Box, Button, Card, CardContent, Chip, Stack, Typography} from "@mui/material";
-import {Add, Bolt, Check, Close, Delete, Edit, Games, Groups, People, PlayArrow} from "@mui/icons-material";
+import {Add, Block, Bolt, Check, Close, Delete, Edit, Games, Groups, People, PlayArrow} from "@mui/icons-material";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {ChallengeAssignForm} from "../../components/form/ChallengeAssignForm.tsx";
 import {ChallengeEditForm} from "../../components/form/ChallengeEditForm.tsx";
 import {GroupChallengeInviteForm} from "../../components/form/GroupChallengeInviteForm.tsx";
+import {BlockPlayerForm} from "../../components/form/BlockPlayerForm.tsx";
 import {useState} from "react";
 import type {ChallengeConceptDto, GroupChallengeDto, PlayerStateDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
@@ -38,12 +39,19 @@ export function PlayerDetailsPage() {
     const [editChallengeItem, setEditChallengeItem] = useState<ChallengeConceptDto>()
     const [assignOpen, setAssignOpen] = useState(false)
     const [inviteOpen, setInviteOpen] = useState(false)
+    const [blockOpen, setBlockOpen] = useState(false)
 
     const invalidate = ["get-player", game.id, playerId]
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-player", game.id, playerId],
         queryFn: () => playerClient.getPlayer(game.id!, playerId!),
+        enabled: !!game && !!playerId
+    })
+
+    const {data: blackList} = useQuery({
+        queryKey: ["get-blacklist", game.id, playerId],
+        queryFn: () => playerBlackListClient.getBlackList(game.id!, playerId!),
         enabled: !!game && !!playerId
     })
 
@@ -92,6 +100,7 @@ export function PlayerDetailsPage() {
     const inventory = data?.inventory
     const choices = inventory?.challengeChoices ?? []
     const groups = data?.groupChallenges ?? []
+    const blockedPlayers = blackList?.blockedPlayers ?? []
 
     function roleOf(gc: GroupChallengeDto): string | undefined {
         return (gc.attendees ?? []).find(a => a.playerId === playerId)?.role
@@ -123,6 +132,8 @@ export function PlayerDetailsPage() {
                            onClose={() => setEditChallengeItem(undefined)}/>
         <GroupChallengeInviteForm gameId={game.id!} playerId={playerId!} open={inviteOpen}
                                   onClose={() => setInviteOpen(false)}/>
+        <BlockPlayerForm gameId={game.id!} playerId={playerId!} excludedIds={[playerId!, ...blockedPlayers]}
+                         open={blockOpen} onClose={() => setBlockOpen(false)}/>
 
         <PageHeader
             title={data?.playerId}
@@ -369,6 +380,30 @@ export function PlayerDetailsPage() {
                         })}
                     </Stack>
                     : <Typography color={"text.secondary"}>{t("players.groups.challenges.empty_list")}</Typography>}
+            </Stack>
+
+            <Stack sx={{gap: 1}}>
+                <Stack direction={"row"} sx={{justifyContent: "space-between", alignItems: "center"}}>
+                    <Typography variant={"subtitle1"}
+                                sx={{fontWeight: 600}}>{t("players.blacklist.title")}</Typography>
+                    <Button size={"small"} variant={"contained"} startIcon={<Block/>}
+                            onClick={() => setBlockOpen(true)}>{t("buttons:block")}</Button>
+                </Stack>
+                {blockedPlayers.length
+                    ? <Stack direction={"row"} sx={{gap: 1, flexWrap: "wrap"}}>
+                        {blockedPlayers.map(otherPlayerId => (
+                            <Chip key={`blocked-${otherPlayerId}`}
+                                  label={otherPlayerId}
+                                  onDelete={() => action.mutate({
+                                      run: () => playerBlackListClient.unblockPlayer(game.id!, playerId!, otherPlayerId),
+                                      invalidate: ["get-blacklist", game.id, playerId],
+                                      title: t("players.blacklist.unblocked.title"),
+                                      content: t("players.blacklist.unblocked.message")
+                                  })}
+                            />
+                        ))}
+                    </Stack>
+                    : <Typography color={"text.secondary"}>{t("players.blacklist.empty_list")}</Typography>}
             </Stack>
         </Stack>
     </PageContainer>

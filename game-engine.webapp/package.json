@@ -20,7 +20,7 @@
     "@xyflow/react": "^12.10.2",
     "blockly": "^12.5.1",
     "cronstrue": "^3.24.0",
-    "drools-builder": "file:../../../../../Svago/WebDev/drools-builder",
+    "drools-builder": "^1.2.0",
     "elkjs": "^0.11.1",
     "i18next-browser-languagedetector": "^8.2.1",
     "i18next-http-backend": "^4.0.0",
@@ -30,8 +30,10 @@
     "react-dom": "^19.2.4",
     "react-hook-form": "^7.72.1",
     "react-i18next": "^17.0.8",
+    "react-markdown": "^10.1.0",
     "react-resizable-panels": "^4.10.0",
-    "react-router-dom": "^7.14.0"
+    "react-router-dom": "^7.14.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

@@ -35,6 +35,7 @@ import {PlayerListPage} from "../pages/players/list.tsx";
 import {PlayerUpsertPage} from "../pages/players/upsert.tsx";
 import {PlayerDetailsPage} from "../pages/players/details.tsx";
 import {UserSettingsPage} from "../pages/settings/page.tsx";
+import {GuidePage} from "../pages/guide/page.tsx";
 
 // eslint-disable-next-line react-refresh/only-export-components
 const BlocklyRuleUpsertPage = lazy(() => import("../pages/rules/upsert.tsx").then(m => ({default: m.BlocklyRuleUpsertPage})));
@@ -62,6 +63,10 @@ export const router = createBrowserRouter([
     {
         path: "/logout",
         element: <LogoutPage/>
+    },
+    {
+        path: "/guide",
+        element: <GuidePage/>
     },
     {
         element: <AuthRoutes/>,

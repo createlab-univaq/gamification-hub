@@ -44,7 +44,7 @@ public class AuthController {
 
     @Operation(summary = "Log in", description = "Authenticates a user and issues a JWT as an httpOnly cookie; for GAME-origin logins the token is also returned in the body.")
     @PostMapping
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         log.info("Login Request: {}", loginRequestDTO);
         String token = authenticationService.createToken(loginRequestDTO.getUsername(), loginRequestDTO.getPassword());
         UserDTO user = authenticationService.getAuthUser();

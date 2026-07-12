@@ -269,6 +269,12 @@ export type ChallengeAssignmentDto = {
     hide?: boolean;
 };
 
+export type PlayerBlackListDto = {
+    gameId?: string;
+    playerId?: string;
+    blockedPlayers?: Array<string>;
+};
+
 export type LevelDto = {
     name?: string;
     pointConceptName?: string;
@@ -412,26 +418,26 @@ export type LoginResponseDto = {
 };
 
 export type PagePlayerDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
     size?: number;
     content?: Array<PlayerDto>;
     number?: number;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    pageable?: PageableObject;
     sort?: SortObject;
+    pageable?: PageableObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
     offset?: number;
-    pageSize?: number;
-    pageNumber?: number;
+    unpaged?: boolean;
     sort?: SortObject;
     paged?: boolean;
-    unpaged?: boolean;
+    pageSize?: number;
+    pageNumber?: number;
 };
 
 export type SortObject = {
@@ -501,16 +507,16 @@ export type ClassificationPositionDto = {
 };
 
 export type PageClassificationPositionDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
     size?: number;
     content?: Array<ClassificationPositionDto>;
     number?: number;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    pageable?: PageableObject;
     sort?: SortObject;
+    pageable?: PageableObject;
     empty?: boolean;
 };
 
@@ -1420,6 +1426,46 @@ export type ForceChallengeChoiceResponses = {
 
 export type ForceChallengeChoiceResponse = ForceChallengeChoiceResponses[keyof ForceChallengeChoiceResponses];
 
+export type UnblockPlayerData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+        otherPlayerId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/blacklist/{otherPlayerId}';
+};
+
+export type UnblockPlayerResponses = {
+    /**
+     * OK
+     */
+    200: PlayerBlackListDto;
+};
+
+export type UnblockPlayerResponse = UnblockPlayerResponses[keyof UnblockPlayerResponses];
+
+export type BlockPlayerData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+        otherPlayerId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/blacklist/{otherPlayerId}';
+};
+
+export type BlockPlayerResponses = {
+    /**
+     * OK
+     */
+    200: PlayerBlackListDto;
+};
+
+export type BlockPlayerResponse = BlockPlayerResponses[keyof BlockPlayerResponses];
+
 export type GetLevelsData = {
     body?: never;
     path: {
@@ -1846,6 +1892,25 @@ export type GetGroupChallengesResponses = {
 
 export type GetGroupChallengesResponse = GetGroupChallengesResponses[keyof GetGroupChallengesResponses];
 
+export type GetBlackListData = {
+    body?: never;
+    path: {
+        gameId: string;
+        playerId: string;
+    };
+    query?: never;
+    url: '/api/v1/games/{gameId}/players/{playerId}/blacklist';
+};
+
+export type GetBlackListResponses = {
+    /**
+     * OK
+     */
+    200: PlayerBlackListDto;
+};
+
+export type GetBlackListResponse = GetBlackListResponses[keyof GetBlackListResponses];
+
 export type GetNotificationsData = {
     body?: never;
     path: {
@@ -1985,6 +2050,22 @@ export type GetAuthenticatedUserResponses = {
 };
 
 export type GetAuthenticatedUserResponse = GetAuthenticatedUserResponses[keyof GetAuthenticatedUserResponses];
+
+export type ReadinessProbeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/';
+};
+
+export type ReadinessProbeResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type ReadinessProbeResponse = ReadinessProbeResponses[keyof ReadinessProbeResponses];
 
 export type UpsertLevel1Data = {
     body?: never;

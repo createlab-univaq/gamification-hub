@@ -54,7 +54,12 @@
     "badges": "Medaglie",
     "levels": "Livelli",
     "scenarios": "Scenari",
-    "challenges": "Modelli di sfida"
+    "challenges": "Modelli di sfida",
+    "guide": "Guida API"
+  },
+  "guide": {
+    "back_to_app": "Torna all'app",
+    "load_error": "Impossibile caricare la guida. Riprova più tardi."
   },
   "total_amount": "{{entity, capitalize}} totali: {{number}}",
   "game": {
@@ -355,6 +360,22 @@
           "percentage": "Percentuale",
           "threshold": "Soglia"
         }
+      }
+    },
+    "blacklist": {
+      "title": "Giocatori bloccati",
+      "empty_list": "Nessun giocatore bloccato",
+      "blocked": {
+        "title": "Giocatore bloccato!",
+        "message": "Il giocatore è stato bloccato con successo"
+      },
+      "unblocked": {
+        "title": "Giocatore sbloccato!",
+        "message": "Il giocatore è stato sbloccato con successo"
+      },
+      "block_form": {
+        "title": "Blocca un giocatore",
+        "player": "Giocatore"
       }
     }
   },

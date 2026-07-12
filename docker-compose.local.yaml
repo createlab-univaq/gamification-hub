@@ -1,0 +1,18 @@
+include:
+  - docker-compose.backend.yaml
+  - docker-compose.frontend.yaml
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: gamification-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: gamification-api
+      MONGO_INITDB_ROOT_PASSWORD: my_password
+    ports:
+      - "50000:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
