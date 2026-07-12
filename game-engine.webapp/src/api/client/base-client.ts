@@ -6,19 +6,19 @@ interface BaseApiClientProps {
 
 export class BaseApiClient {
 
-    private baseUrl: string
+    protected baseUrl: string
 
     constructor({baseUrl}: BaseApiClientProps) {
         this.baseUrl = baseUrl
     }
 
-    private getHeaders() {
+    protected getHeaders() {
         const headers = new Headers()
         headers.set("Content-Type", "application/json")
         return headers
     }
 
-    private async sendRequest<T>(url: RequestInfo | URL, options?: RequestInit): Promise<T> {
+    protected async sendRequest<T>(url: RequestInfo | URL, options?: RequestInit): Promise<T> {
         const result = await fetch(url, {credentials: "include", ...options})
         if (result.status === 204) {
             return undefined as T

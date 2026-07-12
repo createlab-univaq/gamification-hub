@@ -32,5 +32,7 @@
   "cancel": "Cancel",
   "assign": "Assign",
   "copy": "Copy",
-  "clear": "Clear"
+  "clear": "Clear",
+  "block": "Block",
+  "unblock": "Unblock"
 }
