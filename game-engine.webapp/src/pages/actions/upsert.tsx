@@ -5,6 +5,7 @@ import {Stack} from "@mui/material";
 import {ActionForm} from "../../components/form/ActionForm.tsx";
 import {useTranslation} from "react-i18next";
 import {useGame} from "../../hooks/use-game";
+import {Bolt, Games} from "@mui/icons-material";
 
 export function ActionUpsertPage() {
 
@@ -13,7 +14,25 @@ export function ActionUpsertPage() {
     const [t] = useTranslation()
 
     return <PageContainer>
-        <PageHeader title={actionName ? t("actions.update_title") : t("actions.upsert_title")}/>
+        <PageHeader
+            title={actionName ? t("actions.update_title") : t("actions.upsert_title")}
+            breadcrumbs={[
+                {
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
+                },
+                {
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
+                },
+                {
+                    label: t("sidebar.actions"),
+                    href: `/games/${game.id}/actions`,
+                    icon: <Bolt/>
+                }
+            ]}
+        />
         <Stack sx={{marginTop: 3}}>
             <ActionForm gameId={game.id!} action={actionName}/>
         </Stack>

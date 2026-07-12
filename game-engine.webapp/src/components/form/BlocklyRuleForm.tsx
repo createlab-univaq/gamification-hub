@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from 'react'
 import type {PanelImperativeHandle} from 'react-resizable-panels'
 import {Group, Panel} from 'react-resizable-panels'
 import {Button, Stack, TextField} from '@mui/material'
-import {ChevronLeft, ChevronRight, DragIndicator, FactCheck, Save, Terminal} from '@mui/icons-material'
+import {ChevronLeft, ChevronRight, DragIndicator, FactCheck, Games, Rule, Save, Terminal} from '@mui/icons-material'
 import {DRLToMetaTransformer} from 'drools-builder'
 import {PageContainer} from '../layout/PageContainer.tsx'
 import {PageHeader} from '../layout/PageHeader.tsx'
@@ -27,6 +27,7 @@ import {useTranslation} from "react-i18next";
 // @ts-expect-error
 import type {Abstract} from "blockly/core/events/events_abstract";
 import {useNotificationContext} from "../../hooks/use-notification-context.ts";
+import {useGame} from "../../hooks/use-game.ts";
 
 interface BlocklyRuleFormProps {
     rule?: RuleDto
@@ -34,6 +35,7 @@ interface BlocklyRuleFormProps {
 }
 
 export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
+    const game = useGame()
     const [drl, setDrl] = useState('')
     const [blocklyState, setBlocklyState] = useState<object | undefined>()
     const [consoleMessages, setConsoleMessages] = useState<ConsoleMessage[]>([])
@@ -58,7 +60,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
             return ruleClient.addRule(request)
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({queryKey:["get-rule", rule?.id]})
+            queryClient.invalidateQueries({queryKey: ["get-rule", rule?.id]})
             navigateTo(`/games/${gameId}/rules`, {
                 state: {
                     type: "success",
@@ -68,7 +70,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
             })
         },
         onError: handleErrors,
-        mutationKey:["save-rule", rule?.id]
+        mutationKey: ["save-rule", rule?.id]
     })
 
     const {
@@ -76,7 +78,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
         isPending: validateIsPending,
         reset: validateReset
     } = useMutation<ValidationMessageDto[], Error, RuleDto>({
-        mutationKey:["validate-rule"],
+        mutationKey: ["validate-rule"],
         mutationFn: (request) => {
             pushMessage([{
                 content: t("console.validation.start"),
@@ -254,6 +256,22 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                             }
                         }
                     ]}
+                breadcrumbs={[
+                    {
+                        icon: <Games/>,
+                        label: t("sidebar.games"),
+                        href: "/dashboard"
+                    },
+                    {
+                        label: game.name ?? "My Game",
+                        href: `/games/${game.id}`
+                    },
+                    {
+                        label: t("sidebar.rules"),
+                        href: `/games/${game.id}`,
+                        icon: <Rule/>
+                    }
+                ]}
             />
             <Group orientation={"horizontal"}
                    style={{display: "flex", gap: "1.5rem", width: "100%", height: "80dvh", marginTop: "0.5rem"}}>

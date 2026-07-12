@@ -9,6 +9,7 @@ import {Loading} from "../../components/Loading.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {TeamForm} from "../../components/form/TeamForm.tsx";
 import {useTranslation} from "react-i18next";
+import {Games} from "@mui/icons-material";
 
 export function TeamUpsertPage() {
 
@@ -32,7 +33,24 @@ export function TeamUpsertPage() {
     }
 
     return <PageContainer>
-        <PageHeader title={teamId ? t("teams.update_title") : t("teams.upsert_title")}/>
+        <PageHeader
+            title={teamId ? t("teams.update_title") : t("teams.upsert_title")}
+            breadcrumbs={[
+                {
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
+                },
+                {
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
+                },
+                {
+                    label: t("sidebar.teams"),
+                    href: `/games/${game.id}/teams`
+                }
+            ]}
+        />
         <Stack sx={{marginTop: 3}}>
             <TeamForm gameId={game.id!} team={data}/>
         </Stack>

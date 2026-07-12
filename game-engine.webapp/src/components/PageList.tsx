@@ -14,7 +14,7 @@ interface PageListProps<T> extends Omit<LayoutListProps<T>, "layout"> {
     search?: SearchProps
 }
 
-export function PageList<T>({search, ...props}: PageListProps<T>) {
+export function PageList<T>({search, enableLayout=true, ...props}: PageListProps<T>) {
 
     const [layout, setLayout] = useState<LayoutType>("list")
 
@@ -22,21 +22,26 @@ export function PageList<T>({search, ...props}: PageListProps<T>) {
         <Stack
             direction={"row"}
             sx={{
-                justifyContent: "space-between"
+                justifyContent: "space-between",
+                width: "100%",
             }}
         >
-            <TextField
-                type={"text"}
-                label={search?.label}
-                placeholder={search?.placeholder}
-                sx={{
-                    minWidth: "30%"
-                }}
-                onChange={(e) => {
-                    search?.onSearch?.(e.target.value, e)
-                }}
-            />
-            <Stack direction={"row"} divider={<Divider orientation={"vertical"}/>}>
+            <Stack>
+                {!!search &&
+                    <TextField
+                        type={"text"}
+                        label={search?.label}
+                        placeholder={search?.placeholder}
+                        sx={{
+                            minWidth: "30%"
+                        }}
+                        onChange={(e) => {
+                            search?.onSearch?.(e.target.value, e)
+                        }}
+                    />
+                }
+            </Stack>
+            {enableLayout && <Stack direction={"row"} divider={<Divider orientation={"vertical"}/>}>
                 <IconButton
                     color={layout === "list" ? "primary" : "default"}
                     size={"small"}
@@ -61,10 +66,10 @@ export function PageList<T>({search, ...props}: PageListProps<T>) {
                 >
                     <GridOn/>
                 </IconButton>
-            </Stack>
+            </Stack>}
         </Stack>
         <Box sx={{flex: 1, minHeight: 0, overflow: "auto"}}>
-            <LayoutList {...props} layout={layout}/>
+            <LayoutList {...props} enableLayout={enableLayout} layout={layout}/>
         </Box>
     </Stack>
 }

@@ -8,10 +8,13 @@ import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
 import {LevelForm} from "../../components/form/LevelForm.tsx";
 import {Stack} from "@mui/material";
+import {useTranslation} from "react-i18next";
+import {Games, Layers} from "@mui/icons-material";
 
 export function UpsertLevelPage() {
     const game = useGame()
     const {levelName} = useParams()
+    const [t] = useTranslation()
 
     const {isLoading, data, error, isError} = useQuery({
         queryKey: ["get-level", levelName],
@@ -29,7 +32,25 @@ export function UpsertLevelPage() {
     }
 
     return <PageContainer>
-        <PageHeader title={levelName ? "Aggiorna Livello" : "Aggiungi Livello"}/>
+        <PageHeader
+            title={t("levels.form.title")}
+            breadcrumbs={[
+                {
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
+                },
+                {
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
+                },
+                {
+                    label: t("sidebar.levels"),
+                    href: `/games/${game.id}/levels`,
+                    icon: <Layers/>
+                }
+            ]}
+        />
         <Stack sx={{marginTop: 3}}>
             <LevelForm gameId={game.id!} level={data}/>
         </Stack>

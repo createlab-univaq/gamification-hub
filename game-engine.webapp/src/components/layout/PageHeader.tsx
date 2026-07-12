@@ -23,7 +23,7 @@ export function PageHeader({buttons, subTitle, title, breadcrumbs}: PageHeaderPr
     const SubTitle = typeof subTitle === "string" ? <Typography variant={"body1"}>{subTitle}</Typography> : subTitle
     const {width} = useWindowSize()
     const MIN_WIDTH_FOR_BUTTONS = 760
-    const requiresPopoverButton = (width < MIN_WIDTH_FOR_BUTTONS && (buttons?.length ?? 0) > 3) || width < 450
+    const requiresPopoverButton = ((width < MIN_WIDTH_FOR_BUTTONS && (buttons?.length ?? 0) > 3) || width < 450) && buttons?.length
 
     return <Stack sx={{gap: 2}}>
         {(breadcrumbs && breadcrumbs.length) &&
@@ -52,6 +52,7 @@ export function PageHeader({buttons, subTitle, title, breadcrumbs}: PageHeaderPr
                 <PopoverButton id={"header-popover-buttons"}
                                buttonLabel={<MoreVertTwoTone sx={{fontSize: "2rem", cursor: "pointer"}}/>}
                                button={{
+                                   type:"button",
                                    variant: "text",
                                    sx: {
                                        width: "fit-content"
@@ -71,7 +72,7 @@ export function PageHeader({buttons, subTitle, title, breadcrumbs}: PageHeaderPr
                                            <Button fullWidth={true}
                                                    {...b}
                                                    sx={{
-                                                       borderRadius: 0,
+                                                       borderRadius:0,
                                                        justifyContent: "space-between"
                                                    }}
                                                    key={`page-header-btn-${index}`}/>

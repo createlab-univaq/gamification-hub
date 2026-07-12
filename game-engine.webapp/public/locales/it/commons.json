@@ -234,6 +234,7 @@
       "message": "La medaglia \"{{name}}\" è stata salvata con successo"
     },
     "form": {
+      "title": "Salva collezione",
       "collection_name": "Nome collezione",
       "badges_title": "Medaglie",
       "badge_name": "Nome medaglia",
@@ -253,6 +254,7 @@
       "message": "La sfida \"{{name}}\" è stata salvata con successo"
     },
     "form": {
+      "title": "Salva sfida",
       "variables_title": "Variabili",
       "variable_name": "Nome variabile",
       "add_variable": "Aggiungi variabile"
@@ -272,6 +274,7 @@
       "message": "Il livello \"{{name}}\" è stata salvata con successo"
     },
     "form": {
+      "title": "Salva livello",
       "point_concept": "Nome punteggio",
       "thresholds_hint": "Definisci le soglie del livello. L'ordine determina l'indice della soglia.",
       "threshold_name": "Nome soglia",
@@ -431,5 +434,9 @@
       "capacity": "Capacità",
       "add_period": "Aggiungi periodo"
     }
+  },
+  "error_page":{
+    "title": "Qualcosa è andato storto",
+    "message": "La pagina a cui stai cercando di accedere non esiste."
   }
 }

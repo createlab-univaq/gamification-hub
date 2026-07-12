@@ -9,6 +9,7 @@ import {Loading} from "../../components/Loading.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {ClassificationForm} from "../../components/form/ClassificationForm.tsx";
 import {useTranslation} from "react-i18next";
+import {Games, Leaderboard} from "@mui/icons-material";
 
 export function ClassificationUpsertPage() {
 
@@ -32,7 +33,25 @@ export function ClassificationUpsertPage() {
     }
 
     return <PageContainer>
-        <PageHeader title={classificationId ? t("leaderboards.upsert.edit") : t("leaderboards.upsert.new")}/>
+        <PageHeader
+            title={classificationId ? t("leaderboards.upsert.edit") : t("leaderboards.upsert.new")}
+            breadcrumbs={[
+                {
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
+                },
+                {
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
+                },
+                {
+                    label: t("sidebar.classifications"),
+                    href: `/games/${game.id}/classifications`,
+                    icon: <Leaderboard/>
+                }
+            ]}
+        />
         <Stack sx={{marginTop: 3}}>
             <ClassificationForm gameId={game.id!} classification={data}/>
         </Stack>

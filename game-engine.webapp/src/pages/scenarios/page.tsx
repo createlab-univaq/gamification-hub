@@ -6,6 +6,7 @@ import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {Loading} from "../../components/Loading.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {SimulationForm} from "../../components/form/SimulationForm.tsx";
+import {Box} from "@mui/material";
 
 export function SimulationPage() {
 
@@ -28,7 +29,9 @@ export function SimulationPage() {
     }
 
     return <PageContainer>
-        <SimulationForm gameId={game.id!} scenario={data}/>
+        <Box sx={{py:2}}>
+            <SimulationForm gameId={game.id!} scenario={data}/>
+        </Box>
     </PageContainer>
 
 }

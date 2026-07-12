@@ -8,7 +8,7 @@ import {Loading} from "../../components/Loading.tsx";
 import {Navigate} from "react-router-dom";
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {Add} from "@mui/icons-material";
+import {Add, Games} from "@mui/icons-material";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {Stack, Typography} from "@mui/material";
 import {PageList} from "../../components/PageList.tsx";
@@ -77,6 +77,17 @@ export function TeamListPage() {
                     variant: "contained",
                     endIcon: <Add/>,
                     href: `/games/${game.id}/teams/upsert`
+                }
+            ]}
+            breadcrumbs={[
+                {
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
+                },
+                {
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
                 }
             ]}
         />

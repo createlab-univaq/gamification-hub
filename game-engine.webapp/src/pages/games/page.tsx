@@ -156,7 +156,7 @@ export function GamePage() {
                                         entity: t("sidebar.actions"),
                                         number: game.actions?.length ?? 0
                                     })}/>
-            <GameConceptGridElement href={`/games/${game.id}/point-concepts`} title={t("sidebar.points")}
+            <GameConceptGridElement href={`/games/${game.id}/points`} title={t("sidebar.points")}
                                     content={t("total_amount", {
                                         entity: t("sidebar.points"),
                                         number: game.concepts?.filter(concept => "score" in concept).length ?? 0

@@ -7,13 +7,14 @@ import {useMutation, useQuery} from "@tanstack/react-query";
 import {badgeClient} from "../../api";
 import {Loading} from "../../components/Loading.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {Card, CardContent, CardHeader, Chip, Stack, Typography} from "@mui/material";
-import {Delete, Edit} from "@mui/icons-material";
+import {Stack, Typography} from "@mui/material";
+import {Delete, Edit, Games, MilitaryTech} from "@mui/icons-material";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useState} from "react";
 import type {BadgeCollectionDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
+import {PageList} from "../../components/PageList.tsx";
 
 export function BadgeDetailsPage() {
 
@@ -84,19 +85,37 @@ export function BadgeDetailsPage() {
                     onClick: () => setDeleteElement(data)
                 }
             ]}
+            breadcrumbs={[
+                {
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
+                },
+                {
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
+                },
+                {
+                    label: t("sidebar.badges"),
+                    href: `/games/${game.id}/badges`,
+                    icon: <MilitaryTech/>
+                }
+            ]}
         />
         <Stack sx={{gap: 2, py: 2}}>
-            <Typography><b>{t("badges.visibility.label")}</b> {data?.hidden ? t("badges.visibility.hidden") : t("badges.visibility.visibile")}
+            <Typography><b>{t("badges.visibility.label")}</b> {data?.hidden ? t("badges.visibility.hidden") : t("badges.visibility.visible")}
             </Typography>
-            <Card>
-                <CardHeader title={`${t("sidebar.badges")} (${data?.badges?.length ?? 0})`}/>
-                <CardContent>
-                    <Stack direction={"row"} sx={{gap: 1, flexWrap: "wrap"}}>
-                        {(data?.badges ?? []).map(b => <Chip key={b} label={b}/>)}
-                        {!(data?.badges ?? []).length && <Typography>{t("badges.empty_list")}</Typography>}
-                    </Stack>
-                </CardContent>
-            </Card>
+            <Stack>
+                <Typography variant={"h5"}>{t("sidebar.badges")} ({data?.badges?.length ?? 0})</Typography>
+                <PageList items={data?.badges ?? []}
+                          itemHref={() => ""}
+                          renderItem={(badge) => {
+                              return <Typography variant={"h5"}>{badge}</Typography>
+                          }}
+                          emptyListMessage={t("badges.empty_list")}
+                          enableLayout={false}
+                />
+            </Stack>
         </Stack>
     </PageContainer>
 

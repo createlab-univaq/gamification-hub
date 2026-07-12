@@ -20,7 +20,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import {EmojiEvents} from "@mui/icons-material"
+import {EmojiEvents, Games, Leaderboard} from "@mui/icons-material"
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
 import type {GetFilter} from "../../api/filters/filters.ts";
@@ -77,6 +77,22 @@ export function ClassificationBoardPage() {
                     children: t("buttons:turn_back"),
                     variant: "contained",
                     href: `/games/${game.id}/classifications`
+                }
+            ]}
+            breadcrumbs={[
+                {
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
+                },
+                {
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
+                },
+                {
+                    label: t("sidebar.classifications"),
+                    href: `/games/${game.id}/classifications`,
+                    icon: <Leaderboard/>
                 }
             ]}
         />

@@ -1,8 +1,12 @@
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {Stack, Typography} from "@mui/material";
+import {Button, Stack, Typography} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 export function ErrorPage() {
+
+    const [t] = useTranslation();
+
     return <PageContainer>
         <Stack sx={{
             alignItems:"center",
@@ -11,9 +15,9 @@ export function ErrorPage() {
             gap:"2rem"
         }}
         >
-            <PageHeader title={"How did we get here?"}/>
-            <Typography>Seems like the page you are trying to access doesn't exist!</Typography>
-            <Typography>Click to go <a href={"/dashboard"}>back</a></Typography>
+            <PageHeader title={<Typography variant={"h4"} sx={{textAlign:"center"}}>{t("error_page.title")}</Typography>}/>
+            <Typography sx={{textAlign:"center"}}>{t("error_page.message")}</Typography>
+            <Button href={"/dashboard"}>{t("buttons:turn_back")}</Button>
         </Stack>
     </PageContainer>
 }

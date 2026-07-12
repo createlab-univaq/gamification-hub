@@ -66,13 +66,13 @@ export function SidebarLayout() {
         }}
     >
         {width >= 800 && <Toolbar/>}
-        <Box sx={{overflow: 'auto', overflowX: "hidden", overflowY: "hidden"}}>
+        <Box sx={{overflowX: "hidden", overflowY: "hidden"}}>
             {width < 800 &&
-                <Stack direction={"row"} sx={{p:1}}>
-                    <a href={"/dashboard"} style={{display: "flex", justifyContent:"center", alignItems:"center"}} >
+                <Stack direction={"row"} sx={{p: 1}}>
+                    <a href={"/dashboard"} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
                         <UnivaqLogo
                             sx={{
-                                width: "5rem"
+                                width: "4.5rem"
                             }}
                         />
                         <AppIcon
@@ -88,7 +88,7 @@ export function SidebarLayout() {
                                     sm: "50%",
                                     xs: "0"
                                 },
-                                height:{
+                                height: {
                                     lg: "2rem",
                                     md: "2rem",
                                     sm: "2rem",
@@ -99,7 +99,21 @@ export function SidebarLayout() {
                     </a>
                 </Stack>
             }
-            <List sx={{height: "90dvh", backgroundColor:(theme)=>theme.palette.background.paper}}>
+            <List
+                sx={{
+                    height: {
+                        lg:"90dvh",
+                        md:"90dvh",
+                        sm:"90dvh",
+                        xs:"90dvh"
+                    },
+                    paddingBottom:{
+                      xs:5
+                    },
+                    backgroundColor: (theme) => theme.palette.background.paper,
+                    overflowY: "auto"
+                }}
+            >
                 {getSidebarItems().map(item => {
                     const Icon = item.icon
                     const isSelected = location.pathname.endsWith(item.href?.replace(".", ""))

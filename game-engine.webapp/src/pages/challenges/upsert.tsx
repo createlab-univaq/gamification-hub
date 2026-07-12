@@ -8,11 +8,14 @@ import {Stack} from "@mui/material";
 import {Loading} from "../../components/Loading.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {ChallengeForm} from "../../components/form/ChallengeForm.tsx";
+import {Games, SportsScore} from "@mui/icons-material";
+import {useTranslation} from "react-i18next";
 
 export function ChallengeUpsertPage() {
 
     const game = useGame()
     const {challengeId} = useParams()
+    const [t] = useTranslation();
 
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-challenges", game.id],
@@ -32,7 +35,25 @@ export function ChallengeUpsertPage() {
     const challenge = challengeId ? data?.find(c => c.id === challengeId) : undefined
 
     return <PageContainer>
-        <PageHeader title={challengeId ? "Aggiorna modello di sfida" : "Aggiungi modello di sfida"}/>
+        <PageHeader
+            title={t("challenges.form.title")}
+            breadcrumbs={[
+                {
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
+                },
+                {
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
+                },
+                {
+                    label: t("sidebar.challenges"),
+                    href: `/games/${game.id}/challenges`,
+                    icon: <SportsScore/>
+                }
+            ]}
+        />
         <Stack sx={{marginTop: 3}}>
             <ChallengeForm gameId={game.id!} challenge={challenge}/>
         </Stack>
