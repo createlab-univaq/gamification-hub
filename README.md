@@ -47,9 +47,9 @@ The application has three parts: MongoDB (plus optional monitoring), the `game-e
 * Docker and Docker Compose
 
 ### 1. Start the infrastructure
-From the repository root, bring up MongoDB (and the monitoring stack):
+From the repository root, use `docker-compose.local.yaml` — the local-development compose file, which includes MongoDB (and the monitoring stack):
 ```
-docker compose up -d mongo
+docker compose -f docker-compose.local.yaml up -d mongo
 ```
 MongoDB is exposed on `localhost:50000`.
 
@@ -69,10 +69,14 @@ npm run dev
 ```
 The dev server runs on `http://localhost:5173` and proxies `/api` requests to the backend on port `8080`.
 
-### Running everything with Docker
-Alternatively, build and run the full stack (MongoDB, API and monitoring) with Docker Compose:
+### Running everything with Docker (local development)
+Alternatively, build and run the full stack (MongoDB, API, webapp and monitoring) with `docker-compose.local.yaml` — this is the compose file meant for local development; it bundles the split `docker-compose.backend.yaml` and `docker-compose.frontend.yaml` together with a local-only MongoDB:
 ```
-docker compose up --build
+docker compose -f docker-compose.local.yaml up --build
 ```
 
 The API takes a .env.prod file to run. Ask the administrator to provid the file as it contains sensitive information.
+
+### Deployment
+
+`docker-compose.backend.yaml` and `docker-compose.frontend.yaml` are deployed separately (e.g. as two Coolify resources) and don't include MongoDB — it's expected to run as its own managed database resource. See [documentation](documentation) for details.
