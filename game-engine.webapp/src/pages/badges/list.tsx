@@ -8,7 +8,7 @@ import {Loading} from "../../components/Loading.tsx";
 import {Navigate} from "react-router-dom";
 import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
-import {Add, Games} from "@mui/icons-material";
+import {Add, Games, MoreHoriz} from "@mui/icons-material";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {Chip, Stack, Typography} from "@mui/material";
 import {PageList} from "../../components/PageList.tsx";
@@ -99,10 +99,13 @@ export function BadgeListPage() {
             items={collections}
             itemHref={(i) => `/games/${game.id}/badges/${i.id}`}
             renderItem={(badge) => {
+                const firstBadges = badge.badges?.slice(0, 4) ?? []
+                const hasMoreBadges = (badge.badges?.length ?? 0) >= 5
                 return <Stack sx={{gap: 1}}>
                     <Typography sx={{fontWeight: "bold", fontSize: "1.2rem"}}>{badge.name}</Typography>
                     <Stack direction={"row"} sx={{gap: 1, flexWrap: "wrap"}}>
-                        {(badge.badges ?? []).map(b => <Chip key={b} label={b} size={"small"}/>)}
+                        {firstBadges.map(b => <Chip key={b} label={b} size={"small"}/>)}
+                        {hasMoreBadges && <MoreHoriz/>}
                     </Stack>
                 </Stack>
             }}

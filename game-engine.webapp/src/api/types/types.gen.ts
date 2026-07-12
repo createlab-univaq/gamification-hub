@@ -426,18 +426,18 @@ export type PagePlayerDto = {
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    sort?: SortObject;
     pageable?: PageableObject;
+    sort?: SortObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
     offset?: number;
     unpaged?: boolean;
-    sort?: SortObject;
     paged?: boolean;
     pageSize?: number;
     pageNumber?: number;
+    sort?: SortObject;
 };
 
 export type SortObject = {
@@ -515,8 +515,8 @@ export type PageClassificationPositionDto = {
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    sort?: SortObject;
     pageable?: PageableObject;
+    sort?: SortObject;
     empty?: boolean;
 };
 

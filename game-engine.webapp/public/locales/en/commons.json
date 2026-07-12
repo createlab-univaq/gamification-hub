@@ -234,6 +234,7 @@
       "message": "Badge concept \"{{name}}\" has been saved successfully"
     },
     "form": {
+      "title": "Save badge collection",
       "collection_name": "Collection name",
       "badges_title": "Badges",
       "badge_name": "Badge name",
@@ -253,6 +254,7 @@
       "message": "Challenge \"{{name}}\" has been saved successfully"
     },
     "form": {
+      "title": "Save challenge",
       "variables_title": "Variables",
       "variable_name": "Variable name",
       "add_variable": "Add variable"
@@ -272,6 +274,7 @@
       "message": "Level \"{{name}}\" has been saved successfully"
     },
     "form": {
+      "title": "Save level",
       "point_concept": "Point concept name",
       "thresholds_hint": "Define the level thresholds. Their order determines the threshold index.",
       "threshold_name": "Threshold name",
@@ -431,5 +434,9 @@
       "capacity": "Capacity",
       "add_period": "Add period"
     }
+  },
+  "error_page":{
+    "title": "How did we get here?",
+    "message": "Seems like the page you are trying to access doesn't exist!"
   }
 }

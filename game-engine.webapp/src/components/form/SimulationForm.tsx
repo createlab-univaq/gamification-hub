@@ -4,7 +4,6 @@ import {useNotificationContext} from "../../hooks/use-notification-context";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {useFieldArray, useForm} from "react-hook-form";
 import {useEffect} from "react";
-import {navigateTo} from "../../utils/navigation-utils.ts";
 import {
     Accordion,
     AccordionDetails,
@@ -17,7 +16,7 @@ import {
     Tooltip,
     Typography,
 } from "@mui/material";
-import {Add, ArrowBack, Delete, ExpandMore, PlayArrow, Save} from "@mui/icons-material";
+import {Add, ArrowBack, Delete, ExpandMore, Games, PlayArrow, Save, Science} from "@mui/icons-material";
 import type {
     PlayerStateDto,
     SimulationRequestDto,
@@ -32,6 +31,8 @@ import {FormInput} from "./FormInput.tsx";
 import {SimulationFlowGraph} from "../simulation/SimulationFlowGraph.tsx";
 import {PageHeader} from "../layout/PageHeader.tsx";
 import {useTranslation} from "react-i18next";
+import {useGame} from "../../hooks/use-game.ts";
+import {Loading} from "../Loading.tsx";
 
 interface SimulationFormProps {
     gameId: string
@@ -198,7 +199,7 @@ function toFormValues(scenario: SimulationScenarioDto): SimulationFormValues {
 export function SimulationForm({gameId, scenario}: SimulationFormProps) {
     const {setNotification} = useNotificationContext()
     const [t] = useTranslation()
-
+    const game = useGame()
     const form = useForm<SimulationFormValues>({
         defaultValues: {
             name: "",
@@ -305,13 +306,15 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                     {
                         children: t("buttons:turn_back"),
                         variant: "outlined",
+                        type: "button",
                         startIcon: <ArrowBack/>,
                         disabled: isSaving,
-                        onClick: () => navigateTo(`/games/${gameId}/scenarios`)
+                        href: `/games/${gameId}/scenarios`
                     },
                     {
                         children: t("buttons:save"),
                         variant: "contained",
+                        type: "button",
                         loading: isSaving || isPending,
                         disabled: !name?.trim() || isSaving || isPending,
                         endIcon: <Save/>,
@@ -322,7 +325,8 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                         type: "submit",
                         variant: "contained",
                         loading: isPending,
-                        endIcon: <PlayArrow/>
+                        endIcon: <PlayArrow/>,
+                        onClick: form.handleSubmit((v) => mutate(v as SimulationFormValues))
                     },
                     {
                         children: t("buttons:reset"),
@@ -333,6 +337,22 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                         variant: "outlined",
                         loading: isPending,
                         endIcon: <Delete/>
+                    }
+                ]}
+                breadcrumbs={[
+                    {
+                        icon: <Games/>,
+                        label: t("sidebar.games"),
+                        href: "/dashboard"
+                    },
+                    {
+                        label: game.name ?? "My Game",
+                        href: `/games/${game.id}`
+                    },
+                    {
+                        label: t("sidebar.scenarios"),
+                        href: `/games/${game.id}/scenarios`,
+                        icon: <Science/>
                     }
                 ]}
             />
@@ -607,7 +627,11 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                             <Typography color="text.secondary">{t("scenarios.form.outputs.placeholder")}</Typography>
                         </Box>
                     )}
-
+                    {isPending &&
+                        <Stack sx={{alignItems:"center", justifyContent:"center"}}>
+                            <Loading/>
+                        </Stack>
+                    }
                     {result && <>
                         <Typography variant="h6">
                             {t("scenarios.form.outputs.count", {count: result.firedRules?.length ?? 0})}

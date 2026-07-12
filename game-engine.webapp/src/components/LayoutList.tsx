@@ -20,6 +20,7 @@ export interface LayoutListProps<T> {
     renderItem: (i: T, layout: LayoutType) => ReactNode,
     emptyListMessage?: ReactNode
     selection?: ListSelection<T>
+    enableLayout?: boolean
 }
 
 export function LayoutList<T>({
@@ -30,7 +31,7 @@ export function LayoutList<T>({
                                   itemHref,
                                   onItemUpdate,
                                   emptyListMessage,
-                                  selection
+                                  selection,
                               }: LayoutListProps<T>) {
 
     const hasUpdateButton = !!onItemUpdate
