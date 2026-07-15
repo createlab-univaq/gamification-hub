@@ -11,7 +11,7 @@ interface ThemeProviderProps {
 }
 
 const defaultTheme = {
-    mode: "light",
+    mode: "dark",
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     switchTheme: (_type) => {
     }
@@ -26,7 +26,7 @@ function GameEngineUIThemeProvider({children}: PropsWithChildren) {
     const THEME_KEY = "game-engine.ui.theme"
 
     const [mode, setMode] = useState<ThemeType>(() => {
-        const currentTheme = localStorage.getItem(THEME_KEY) as ThemeType ?? "light"
+        const currentTheme = localStorage.getItem(THEME_KEY) as ThemeType ?? "dark"
         localStorage.setItem(THEME_KEY, currentTheme)
         return currentTheme
     })

@@ -39,8 +39,8 @@ export function GamesListPage() {
             setNotification({
                 notification: {
                     type: "success",
-                    title: "Game deleted",
-                    content: `The game has been successfully deleted`
+                    title: t("game.deleted.title"),
+                    content: t("game.deleted.message")
                 },
                 isSnack: true
             })
@@ -130,8 +130,8 @@ export function GamesListPage() {
             onSuccess={(data) => {
                 setNotification({
                     notification: {
-                        title: "Import successful!",
-                        content: `${data.length} were successfully saved.`,
+                        title: t("import.success.title"),
+                        content: t("import.success.message", {number:data.length}),
                         type: "success"
                     },
                     isSnack: true

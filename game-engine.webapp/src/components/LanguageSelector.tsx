@@ -50,6 +50,7 @@ export function LanguageSelector({defaultLanguage}: LanguageSelectorProps) {
         size={"small"}
         value={lng.lang}
         onChange={(e) => handleChange(e.target.value as Language)}
+        MenuProps={{disableScrollLock: true}}
         sx={{
             "&:before": {
                 borderBottom: "unset"

@@ -1,10 +1,15 @@
-import {Stack} from "@mui/material";
-import type {PropsWithChildren} from "react";
+import {Stack, type SxProps} from "@mui/material";
+import type {ReactNode} from "react";
 import {useEffect, useRef} from "react";
 import {useLocation} from "react-router-dom";
 import {useNotificationContext} from "../../hooks/use-notification-context";
 
-export function PageContainer({children}: PropsWithChildren) {
+interface PageContainerProps {
+    sx?: SxProps
+    children: ReactNode;
+}
+
+export function PageContainer({children, sx}: PageContainerProps) {
 
     const location = useLocation()
     const {setNotification} = useNotificationContext()
@@ -31,6 +36,7 @@ export function PageContainer({children}: PropsWithChildren) {
         flex: 1,
         minHeight: 0,
         overflow: "auto",
+        ...(sx ?? {})
     }}
     >
         {children}

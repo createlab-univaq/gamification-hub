@@ -1,6 +1,7 @@
 import {Box, Stack, Typography} from "@mui/material";
 import {type DragEvent, useRef, useState} from "react";
 import {CloudUpload, DeleteForever, InsertDriveFile} from "@mui/icons-material";
+import {useTranslation} from "react-i18next";
 
 interface FileUploaderProps {
     multiple?: boolean
@@ -13,6 +14,7 @@ export function FileUploader({acceptedMimeTypes, onChange, multiple, disabled}: 
     const inputRef = useRef<HTMLInputElement>(null)
     const [currentFiles, setCurrentFiles] = useState<FileList | undefined>(undefined)
     const [dragOver, setDragOver] = useState(false)
+    const [t] = useTranslation()
 
     const handleChangeEvent = (files: FileList) => {
         setCurrentFiles(files)
@@ -86,7 +88,7 @@ export function FileUploader({acceptedMimeTypes, onChange, multiple, disabled}: 
                     <Stack spacing={1} sx={{color: "text.secondary", alignItems: "center"}}>
                         <CloudUpload sx={{fontSize: 48}}/>
                         <Typography variant="body2">
-                            Drag &amp; drop or click to upload
+                            {t("import.modal.upload")}
                         </Typography>
                     </Stack>
                 ) : (
