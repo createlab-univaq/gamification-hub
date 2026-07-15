@@ -434,16 +434,16 @@ export type PagePlayerDto = {
 export type PageableObject = {
     offset?: number;
     unpaged?: boolean;
-    paged?: boolean;
     pageSize?: number;
     pageNumber?: number;
+    paged?: boolean;
     sort?: SortObject;
 };
 
 export type SortObject = {
     empty?: boolean;
-    sorted?: boolean;
     unsorted?: boolean;
+    sorted?: boolean;
 };
 
 export type NotificationDto = {

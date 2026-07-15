@@ -1,5 +1,5 @@
 import {ChevronRight, MoreVertTwoTone} from "@mui/icons-material";
-import {Breadcrumbs, Button, type ButtonProps, Divider, Stack, Typography} from "@mui/material"
+import {Breadcrumbs, Button, type ButtonProps, Divider, Stack, type SxProps, Typography} from "@mui/material"
 import type {ReactNode} from "react";
 import {useWindowSize} from "../../hooks/use-window-size.ts";
 import {PopoverButton} from "../PopoverButton.tsx";
@@ -14,10 +14,11 @@ export interface PageHeaderProps {
     title?: ReactNode
     subTitle?: ReactNode
     buttons?: ButtonProps[]
-    breadcrumbs?: BreadcrumbProps[]
+    breadcrumbs?: BreadcrumbProps[],
+    sx?:SxProps
 }
 
-export function PageHeader({buttons, subTitle, title, breadcrumbs}: PageHeaderProps) {
+export function PageHeader({buttons, subTitle, title, breadcrumbs, sx}: PageHeaderProps) {
 
     const Title = typeof title === "string" ? <Typography variant={"h4"}>{title}</Typography> : title
     const SubTitle = typeof subTitle === "string" ? <Typography variant={"body1"}>{subTitle}</Typography> : subTitle
@@ -25,7 +26,7 @@ export function PageHeader({buttons, subTitle, title, breadcrumbs}: PageHeaderPr
     const MIN_WIDTH_FOR_BUTTONS = 760
     const requiresPopoverButton = ((width < MIN_WIDTH_FOR_BUTTONS && (buttons?.length ?? 0) > 3) || width < 450) && buttons?.length
 
-    return <Stack sx={{gap: 2}}>
+    return <Stack sx={{gap: 2, ...(sx ?? {})}}>
         {(breadcrumbs && breadcrumbs.length) &&
             <Stack direction={"row"}>
                 <Breadcrumbs component={"span"} separator={<ChevronRight/>} sx={{gap: 0}}>

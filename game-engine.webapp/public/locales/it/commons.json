@@ -55,11 +55,49 @@
     "levels": "Livelli",
     "scenarios": "Scenari",
     "challenges": "Modelli di sfida",
-    "guide": "Guida API"
+    "guide": "Guida"
   },
   "guide": {
     "back_to_app": "Torna all'app",
     "load_error": "Impossibile caricare la guida. Riprova più tardi."
+  },
+  "landing": {
+    "hero": {
+      "title": "Trasforma le tue regole in un gioco",
+      "subtitle": "Definisci ed esegui giochi basati su punteggi: sfide, azioni, medaglie, livelli e molto altro, il tutto guidato da un motore di regole che controlli tu."
+    },
+    "highlights": [
+      {
+        "title": "Progetta il tuo gioco",
+        "description": "Parti dal quadro d'insieme. Combina diversi concetti come medaglie e soglie di livello in un unico gioco che rispecchia esattamente ciò che vuoi premiare, senza bisogno di scrivere codice per ottenere la struttura giusta e senza un foglio di calcolo da tenere aggiornato."
+      },
+      {
+        "title": "Costruisci le tue regole",
+        "description": "Trasforma le condizioni in logica con un builder di regole visuale, supportato da un vero motore di regole basato su Drools. Trascina, collega e riusa le condizioni invece di scrivere script fragili a mano che si rompono al primo cambiamento."
+      },
+      {
+        "title": "Simula e testa",
+        "description": "Non indovinare mai cosa farà una modifica alle regole. Eseguila prima su uno stato sintetico, osserva esattamente cosa si attiva e cosa cambia grazie a un'analisi d'impatto completa, e pubblicala solo quando sei sicuro che sia sicura."
+      },
+      {
+        "title": "Segui i tuoi giocatori",
+        "description": "Mantieni tutti in corsa per il primo posto. Crea diverse classifiche, segui i profili dei singoli giocatori e guarda ogni classifica aggiornarsi in tempo reale al variare dei punteggi."
+      },
+      {
+        "title": "Avvia sfide",
+        "description": "Trasforma gli obiettivi in sfide che i giocatori possono davvero inseguire. Assegnale uno contro uno o invita intere squadre a competere, e premia automaticamente chi taglia il traguardo per primo, senza alcuna gestione manuale."
+      }
+    ],
+    "cta": {
+      "title": "Pronto a creare il tuo primo gioco?",
+      "subtitle": "Accedi e inizia a definire regole, punteggi e sfide in pochi minuti."
+    },
+    "footer": {
+      "tagline": "Trasforma le tue regole in un gioco.",
+      "department": "Università degli Studi dell'Aquila, Dipartimento di Ingegneria e Scienze dell'Informazione e Matematica",
+      "linksTitle": "Prodotto",
+      "copyright": "© {{year}} GamificationHub. Tutti i diritti riservati."
+    }
   },
   "total_amount": "{{entity, capitalize}} totali: {{number}}",
   "game": {
@@ -75,6 +113,10 @@
     "saved": {
       "title": "Gioco salvato!",
       "message": "Il gioco \"{{name}}\" è stato salvato con successo"
+    },
+    "deleted":{
+      "title": "Gioco eliminato!",
+      "message": "Il gioco è stato eliminato con successo"
     }
   },
   "rules": {
@@ -438,5 +480,16 @@
   "error_page":{
     "title": "Qualcosa è andato storto",
     "message": "La pagina a cui stai cercando di accedere non esiste."
+  },
+  "import":{
+    "modal": {
+      "title": "Importa Giochi",
+      "errors": "Uno o più files non possono essere caricati. Il formato del JSON non è corretto",
+      "upload": "Trascina o seleziona files"
+    },
+    "success": {
+      "title": "Importazione completata!",
+      "message": "{{number}} giochi salvati correttamente"
+    }
   }
 }

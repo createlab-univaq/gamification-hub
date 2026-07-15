@@ -12,12 +12,13 @@ services:
       - "host.docker.internal:host-gateway"
 
   grafana:
-    image: grafana/grafana:latest
+    build:
+      context: ./monitoring/grafana
+      dockerfile: Dockerfile
     container_name: gamification-grafana
     ports:
       - "3000:3000"
     volumes:
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus

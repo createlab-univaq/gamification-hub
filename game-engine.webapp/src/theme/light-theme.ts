@@ -5,26 +5,26 @@ export const lightTheme = createTheme({
     palette: {
         mode: 'light',
         primary: {
-            light: '#5B8DEF',
-            main: '#1A56DB',
-            dark: '#1040B0',
+            light: '#C084FC',
+            main: '#9333EA',
+            dark: '#7E22CE',
             contrastText: '#FFFFFF',
         },
         secondary: {
-            light: '#E8F0FE',
-            main: '#D2E3FC',
-            dark: '#A8C7FA',
-            contrastText: '#1A56DB',
+            light: '#FBCFE8',
+            main: '#DB2777',
+            dark: '#9D174D',
+            contrastText: '#FFFFFF',
         },
         background: {
-            default: '#F7F9FC',
+            default: '#F9F7FC',
             paper: '#FFFFFF'
         },
         text: {
-            primary: '#111827',
-            secondary: '#6B7280',
+            primary: '#1A1625',
+            secondary: '#6E6878',
         },
-        divider: '#E5E7EB',
+        divider: '#E7E1F0',
         warning: {
             light: '#ffca24',
             main: '#ffd200',
@@ -45,8 +45,8 @@ export const lightTheme = createTheme({
             styleOverrides: {
                 root: {
                     backgroundColor: '#FFFFFF',
-                    color: '#111827',
-                    boxShadow: '0 1px 0 0 #E5E7EB',
+                    color: '#1A1625',
+                    boxShadow: '0 1px 0 0 #E7E1F0',
                 },
             },
         },
@@ -54,8 +54,8 @@ export const lightTheme = createTheme({
             styleOverrides: {
                 paper: {
                     backgroundColor: '#FFFFFF',
-                    color: '#111827',
-                    boxShadow: '0 1px 0 0 #E5E7EB',
+                    color: '#1A1625',
+                    boxShadow: '0 1px 0 0 #E7E1F0',
                 },
             },
         },
@@ -77,7 +77,7 @@ export const lightTheme = createTheme({
             styleOverrides: {
                 root: {
                     boxShadow: '0 1px 3px 0 rgba(0,0,0,0.08)',
-                    border: '1px solid #E5E7EB',
+                    border: '1px solid #E7E1F0',
                 },
             },
         },

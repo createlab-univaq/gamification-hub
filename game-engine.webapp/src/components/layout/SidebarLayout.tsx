@@ -7,7 +7,6 @@ import {SIDEBAR_OPEN_KEY} from "../../utils/storage-utils.ts";
 import {getBaseGamePath} from "../../utils/navigation-utils.ts";
 import {useTranslation} from "react-i18next";
 import {UseSidebarContext, useSidebarContext} from "../../hooks/use-sidebar-context.ts";
-import {UnivaqLogo} from "../logo/UnivaqLogo.tsx";
 import {AppLogo} from "../logo/AppLogo.tsx";
 import {AppIcon} from "../logo/AppIcon.tsx";
 
@@ -70,28 +69,23 @@ export function SidebarLayout() {
             {width < 800 &&
                 <Stack direction={"row"} sx={{p: 1}}>
                     <a href={"/dashboard"} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-                        <UnivaqLogo
-                            sx={{
-                                width: "4.5rem"
-                            }}
-                        />
                         <AppIcon
                             sx={{
-                                width: "4rem"
+                                width: "3rem"
                             }}
                         />
                         <AppLogo
                             sx={{
                                 width: {
-                                    lg: "50%",
-                                    md: "50%",
-                                    sm: "50%",
+                                    lg: "65%",
+                                    md: "65%",
+                                    sm: "65%",
                                     xs: "0"
                                 },
                                 height: {
-                                    lg: "2rem",
-                                    md: "2rem",
-                                    sm: "2rem",
+                                    lg: "2.2rem",
+                                    md: "2.2rem",
+                                    sm: "2.2rem",
                                     xs: "0"
                                 }
                             }}
@@ -102,13 +96,13 @@ export function SidebarLayout() {
             <List
                 sx={{
                     height: {
-                        lg:"90dvh",
-                        md:"90dvh",
-                        sm:"90dvh",
-                        xs:"90dvh"
+                        lg: "90dvh",
+                        md: "90dvh",
+                        sm: "90dvh",
+                        xs: "90dvh"
                     },
-                    paddingBottom:{
-                      xs:5
+                    paddingBottom: {
+                        xs: 5
                     },
                     backgroundColor: (theme) => theme.palette.background.paper,
                     overflowY: "auto"
