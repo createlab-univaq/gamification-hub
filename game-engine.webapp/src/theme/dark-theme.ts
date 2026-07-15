@@ -5,26 +5,26 @@ export const darkTheme = createTheme({
     palette: {
         mode: 'dark',
         primary: {
-            light: '#93B4F8',
-            main: '#3B82F6',
-            dark: '#1D4ED8',
+            light: '#D8B4FE',
+            main: '#A855F7',
+            dark: '#7E22CE',
             contrastText: '#FFFFFF',
         },
         secondary: {
-            light: '#1E3A5F',
-            main: '#172D4D',
-            dark: '#0F1E33',
-            contrastText: '#93B4F8',
+            light: '#831843',
+            main: '#9D174D',
+            dark: '#500724',
+            contrastText: '#F9A8D4',
         },
         background: {
-            default: '#0F172A',
-            paper: '#1E293B'
+            default: '#0F0B1A',
+            paper: '#1E1730'
         },
         text: {
-            primary: '#F1F5F9',
-            secondary: '#94A3B8',
+            primary: '#F3EFFA',
+            secondary: '#A99BC7',
         },
-        divider: '#334155',
+        divider: '#332B4D',
         warning: {
             light: '#ffd455',
             main: '#ffcc44',
@@ -44,17 +44,17 @@ export const darkTheme = createTheme({
         MuiAppBar: {
             styleOverrides: {
                 root: {
-                    backgroundColor: '#1E293B',
-                    color: '#F1F5F9',
-                    boxShadow: '0 1px 0 0 #334155',
+                    backgroundColor: '#1E1730',
+                    color: '#F3EFFA',
+                    boxShadow: '0 1px 0 0 #332B4D',
                 },
             },
         },
         MuiDrawer: {
             styleOverrides: {
                 paper: {
-                    backgroundColor: '#1E293B',
-                    color: '#F1F5F9',
+                    backgroundColor: '#1E1730',
+                    color: '#F3EFFA',
                     borderRight: 'none',
                 },
             },
@@ -77,7 +77,7 @@ export const darkTheme = createTheme({
             styleOverrides: {
                 root: {
                     boxShadow: 'none',
-                    border: '1px solid #334155',
+                    border: '1px solid #332B4D',
                 },
             },
         },

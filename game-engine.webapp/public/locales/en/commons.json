@@ -55,11 +55,49 @@
     "levels": "Levels",
     "scenarios": "Scenarios",
     "challenges": "Challenge Models",
-    "guide": "API Guide"
+    "guide": "Guide"
   },
   "guide": {
     "back_to_app": "Back to app",
     "load_error": "Could not load the guide. Please try again later."
+  },
+  "landing": {
+    "hero": {
+      "title": "Turn your rules into a game",
+      "subtitle": "Define and run score-based games: rules, points, badges, levels, challenges, teams and leaderboards, all powered by a rule engine you control."
+    },
+    "highlights": [
+      {
+        "title": "Design your game",
+        "description": "Start with the big picture. Combine point concepts, badges and level thresholds into a single game that reflects exactly what you want to reward, with no code required to get the structure right and no spreadsheet to keep in sync."
+      },
+      {
+        "title": "Build your rules",
+        "description": "Turn conditions into logic with a visual rule builder backed by a real rule engine powered by Drools. Drag, connect and reuse conditions instead of hand-writing fragile scripts that break the moment something changes."
+      },
+      {
+        "title": "Simulate & test",
+        "description": "Never guess what a rule change will do. Run it against a synthetic player first, inspect exactly what fires and what changes through a full impact analysis, and only publish once you're confident it's safe."
+      },
+      {
+        "title": "Track your players",
+        "description": "Keep everyone racing for the top. Build all-time rankings or ones that reset every week or month, follow individual player profiles, and watch every leaderboard update live as scores change."
+      },
+      {
+        "title": "Run challenges",
+        "description": "Turn goals into challenges players can actually chase. Assign them one-on-one or invite whole teams to compete, and reward automatically whoever crosses the line first, with no manual bookkeeping involved."
+      }
+    ],
+    "cta": {
+      "title": "Ready to build your first game?",
+      "subtitle": "Sign in and start defining rules, points and challenges in minutes."
+    },
+    "footer": {
+      "tagline": "Turn your rules into a game.",
+      "department": "University of L'Aquila, Department of Information Engineering, Computer Science and Mathematics",
+      "linksTitle": "Product",
+      "copyright": "© {{year}} GamificationHub. All rights reserved."
+    }
   },
   "total_amount": "Total {{entity, lowercase}}: {{number}}",
   "game": {
@@ -75,6 +113,10 @@
     "saved": {
       "title": "Game saved!",
       "message": "Game \"{{name}}\" has been saved successfully"
+    },
+    "deleted":{
+      "title": "Game deleted!",
+      "message": "The game has been deleted successfully"
     }
   },
   "rules": {
@@ -438,5 +480,16 @@
   "error_page":{
     "title": "How did we get here?",
     "message": "Seems like the page you are trying to access doesn't exist!"
+  },
+  "import":{
+    "modal": {
+      "title": "Import Games",
+      "errors": "One or more files could not be parsed to JSON",
+      "upload": "Drag and drop or click to upload"
+    },
+    "success": {
+      "title": "Import complete!",
+      "message": "{{number}} games were successfully saved."
+    }
   }
 }

@@ -1,4 +1,4 @@
-import {createBrowserRouter, Navigate} from "react-router-dom";
+import {createBrowserRouter} from "react-router-dom";
 import {lazy, Suspense} from "react";
 import {Loading} from "../components/Loading.tsx";
 import {LoginPage} from "../pages/login/page.tsx";
@@ -36,6 +36,7 @@ import {PlayerUpsertPage} from "../pages/players/upsert.tsx";
 import {PlayerDetailsPage} from "../pages/players/details.tsx";
 import {UserSettingsPage} from "../pages/settings/page.tsx";
 import {GuidePage} from "../pages/guide/page.tsx";
+import {LandingPage} from "../pages/landing/page.tsx";
 
 // eslint-disable-next-line react-refresh/only-export-components
 const BlocklyRuleUpsertPage = lazy(() => import("../pages/rules/upsert.tsx").then(m => ({default: m.BlocklyRuleUpsertPage})));
@@ -49,7 +50,7 @@ export const router = createBrowserRouter([
     },
     {
         path: "/",
-        element: <Navigate to={"/login"}/>,
+        element: <LandingPage/>,
     },
     {
         element: <PublicRoutes/>,

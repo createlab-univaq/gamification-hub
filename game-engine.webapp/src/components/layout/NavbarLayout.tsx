@@ -8,7 +8,6 @@ import {LanguageSelector} from "../LanguageSelector.tsx";
 import {useTranslation} from "react-i18next";
 import {useSidebarContext} from "../../hooks/use-sidebar-context.ts";
 import {AppLogo} from "../logo/AppLogo.tsx";
-import {UnivaqLogo} from "../logo/UnivaqLogo.tsx";
 import {useWindowSize} from "../../hooks/use-window-size.ts";
 import {AppIcon} from "../logo/AppIcon.tsx";
 
@@ -63,7 +62,7 @@ export function NavbarLayout() {
                                        </Stack>
                                        {width < 400 &&
                                            <>
-                                               <Stack direction={"row"} sx={{width:"fit-content", px:2}}>
+                                               <Stack direction={"row"} sx={{width: "fit-content", px: 2}}>
                                                    <LanguageSelector defaultLanguage={"en"}/>
                                                    <ThemeSwitch/>
                                                </Stack>
@@ -98,17 +97,12 @@ export function NavbarLayout() {
                                }}
                 />
             </Stack>
-            <Stack direction={"row"} >
+            <Stack direction={"row"}>
                 <Button variant={"text"} onClick={() => setOpen(!isOpen)}><Menu/></Button>
-                <a href={"/dashboard"} style={{display: "flex", justifyContent:"center", alignItems:"center"}}  >
-                    <UnivaqLogo
-                        sx={{
-                            width: "3.5rem"
-                        }}
-                    />
+                <a href={"/dashboard"} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
                     <AppIcon
                         sx={{
-                            width: "3rem"
+                            width: "3.5rem"
                         }}
                     />
                     <AppLogo
@@ -119,7 +113,7 @@ export function NavbarLayout() {
                                 sm: "15rem",
                                 xs: "0"
                             },
-                            height:{
+                            height: {
                                 lg: "2rem",
                                 md: "2rem",
                                 sm: "2rem",

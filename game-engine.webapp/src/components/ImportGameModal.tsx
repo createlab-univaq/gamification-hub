@@ -5,6 +5,7 @@ import type {GamePersistanceDto, ImportGameDto} from "../api/types";
 import type {DefaultError} from "@tanstack/react-query";
 import {useMutation} from "@tanstack/react-query";
 import {gameClient} from "../api";
+import {useTranslation} from "react-i18next";
 
 interface ImportGameModalProps {
     open: boolean
@@ -17,6 +18,7 @@ export function ImportGameModal({setOpen, open, onError, onSuccess}: ImportGameM
 
     const [errors, setErrors] = useState<string[]>([])
     const [games, setGames] = useState<ImportGameDto[]>()
+    const [t] = useTranslation();
     const {mutate, isPending} = useMutation<GamePersistanceDto[], DefaultError, ImportGameDto[]>({
         mutationKey: ["import-games"],
         mutationFn: (data) => gameClient.importGames(data),
@@ -31,13 +33,18 @@ export function ImportGameModal({setOpen, open, onError, onSuccess}: ImportGameM
         if (!files || !files.length) {
             return undefined
         }
-        const jsons = []
+        const jsons: ImportGameDto[] = []
         for (let i = 0; i < files.length; i++) {
             try {
-                jsons.push(JSON.parse(await files[i].text()))
+                const parsed = JSON.parse(await files[i].text())
+                if (Array.isArray(parsed)) {
+                    jsons.push(...parsed)
+                } else {
+                    jsons.push(parsed)
+                }
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
-                setErrors(["One or more files could not be parsed to JSON"])
+                setErrors([ t("import.modal.errors")])
             }
         }
         return jsons
@@ -45,7 +52,7 @@ export function ImportGameModal({setOpen, open, onError, onSuccess}: ImportGameM
 
     return <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle sx={{textAlign: "center"}}>
-            Import Game
+            {t("import.modal.title")}
         </DialogTitle>
         <DialogContent>
             <Stack direction={"row"}>
@@ -75,7 +82,7 @@ export function ImportGameModal({setOpen, open, onError, onSuccess}: ImportGameM
                     }
                 }}
             >
-                Save
+                {t("buttons:save")}
             </Button>
         </DialogActions>
     </Dialog>

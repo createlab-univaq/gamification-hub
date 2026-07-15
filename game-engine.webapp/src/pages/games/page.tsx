@@ -68,8 +68,8 @@ export function GamePage() {
             navigateTo("/dashboard", {
                 state: {
                     type: "success",
-                    title: "Game deleted",
-                    content: `The game has been successfully deleted`
+                    title: t("game.deleted.title"),
+                    content: t("game.deleted.message")
                 }
             })
         },
