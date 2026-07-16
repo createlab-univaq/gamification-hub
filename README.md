@@ -1,7 +1,7 @@
 <div>
 <img src="./game-engine.webapp/public/univaq-logo-dark.png" style="width:6rem"/>
 <img src="./game-engine.webapp/public/logo-dark.png" style="width:5rem"/>
-<img src="./game-engine.webapp/public/app-logo-dark.png" style="width:30rem"/>
+<img src="./game-engine.webapp/public/app-logo-readme.png" style="width:30rem"/>
 </div>
 
 GamificationHub is a platform that permits to define and execute score based games.
