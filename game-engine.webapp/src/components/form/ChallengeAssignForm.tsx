@@ -11,7 +11,7 @@ import type {ChallengeAssignmentDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
 import {FormCheckbox} from "./FormCheckbox.tsx";
 import {toIsoDate} from "../../utils/date-utils.ts";
-import {CHALLENGE_TYPES} from "../../utils/enum-utils.ts";
+import {ASSIGNABLE_CHALLENGE_STATES} from "../../utils/enum-utils.ts";
 
 interface ChallengeAssignFormProps {
     gameId: string
@@ -95,7 +95,7 @@ export function ChallengeAssignForm({gameId, playerId, open, onClose}: Challenge
                     <AutocompleteFormItem
                         name={"challengeType"}
                         label={t("form.labels.initial_state")}
-                        options={[...CHALLENGE_TYPES]}
+                        options={[...ASSIGNABLE_CHALLENGE_STATES]}
                         getOptionLabel={(o) => t(`enums:${o}`)}
                         getOptionValue={(o) => o}
                         rules={{required: t("required_field")}}

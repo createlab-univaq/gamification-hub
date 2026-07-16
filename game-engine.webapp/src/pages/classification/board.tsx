@@ -18,13 +18,16 @@ import {
     TablePagination,
     TableRow,
     TextField,
+    ToggleButton,
+    ToggleButtonGroup,
     Typography,
 } from "@mui/material";
-import {EmojiEvents, Games, Leaderboard} from "@mui/icons-material"
+import {EmojiEvents, Games, Groups, Leaderboard, Person} from "@mui/icons-material"
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
 import type {GetFilter} from "../../api/filters/filters.ts";
 import type {ClassificationBoardDto} from "../../api/types";
+import {CLASSIFICATION_SCOPES, type ClassificationScope} from "../../utils/enum-utils.ts";
 
 const LEADERBOARD_PODIUM_COLOURS = {
     1: "gold",
@@ -34,6 +37,7 @@ const LEADERBOARD_PODIUM_COLOURS = {
 
 type BoardFilters = {
     periodInstanceIndex: number
+    scope: ClassificationScope
     page: number
     size: number
 }
@@ -43,7 +47,7 @@ export function ClassificationBoardPage() {
     const [t] = useTranslation()
     const game = useGame()
     const {classificationId} = useParams()
-    const [filters, setFilters] = useState<BoardFilters>({periodInstanceIndex: 0, page: 0, size: 10})
+    const [filters, setFilters] = useState<BoardFilters>({periodInstanceIndex: 0, scope: "PLAYERS", page: 0, size: 10})
 
 
     const criteria: GetFilter<ClassificationBoardDto>[] =
@@ -97,8 +101,25 @@ export function ClassificationBoardPage() {
             ]}
         />
         <Stack sx={{gap: 2, marginTop: 2, minHeight: 0, flex: 1}}>
-            <Typography
-                color={"text.secondary"}>{t("leaderboards.point_concept")}: {data?.pointConceptName}</Typography>
+            <Stack direction={{xs: "column", sm: "row"}}
+                   sx={{gap: 2, alignItems: {xs: "flex-start", sm: "center"}, justifyContent: "space-between"}}>
+                <Typography
+                    color={"text.secondary"}>{t("leaderboards.point_concept")}: {data?.pointConceptName}</Typography>
+                <ToggleButtonGroup
+                    color={"primary"}
+                    exclusive={true}
+                    value={filters.scope}
+                    onChange={(_, value: ClassificationScope | null) => {
+                        if (value !== null) {
+                            setFilters(previous => ({...previous, scope: value, page: 0}))
+                        }
+                    }}
+                >
+                    {CLASSIFICATION_SCOPES.map((scope) => (
+                        <ToggleButton key={scope} value={scope}>{t(`enums:${scope}`)}</ToggleButton>
+                    ))}
+                </ToggleButtonGroup>
+            </Stack>
             {isIncremental &&
                 <TextField
                     type={"number"}
@@ -137,8 +158,13 @@ export function ClassificationBoardPage() {
                                         }
                                     </TableCell>
                                     <TableCell>
-                                        {p.playerId}
-                                        {}
+                                        <Stack direction={"row"} sx={{alignItems: "center", gap: 1}}>
+                                            {p.playerId}
+                                            {p.team
+                                                ? <Groups/>
+                                                : <Person/>
+                                            }
+                                        </Stack>
                                     </TableCell>
                                     <TableCell align={"right"}>
                                         {p.score}

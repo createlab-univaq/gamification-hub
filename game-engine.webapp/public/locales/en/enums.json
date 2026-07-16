@@ -1,5 +1,16 @@
 {
-  "ASSIGNED": "ASSIGNED",
-  "ACTIVE": "ACTIVE",
-  "PROPOSED": "PROPOSED"
+  "PROPOSED": "Proposed",
+  "ASSIGNED": "Assigned",
+  "ACTIVE": "Active",
+  "COMPLETED": "Completed",
+  "FAILED": "Failed",
+  "REFUSED": "Refused",
+  "AUTO_DISCARDED": "Auto-discarded",
+  "CANCELED": "Canceled",
+  "AVAILABLE": "Available",
+  "GUEST": "Guest",
+  "PROPOSER": "Proposer",
+  "ALL": "All",
+  "PLAYERS": "Players",
+  "TEAMS": "Teams"
 }

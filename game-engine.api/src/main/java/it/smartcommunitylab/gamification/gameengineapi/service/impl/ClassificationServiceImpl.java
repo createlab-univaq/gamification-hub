@@ -22,6 +22,7 @@ import it.smartcommunitylab.gamification.gameengineapi.exception.RequestExceptio
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.ClassificationCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationBoardDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationDTO;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationScope;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationType;
 import it.smartcommunitylab.gamification.gameengineapi.model.mapper.ClassificationMapper;
 import it.smartcommunitylab.gamification.gameengineapi.service.ClassificationService;
@@ -148,7 +149,7 @@ public class ClassificationServiceImpl implements ClassificationService {
 
     @Override
     public ClassificationBoardDTO getBoard(String gameId, String classificationId, long timestamp,
-            int periodInstanceIndex, Pageable pageable) {
+            int periodInstanceIndex, ClassificationScope scope, Pageable pageable) {
         if (timestamp > -1 && periodInstanceIndex > -1) {
             throw new RequestException("Invalid board request",
                     "Cannot use both timestamp and periodInstanceIndex parameters in the same request",
@@ -156,6 +157,10 @@ public class ClassificationServiceImpl implements ClassificationService {
         }
         Game game = loadGameOrThrow(gameId);
         ClassificationTask task = findTask(game, classificationId);
+
+        eu.trentorise.game.model.core.ClassificationScope engineScope =
+                eu.trentorise.game.model.core.ClassificationScope.valueOf(
+                        Objects.requireNonNullElse(scope, ClassificationScope.ALL).name());
 
         Page<ClassificationPosition> board;
         if (task instanceof IncrementalClassificationTask incrementalTask) {
@@ -170,15 +175,16 @@ public class ClassificationServiceImpl implements ClassificationService {
                         ErrorCodes.VALIDATION, HttpStatus.BAD_REQUEST);
             }
             String key = ClassificationUtils.generateKey(instance);
-            log.info("Computing incremental board for classification {} of game {} on window {}",
-                    classificationId, gameId, key);
+            log.info("Computing incremental board for classification {} of game {} on window {} scope {}",
+                    classificationId, gameId, key, engineScope);
             board = playerService.classifyPlayerStatesWithKey(timestamp,
                     incrementalTask.getPointConceptName(), incrementalTask.getPeriodName(), key, game.getId(),
-                    pageable);
+                    engineScope, pageable);
         } else {
-            log.info("Computing general board for classification {} of game {}", classificationId, gameId);
+            log.info("Computing general board for classification {} of game {} scope {}", classificationId, gameId,
+                    engineScope);
             board = playerService.classifyAllPlayerStates(game,
-                    ((GeneralClassificationTask) task).getItemType(), pageable);
+                    ((GeneralClassificationTask) task).getItemType(), engineScope, pageable);
         }
 
         return classificationMapper.toBoardDTO(task, board);

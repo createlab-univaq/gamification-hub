@@ -65,6 +65,7 @@ import eu.trentorise.game.model.TeamState;
 import eu.trentorise.game.model.core.ChallengeAssignment;
 import eu.trentorise.game.model.core.ClassificationBoard;
 import eu.trentorise.game.model.core.ClassificationPosition;
+import eu.trentorise.game.model.core.ClassificationScope;
 import eu.trentorise.game.model.core.ClassificationType;
 import eu.trentorise.game.model.core.ComplexSearchQuery;
 import eu.trentorise.game.model.core.GameConcept;
@@ -618,11 +619,18 @@ public class DBPlayerManager implements PlayerService {
     @Override
     public Page<ClassificationPosition> classifyPlayerStatesWithKey(long timestamp, String pointConceptName,
             String periodName, String key, String gameId, Pageable pageable) {
+        return classifyPlayerStatesWithKey(timestamp, pointConceptName, periodName, key, gameId,
+                ClassificationScope.ALL, pageable);
+    }
+
+    @Override
+    public Page<ClassificationPosition> classifyPlayerStatesWithKey(long timestamp, String pointConceptName,
+            String periodName, String key, String gameId, ClassificationScope scope, Pageable pageable) {
 
         String field = "concepts.PointConcept." + pointConceptName
                 + ".obj.periods." + periodName + ".instances." + key + ".score";
-        Criteria criteria = Criteria
-        		.where("gameId").is(gameId).and(field).gt(0);
+        Criteria criteria = applyScope(Criteria
+        		.where("gameId").is(gameId).and(field).gt(0), scope);
 
         Query query = new Query();
         // criteria.
@@ -631,6 +639,7 @@ public class DBPlayerManager implements PlayerService {
         // fields in response.
         query.fields().include(field);
         query.fields().include("playerId");
+        query.fields().include("metadata");
         // pagination.
         query.with(pageable);
         logger.info("Classification query " + query);
@@ -642,7 +651,7 @@ public class DBPlayerManager implements PlayerService {
         for (StatePersistence state : pStates) {
             classification.add(new ClassificationPosition(
                     state.getIncrementalScore(pointConceptName, periodName, key),
-                    state.getPlayerId()));
+                    state.getPlayerId(), isTeam(state)));
         }
 
         return new PageImpl<>(classification, pageable, total);
@@ -650,10 +659,16 @@ public class DBPlayerManager implements PlayerService {
 
     @Override
     public Page<ClassificationPosition> classifyAllPlayerStates(Game g, String itemType, Pageable pageable) {
+        return classifyAllPlayerStates(g, itemType, ClassificationScope.ALL, pageable);
+    }
+
+    @Override
+    public Page<ClassificationPosition> classifyAllPlayerStates(Game g, String itemType, ClassificationScope scope,
+            Pageable pageable) {
 
         List<ClassificationPosition> classification = new ArrayList<ClassificationPosition>();
 
-        Criteria general = Criteria.where("gameId").is(g.getId());
+        Criteria general = applyScope(Criteria.where("gameId").is(g.getId()), scope);
 
         Query query = new Query();
         query.addCriteria(general);
@@ -661,6 +676,7 @@ public class DBPlayerManager implements PlayerService {
 
         query.fields().include("concepts.PointConcept." + itemType + ".obj.score");
         query.fields().include("playerId");
+        query.fields().include("metadata");
         // pagination.
         query.with(pageable);
 
@@ -669,10 +685,19 @@ public class DBPlayerManager implements PlayerService {
 
         for (StatePersistence state : pStates) {
             classification.add(new ClassificationPosition(state.getGeneralItemScore(itemType),
-                    state.getPlayerId()));
+                    state.getPlayerId(), isTeam(state)));
         }
 
         return new PageImpl<>(classification, pageable, total);
+    }
+
+    private Criteria applyScope(Criteria criteria, ClassificationScope scope) {
+        if (scope == ClassificationScope.PLAYERS) {
+            criteria.and("metadata." + TeamState.NAME_METADATA).exists(false);
+        } else if (scope == ClassificationScope.TEAMS) {
+            criteria.and("metadata." + TeamState.NAME_METADATA).exists(true);
+        }
+        return criteria;
     }
 
     private Page<PlayerState> convertToPlayerState(Page<StatePersistence> states,

@@ -34,6 +34,7 @@ import eu.trentorise.game.model.TeamState;
 import eu.trentorise.game.model.core.ChallengeAssignment;
 import eu.trentorise.game.model.core.ClassificationBoard;
 import eu.trentorise.game.model.core.ClassificationPosition;
+import eu.trentorise.game.model.core.ClassificationScope;
 import eu.trentorise.game.model.core.ComplexSearchQuery;
 import eu.trentorise.game.model.core.RawSearchQuery;
 import eu.trentorise.game.model.core.StringSearchQuery;
@@ -60,8 +61,14 @@ public interface PlayerService {
 
 	public Page<ClassificationPosition> classifyAllPlayerStates(Game g, String itemType, Pageable pageable);
 
+	public Page<ClassificationPosition> classifyAllPlayerStates(Game g, String itemType, ClassificationScope scope,
+			Pageable pageable);
+
 	public Page<ClassificationPosition> classifyPlayerStatesWithKey(long timestamp, String pointConceptName, String periodName,
 			String key, String gameId, Pageable pageable);
+
+	public Page<ClassificationPosition> classifyPlayerStatesWithKey(long timestamp, String pointConceptName, String periodName,
+			String key, String gameId, ClassificationScope scope, Pageable pageable);
 
 	public PlayerState saveState(PlayerState state);
 

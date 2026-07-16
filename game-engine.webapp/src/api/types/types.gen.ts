@@ -16,8 +16,8 @@ export type GameDto = {
     domain?: string;
     actions?: Array<string>;
     rules?: Array<string>;
-    tasks?: Array<GameTask>;
-    concepts?: Array<GameConcept>;
+    readonly tasks?: Array<GameTask>;
+    readonly concepts?: Array<GameConcept>;
     expiration?: number;
     terminated?: boolean;
 };
@@ -418,32 +418,32 @@ export type LoginResponseDto = {
 };
 
 export type PagePlayerDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<PlayerDto>;
     number?: number;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    sort?: SortObject;
     pageable?: PageableObject;
+    sort?: SortObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
     offset?: number;
+    pageSize?: number;
+    pageNumber?: number;
+    unpaged?: boolean;
     sort?: SortObject;
     paged?: boolean;
-    unpaged?: boolean;
-    pageNumber?: number;
-    pageSize?: number;
 };
 
 export type SortObject = {
     empty?: boolean;
-    sorted?: boolean;
     unsorted?: boolean;
+    sorted?: boolean;
 };
 
 export type NotificationDto = {
@@ -504,20 +504,32 @@ export type ClassificationPositionDto = {
     position?: number;
     playerId?: string;
     score?: number;
+    team?: boolean;
 };
 
 export type PageClassificationPositionDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<ClassificationPositionDto>;
     number?: number;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    sort?: SortObject;
     pageable?: PageableObject;
+    sort?: SortObject;
     empty?: boolean;
+};
+
+export type GameDtoWritable = {
+    id?: string;
+    name?: string;
+    owner?: string;
+    domain?: string;
+    actions?: Array<string>;
+    rules?: Array<string>;
+    expiration?: number;
+    terminated?: boolean;
 };
 
 export type DeleteGameData = {
@@ -555,7 +567,7 @@ export type GetGameResponses = {
 export type GetGameResponse = GetGameResponses[keyof GetGameResponses];
 
 export type UpdateGameData = {
-    body: GameDto;
+    body: GameDtoWritable;
     path: {
         gameId: string;
     };
@@ -1015,7 +1027,7 @@ export type GetGamesResponses = {
 export type GetGamesResponse = GetGamesResponses[keyof GetGamesResponses];
 
 export type CreateGameData = {
-    body: GameDto;
+    body: GameDtoWritable;
     path?: never;
     query?: never;
     url: '/api/v1/games';
@@ -2010,6 +2022,7 @@ export type GetClassificationBoardData = {
     query?: {
         timestamp?: number;
         periodInstanceIndex?: number;
+        scope?: 'PLAYERS' | 'TEAMS' | 'ALL';
         /**
          * Zero-based page index (0..N)
          */

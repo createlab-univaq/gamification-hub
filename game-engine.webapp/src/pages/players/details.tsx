@@ -18,7 +18,7 @@ import {BlockPlayerForm} from "../../components/form/BlockPlayerForm.tsx";
 import {useState} from "react";
 import type {ChallengeConceptDto, GroupChallengeDto, PlayerStateDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
-import {type ChallengeType, ChallengeTypeChipColorRecord} from "../../utils/enum-utils.ts";
+import {type ChallengeState, ChallengeStateChipColorRecord} from "../../utils/enum-utils.ts";
 import {formatDate} from "../../utils/date-utils.ts";
 
 type ActionVars = {
@@ -225,7 +225,7 @@ export function PlayerDetailsPage() {
                                                 </Typography>
                                                 <Chip
                                                     sx={{
-                                                        backgroundColor: ChallengeTypeChipColorRecord[c.state as ChallengeType]
+                                                        backgroundColor: ChallengeStateChipColorRecord[c.state as ChallengeState]
                                                     }}
                                                     label={t(`enums:${c.state}`)}
                                                     size={"small"}
@@ -289,7 +289,7 @@ export function PlayerDetailsPage() {
                                            sx={{justifyContent: "space-between", alignItems: "center", gap: 2}}>
                                         <Box>
                                             <Typography sx={{fontWeight: "bold"}}>{choice.modelName}</Typography>
-                                            <Typography color={"text.secondary"}>{choice.state}</Typography>
+                                            <Typography color={"text.secondary"}>{t(`enums:${choice.state}`)}</Typography>
                                         </Box>
                                         {choice.state === "AVAILABLE" &&
                                             <Button size={"small"} variant={"outlined"} startIcon={<PlayArrow/>}
@@ -333,11 +333,11 @@ export function PlayerDetailsPage() {
                                         <Box>
                                             <Typography sx={{fontWeight: "bold"}}>{gc.challengeModel}</Typography>
                                             <Typography
-                                                color={"text.secondary"}>{gc.instanceName} — {gc.state}</Typography>
+                                                color={"text.secondary"}>{gc.instanceName} - {t(`enums:${gc.state}`)}</Typography>
                                             <Stack direction={"row"} sx={{gap: 1, flexWrap: "wrap", mt: 1}}>
                                                 {(gc.attendees ?? []).map(a =>
                                                     <Chip key={a.playerId} size={"small"}
-                                                          label={`${a.playerId} (${a.role})`}/>)}
+                                                          label={`${a.playerId} (${t(`enums:${a.role}`)})`}/>)}
                                             </Stack>
                                         </Box>
                                         {gc.state === "PROPOSED" &&

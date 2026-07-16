@@ -15,4 +15,6 @@ public class ClassificationPositionDTO {
 
     private double score;
 
+    private boolean team;
+
 }
