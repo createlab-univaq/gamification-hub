@@ -3,6 +3,7 @@ package it.smartcommunitylab.gamification.gameengineapi.controller.v1.games;
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.ClassificationCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationBoardDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationDTO;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationScope;
 import it.smartcommunitylab.gamification.gameengineapi.service.ClassificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -83,10 +84,11 @@ public class ClassificationController {
             @PathVariable String classificationId,
             @RequestParam(defaultValue = "-1") long timestamp,
             @RequestParam(defaultValue = "-1") int periodInstanceIndex,
+            @RequestParam(defaultValue = "ALL") ClassificationScope scope,
             @ParameterObject Pageable pageable) {
-        log.info("Get board of classification={} of game={}", classificationId, gameId);
+        log.info("Get board of classification={} of game={} scope={}", classificationId, gameId, scope);
         return ResponseEntity.ok(classificationService.getBoard(gameId, classificationId, timestamp,
-                periodInstanceIndex, pageable));
+                periodInstanceIndex, scope, pageable));
     }
 
 }

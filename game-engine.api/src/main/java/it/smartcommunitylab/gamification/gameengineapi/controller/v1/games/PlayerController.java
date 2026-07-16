@@ -52,8 +52,8 @@ public class PlayerController extends BaseGameController {
         log.info("REST request to get all players of game {}", gameId);
         findGameByIdOrThrow(gameId);
         Page<PlayerState> states = StringUtils.isBlank(playerId)
-                ? playerService.loadStates(gameId, page, false)
-                : playerService.loadStates(gameId, playerId, page, false, false);
+                ? playerService.loadStates(gameId, page, false, false, true)
+                : playerService.loadStates(gameId, playerId, page, false, false, true);
         Page<PlayerDTO> statesDTO = states.map(playerMapper::toDTO);
         return ResponseEntity.ok(statesDTO);
     }

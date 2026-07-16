@@ -7,14 +7,15 @@ import {useMutation, useQuery} from "@tanstack/react-query";
 import {pointConceptClient} from "../../api";
 import {Loading} from "../../components/Loading.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {Card, CardContent, CardHeader, Stack, Typography} from "@mui/material";
-import {Delete, Edit} from "@mui/icons-material";
+import {Divider, Stack, Typography} from "@mui/material";
+import {Delete, Edit, Games, Stars} from "@mui/icons-material";
 import {formatDate, formatMilliseconds} from "../../utils/date-utils.ts";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useState} from "react";
 import type {PointConceptDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
+import {PageList} from "../../components/PageList.tsx";
 
 export function PointConceptDetailsPage() {
 
@@ -30,7 +31,7 @@ export function PointConceptDetailsPage() {
         enabled: !!game && !!pcId
     })
 
-    const {mutate, isPending} = useMutation<unknown, Error, {gameId:string, pcId:string}>({
+    const {mutate, isPending} = useMutation<unknown, Error, { gameId: string, pcId: string }>({
         mutationKey: ["delete-pc", pcId],
         mutationFn: ({gameId, pcId}) => pointConceptClient.deletePointConcept(gameId, pcId),
         onSuccess: () => {
@@ -88,31 +89,40 @@ export function PointConceptDetailsPage() {
                     onClick: () => setDeleteElement(data)
                 }
             ]}
+            breadcrumbs={[
+                {
+                    icon: <Games/>,
+                    label: t("sidebar.games"),
+                    href: "/dashboard"
+                },
+                {
+                    label: game.name ?? "My Game",
+                    href: `/games/${game.id}`
+                },
+                {
+                    icon: <Stars/>,
+                    label: t("sidebar.points"),
+                    href: `/games/${game.id}`
+                }
+            ]}
         />
-        <Stack
-            sx={{
-                gap: 2,
-                py: 2
+        <PageList
+            items={Array.from(Object.values(data!.periods!))}
+            itemHref={() => ""}
+            renderItem={(period) => {
+                return <Stack sx={{gap: 1}} divider={<Divider/>}>
+                    <Typography variant={"h5"}>{period.identifier}</Typography>
+                    <Stack sx={{gap: 2}}>
+                        <Typography>{t("points.details.validity")}: <b>{formatDate(period.start!)}</b> — <b>{formatDate(period.end!)}</b></Typography>
+                        <Typography><b>{t("points.details.duration")}:</b> {formatMilliseconds(period.period!)}
+                        </Typography>
+                        <Typography><b>{t("points.details.kept_instances")}:</b> {period.capacity}</Typography>
+                    </Stack>
+                </Stack>
             }}
-            direction={{
-                md: "row",
-                lg: "row"
-            }}
-        >
-            {Array.from(Object.values(data!.periods!)).map(period => {
-                return <Card key={`period-${period.identifier}`}>
-                    <CardHeader title={period.identifier}/>
-                    <CardContent>
-                        <Stack sx={{gap: 2}}>
-                            <Typography>{t("points.details.validity")}: <b>{formatDate(period.start!)}</b> — <b>{formatDate(period.end!)}</b></Typography>
-                            <Typography><b>{t("points.details.duration")}:</b> {formatMilliseconds(period.period!)}</Typography>
-                            <Typography><b>{t("points.details.kept_instances")}:</b> {period.capacity}</Typography>
-                        </Stack>
-                    </CardContent>
-                </Card>
-            })}
-            {!Array.from(Object.values(data!.periods!)).length && <Typography>{t("points.details.no_periods")}</Typography>}
-        </Stack>
+            enableLayout={true}
+            emptyListMessage={t("points.details.no_periods")}
+        />
     </PageContainer>
 
 }

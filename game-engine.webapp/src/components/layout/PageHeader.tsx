@@ -1,5 +1,5 @@
 import {ChevronRight, MoreVertTwoTone} from "@mui/icons-material";
-import {Breadcrumbs, Button, type ButtonProps, Divider, Stack, type SxProps, Typography} from "@mui/material"
+import {Breadcrumbs, Button, type ButtonProps, Divider, Stack, type SxProps, type Theme, Typography} from "@mui/material"
 import type {ReactNode} from "react";
 import {useWindowSize} from "../../hooks/use-window-size.ts";
 import {PopoverButton} from "../PopoverButton.tsx";
@@ -15,7 +15,7 @@ export interface PageHeaderProps {
     subTitle?: ReactNode
     buttons?: ButtonProps[]
     breadcrumbs?: BreadcrumbProps[],
-    sx?:SxProps
+    sx?:SxProps<Theme>
 }
 
 export function PageHeader({buttons, subTitle, title, breadcrumbs, sx}: PageHeaderProps) {

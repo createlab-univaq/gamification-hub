@@ -1,7 +1,19 @@
 <div>
-<img src="./game-engine.webapp/public/univaq-logo-dark.png" style="width:6rem"/>
-<img src="./game-engine.webapp/public/logo-dark.png" style="width:5rem"/>
-<img src="./game-engine.webapp/public/app-logo-dark.png" style="width:30rem"/>
+<picture style="width:5rem">
+  <source media="(prefers-color-scheme: dark)" srcset="./game-engine.webapp/public/univaq-logo-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="./game-engine.webapp/public/univaq-logo-light.png">
+  <img style="width:5rem" alt="Univaq Logo" src="./game-engine.webapp/public/univaq-logo-dark.png">
+</picture>
+<picture style="width:6rem">
+  <source media="(prefers-color-scheme: dark)" srcset="./game-engine.webapp/public/logo-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="./game-engine.webapp/public/logo-light.png">
+  <img style="width:6rem" alt="GamificationHub Icon" src="./game-engine.webapp/public/logo-dark.png">
+</picture>
+<picture style="width:30rem">
+  <source media="(prefers-color-scheme: dark)" srcset="./game-engine.webapp/public/app-logo-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="./game-engine.webapp/public/app-logo-light.png">
+  <img style="width:30rem" alt="GamificationHub Logo" src="./game-engine.webapp/public/app-logo-dark.png">
+</picture>
 </div>
 
 GamificationHub is a platform that permits to define and execute score based games.

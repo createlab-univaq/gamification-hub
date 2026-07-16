@@ -1,114 +1,364 @@
-# Gamification Engine — Guida all'applicazione
+# Campus Quest: guida completa alla console
 
-Una panoramica di cosa puoi fare in questa console: ogni pagina, cosa mostra e cosa fa ciascuna azione. Per l'API REST sottostante, consulta la documentazione per sviluppatori nel repository del progetto.
+Questa guida spiega ogni funzionalità della console di gamification, un concetto alla volta: che cos'è, perché esiste, come si comporta e quali opzioni hai quando la usi. Per mantenere le spiegazioni concrete anziché astratte, ognuna è illustrata con un unico esempio ricorrente, **Campus Quest**, un gioco di coinvolgimento universitario in cui gli studenti guadagnano punti e medaglie frequentando lezioni, consegnando compiti e usando la biblioteca; salgono di livello, entrano in squadre, affrontano sfide e competono nelle classifiche.
 
----
+Leggila dall'inizio alla fine per un giro completo del motore, oppure salta alla sezione del concetto che ti serve. I riquadri **In Campus Quest** mostrano come ciascuna idea viene messa in pratica, con valori reali che puoi riprodurre se vuoi seguire nell'app; ma il punto di ogni sezione è il concetto, e Campus Quest serve solo a renderlo tangibile.
 
-## 1. Accesso
+Nel testo, il **grassetto** indica un pulsante o un campo nella console, e il `codice` indica un valore concreto.
 
-La pagina di login permette di **accedere** con username e password, oppure di **passare alla registrazione** per creare un nuovo account. Il selettore di lingua (icona bandiera, in alto nella pagina) cambia la lingua della console tra Italiano e Inglese in qualsiasi momento — la scelta viene ricordata per le visite successive.
+## 1. Crea il gioco
 
-Dopo l'accesso, arrivi alla dashboard dei **Giochi**.
+Un **gioco** è il contenitore di livello più alto per tutto il resto di questa guida. Le sue azioni, regole, concetti di punteggio, medaglie, giocatori, squadre e classifiche gli appartengono, e niente è condiviso tra giochi diversi: due giochi possono avere ciascuno un'azione chiamata `attend_lecture` senza mai interferire. Questo rende un gioco un'unità di lavoro sicura; puoi costruirne, esportarne, eliminarne o duplicarne uno senza toccare gli altri.
 
----
+Crei un gioco con soltanto un **nome** e un **dominio**. Il dominio è un'etichetta libera per raggruppare giochi correlati (ad esempio tutti i giochi di un prodotto o di un reparto); non ha alcun effetto sul comportamento ed esiste solo per aiutarti a organizzare un elenco lungo. Una volta creato, un gioco si apre dalla dashboard, e la sua barra laterale a sinistra diventa il tuo indice per tutto ciò che descrivono le sezioni successive (Regole, Azioni, Concetti di punteggio, Medaglie, Livelli e così via).
 
-## 2. Giochi — la dashboard
+Un gioco è anche portabile. Dalla dashboard puoi **Esportarlo** in un file, che è un'istantanea completa (regole, modelli di sfida, livelli e tutto il resto), e **Importare** quel file altrove. Le esportazioni sono il modo per fare il backup di un gioco, spostarlo tra ambienti diversi o consegnare una configurazione funzionante a qualcun altro.
 
-La dashboard elenca ogni gioco che possiedi. Da qui puoi:
+> **In Campus Quest.** Nella dashboard **Giochi**, clicca **Aggiungi**, imposta **Nome** su `Campus Quest` e **Dominio** su `campus`, e **Salva**. Aprilo dall'elenco; il resto di questa guida lavora dentro questo unico gioco.
 
-- **Cercare** giochi per nome.
-- **Creare un nuovo gioco** — nome, dominio e, opzionalmente, una data di scadenza.
-- **Importare giochi** — caricare una definizione completa di gioco (regole, modelli di sfida e metadati insieme) invece di crearne uno da zero.
-- **Esportare** uno o più giochi in un file, ad esempio per farne un backup o spostarli in un altro ambiente.
-- Fare clic su un gioco per **aprirlo** — questo porta alla sezione di quel gioco, con una barra laterale che copre tutto quanto segue (Regole, Azioni, Concetti Punteggio, Giocatori, Squadre, Classifiche, Medaglie, Livelli, Scenari, Modelli di Sfida).
-- **Modificare** nome, dominio o stato di terminazione di un gioco, oppure **eliminarlo** del tutto.
+![Il form del nuovo gioco](/docs/images/create-game.png "Creazione di Campus Quest: nome e dominio")
 
-Un gioco **terminato** viene segnato come non più attivo — i suoi dati restano intatti, ma segnala che il gioco si è concluso.
+## 2. Azioni
 
----
+Un'**azione** è il vocabolario di eventi che il tuo gioco comprende. Rappresenta qualcosa che un giocatore può fare e a cui il motore può reagire, come una lezione frequentata o un compito consegnato. Definire un'azione fa due cose: dà a quell'evento un **id** stabile a cui riferirti altrove, e permette al motore di accettare eventi che nominano quell'id. Da sola un'azione non fa nulla; non porta punti né logica. Il comportamento che trasforma un'azione in punti, medaglie o passaggi di livello si scrive separatamente, nelle **Regole** (sezione 6). Tenere le due cose distinte significa che puoi aggiungere, rinominare o ragionare sui tuoi eventi senza toccare la logica di punteggio, e viceversa.
 
-## 3. Regole
+Le azioni possono anche portare dei **dati**. Quando viene inviato un evento, può includere un piccolo carico di valori con nome, ad esempio un compito consegnato che porta un `grade` (voto), o una visita in biblioteca che porta un numero di `hours` (ore). Non dichiari mai questi dati sull'azione stessa; la forma del carico è aperta, e una regola legge semplicemente le chiavi che le interessano quando arriva un evento di quell'azione (la sezione 6 mostra come). Questo mantiene leggere le azioni: un'azione è un nome, e i dati che porta sono decisi da chi invia l'evento e letti dalla regola che ne ha bisogno.
 
-Le regole sono la logica che reagisce alle azioni dei giocatori (es. "quando un giocatore cammina, assegna 10 passi"). L'editor delle regole offre due modi per scriverne una, mantenuti sincronizzati:
+> **In Campus Quest.** Apri **Azioni** e aggiungine cinque, ognuna con solo un nome: `attend_lecture`, `submit_assignment`, `use_library`, `join_event` e `answer_quiz`. Due di esse sono pensate per portare dati: `submit_assignment` porterà un `grade`, e `use_library` porterà `hours`. Ancora nulla reagisce a esse; è a questo che servono le regole.
 
-- **Builder visuale** — blocchi trascinabili (condizioni, azioni, variabili) senza scrivere codice a mano.
-- **Editor di codice** — lo script della regola equivalente, grezzo, per la modifica diretta.
-- Un **pannello console** mostra l'esito della validazione e del salvataggio.
+![L'elenco delle azioni](/docs/images/actions-list.png "Le cinque azioni di Campus Quest")
 
-Prima di salvare, usa **Valida** per compilare la regola contro il gioco e individuare gli errori in anticipo — incluso il caso in cui la regola entri in conflitto con un'altra regola già presente nel gioco. **Salva** la persiste; la vista elenco permette di cercare, modificare o eliminare le regole esistenti.
+## 3. Concetti di punteggio
 
-### Analisi d'impatto
-Una pagina separata (raggiungibile dalla sezione Regole) mostra un **grafo di come le regole interagiscono tra loro** — quali regole possono attivarne o bloccarne altre. È una visualizzazione best-effort per aiutarti a ragionare su insiemi di regole complessi prima di andare in produzione; non cattura tutto, quindi il test tramite gli Scenari (sotto) resta il modo affidabile per confermare il comportamento.
+Un **concetto di punteggio** è un punteggio con nome che il motore traccia in modo indipendente per ogni giocatore e ogni squadra. Un gioco può definirne quanti ne servono, e conviene pensarli come valute separate: un giocatore può essere ricco in una e povero in un'altra, e ciascuna è guadagnata e spesa dalle proprie regole. Separare così i punteggi permette a un singolo gioco di premiare comportamenti molto diversi senza mescolarli, e permette a ciascuno di alimentare i propri livelli e classifiche.
 
----
+La parte potente di un concetto di punteggio sono i **periodi**. Oltre al totale progressivo di sempre, un concetto può tracciare una o più finestre temporali ricorrenti, ognuna definita da un **nome**, una data di **inizio** e una **durata** in giorni. Il motore tiene un conteggio separato per la finestra corrente di ogni periodo, azzerandolo quando la finestra si rinnova, mentre il totale di sempre continua a crescere intatto. È questo che rende possibili le classifiche "di questa settimana" e "di questo mese": lo stesso concetto alimenta sia una classifica di sempre sia una periodica (sezione 15). Un concetto senza periodi è semplicemente un punteggio di sempre.
 
-## 4. Azioni
+> **In Campus Quest.** Apri **Concetti di punteggio** e creane tre. `study_points` è il punteggio accademico principale, con un periodo `weekly` di `7` giorni (fallo partire da una qualsiasi data passata; la finestra si ripete in avanti). `credits` sono i crediti formali del corso, un punteggio di sempre senza periodi. `social_points` copre la vita sociale del campus, con un periodo `monthly` di `30` giorni. Tutti e tre partono da zero per ogni giocatore, e le regole della sezione 6 danno al motore dei motivi per farli crescere.
 
-L'elenco degli eventi con nome che il tuo gioco ascolta (es. `walk`, `check-in`). Puoi aggiungere nuovi nomi di azione, rinominarli o rimuovere quelli non più usati da alcuna regola. Le azioni sono ciò a cui fai riferimento scrivendo le condizioni delle regole, e ciò che un client rivolto al giocatore genera per far reagire il motore.
+![L'elenco dei concetti di punteggio](/docs/images/point-concepts-list.png "I tre concetti di punteggio, con i loro periodi")
 
----
+## 4. Medaglie
 
-## 5. Concetti Punteggio
+Una **medaglia** è un riconoscimento una tantum: un giocatore ce l'ha oppure no, a differenza di un concetto di punteggio, che è un numero che sale e scende. Le medaglie sono raggruppate in **collezioni**, e una collezione è **visibile** oppure **nascosta**. Una collezione visibile è mostrata al giocatore fin dall'inizio (di solito con le sue medaglie guadagnate e non ancora guadagnate), il che è utile per pubblicizzare gli obiettivi da raggiungere. Una collezione nascosta resta invisibile finché il giocatore non guadagna la sua prima medaglia al suo interno, il che è ideale per i traguardi segreti e le sorprese.
 
-Le "valute" numeriche che il tuo gioco traccia per giocatore — es. `steps`, `points`, `coins`. Crea, rinomina o elimina qui. Il punteggio di un concetto punteggio parte sempre da zero per un nuovo giocatore e si muove in base a ciò che le tue regole ne fanno.
+C'è un dettaglio di questo motore che vale la pena capire, perché determina come imposti le medaglie. Una collezione di medaglie, nel modello del motore, *è* l'insieme delle medaglie che un giocatore ha **guadagnato**. Non esiste un catalogo separato di medaglie "possibili": ciò che una collezione contiene è ciò che al giocatore è già stato conferito. La conseguenza pratica è che crei le collezioni **vuote** (solo un nome e una visibilità), e le medaglie effettive sono conferite in fase di gioco dalle **regole** (sezione 6). Se digitassi dei nomi di medaglia in una collezione al momento della creazione, ogni giocatore risulterebbe già in loro possesso.
 
----
+> **In Campus Quest.** Apri **Medaglie** e crea due collezioni vuote: `achievements`, lasciata **Visibile**, e `secret_achievements`, impostata su **Nascosta**. Non aggiungere medaglie a mano. Durante il gioco, le regole conferiscono `first_lecture`, `bookworm`, `honor_roll` e `social_butterfly` in `achievements`, e la segreta `night_owl` in `secret_achievements`. Quelle regole arrivano nella sezione 6.
 
-## 6. Medaglie
+![Il form della collezione di medaglie](/docs/images/create-badge.png "Creazione della collezione achievements")
 
-Le medaglie sono organizzate in **collezioni** — un gruppo con nome di medaglie che un giocatore può guadagnare (es. una collezione "traguardi" contenente `bronzo`, `argento`, `oro`). Le collezioni si gestiscono qui: creane una, elenca le medaglie al suo interno, e segna una collezione come **nascosta** se non vuoi che sia visibile ai giocatori finché non viene guadagnata.
+## 5. Livelli
 
----
+Un **livello** trasforma un concetto di punteggio in un rango. Scegli un concetto e definisci un elenco ordinato di **soglie** con nome, ognuna con un valore; il livello di un giocatore è la soglia più alta che il suo punteggio ha raggiunto. I livelli danno ai giocatori un senso di progressione che un numero grezzo non può dare: passare da un rango con nome al successivo è un traguardo, ed è qualcosa a cui il motore può reagire. Un gioco può definire diversi livelli, ciascuno basato su un concetto di punteggio differente, così che lo stesso giocatore possa essere un veterano su una scala e un novizio su un'altra.
 
-## 7. Livelli
+I livelli fanno più che etichettare un giocatore. Poiché il motore conosce l'istante esatto in cui un giocatore supera una soglia, una soglia può portare una **ricompensa**: raggiungerla può consegnare al giocatore una **scelta di sfida**, una voce che finisce nel suo inventario perché la attivi in seguito (sezioni 12 e 13). È così che un passaggio di livello diventa un'opportunità invece che solo un nuovo titolo. Configurare quella ricompensa richiede che i modelli di sfida esistano già, quindi la aggiungiamo nella sezione 12.
 
-Un livello lega un **concetto punteggio** a una serie di **soglie** — valori di punteggio che rappresentano una progressione (es. "Principiante" a 0, "Esperto" a 500). Ogni soglia può anche sbloccare un insieme di **modelli di sfida**, permettendo ai giocatori di scegliere tra nuove sfide una volta superata. Definisci le soglie in ordine; la console permette di aggiungerle, modificarle o rimuoverle, e di scegliere quante scelte di sfida un giocatore riceve a ciascuna soglia.
+> **In Campus Quest.** Apri **Livelli** e aggiungi un livello sul concetto `study_points`, con cinque soglie:
+>
+> | Soglia    | Valore |
+> |-----------|--------|
+> | Freshman  | 0      |
+> | Sophomore | 100    |
+> | Junior    | 300    |
+> | Senior    | 600    |
+> | Graduate  | 1000   |
+>
+> Ogni giocatore parte da **Freshman** e passa a **Sophomore** a 100 punti, e così via. Nella sezione 12 la soglia **Sophomore** acquisisce una ricompensa a scelta di sfida.
 
----
+![Il form del livello con le soglie](/docs/images/levels-form.png "Il livello Scholar: cinque soglie di study_points")
 
-## 8. Modelli di Sfida
+## 6. Regole
 
-I modelli di sfida sono **template** — un nome più un insieme di variabili — che vengono trasformati in sfide vere e proprie per i giocatori, tramite assegnazione diretta o inviti di gruppo (vedi Giocatori, sotto). I template si gestiscono qui; le pagine Giocatore della console sono dove le sfide vengono effettivamente assegnate alle persone.
+Le regole sono il punto in cui il comportamento di un gioco prende davvero vita; tutto ciò che precedeva erano dichiarazioni di sostantivi, e le regole sono i verbi. Il motore integra un **motore di regole** (Drools), e ogni regola ha due parti: una parte **when** che elenca le condizioni, e una parte **then** che elenca le conseguenze. Quando arriva un evento, il motore mette una serie di **fatti** in memoria di lavoro (l'azione, i suoi dati, i punteggi e le medaglie attuali del giocatore e altro ancora), poi attiva ogni regola le cui condizioni **when** corrispondono. La parte **then** di una regola reagisce cambiando quei fatti: aggiungendo a un punteggio, conferendo una medaglia, inviando una notifica.
 
----
+Basi le condizioni sui fatti. Quelli che userai più spesso:
 
-## 9. Squadre
+| Fatto | Corrisponde a | Esempio |
+|-------|---------------|---------|
+| `Action( id == "..." )` | quale azione è avvenuta | `Action( id == "attend_lecture" )` |
+| `InputData( $x : data["..."] )` | i dati inviati con l'azione | `InputData( $hours : data["hours"] )` |
+| `PointConcept( name == "...", ... )` | il punteggio di un giocatore | `PointConcept( name == "study_points", score >= 100 )` |
+| `BadgeCollectionConcept( name == "...", ... )` | la collezione di medaglie di un giocatore | `badgeEarned not contains "bookworm"` |
+| `Game( $gameId : id )`, `Player( $playerId : id )` | il gioco e il giocatore correnti | usati per inviare una notifica di medaglia |
 
-Una squadra raggruppa un insieme di giocatori sotto un nome. Crea una squadra, aggiungi o rimuovi membri (scelti tra i giocatori esistenti del gioco), rinominala o eliminala. Le squadre esistono come raggruppamento organizzativo — le sfide di gruppo (sotto) sono un meccanismo separato, basato su inviti.
+Due meccanismi vale la pena conoscerli fin da subito. Primo, la **salience** è la priorità di una regola: le regole con salience più alta si attivano prima. Questo conta quando una regola dipende dal risultato di un'altra, ad esempio una regola di medaglia che dovrebbe eseguire solo dopo che una regola di punteggio ha aggiornato il punteggio; dare alla regola di medaglia una salience negativa la fa aspettare. Secondo, una regola si protegge dal ripetersi controllando lo stato attuale nella sua parte **when**: una regola di medaglia che aggiunge `bookworm` si attiva solo quando la collezione *non* contiene già `bookworm`, così la medaglia viene conferita esattamente una volta.
 
----
+Componi le regole nella pagina **Regole**, che tiene sincronizzate due rappresentazioni: un **costruttore a blocchi** visuale a sinistra, dove trascini condizioni e conseguenze, e un pannello di **codice DRL** accanto, dove puoi digitare la regola direttamente. Modificare l'una aggiorna l'altra. Un pulsante **valida** compila la regola e segnala i problemi in un pannello console, e **salva** la memorizza. Validare prima di salvare è l'abitudine che intercetta refusi ed errori di tipo prima che raggiungano un giocatore.
 
-## 10. Giocatori
+La regola utile più semplice aggiunge a un punteggio quando avviene un'azione. Questa assegna 10 `study_points` per ogni lezione frequentata:
 
-L'elenco giocatori mostra tutti quelli registrati nel gioco, con ricerca e la possibilità di **aggiungere** un nuovo giocatore (tramite id) o **rimuoverne** uno. Fare clic su un giocatore apre la sua **pagina dettagli**, la pagina più ricca di funzionalità della console:
+```
+package eu.trentorise.game.model
+import eu.trentorise.game.core.Utility;
+global Utility utils;
 
-- **Concetti punteggio e medaglie** — i punteggi attuali del giocatore e le medaglie guadagnate, in un colpo d'occhio.
-- **Sfide** — le istanze di sfida individuali del giocatore. Puoi **assegnare** una nuova sfida (scegliere un modello, dargli un nome istanza, una finestra di inizio/fine), **accettare** una sfida proposta per conto del giocatore, **modificarne** le date o la visibilità, oppure **eliminarla**.
-- **Inventario** — le *scelte* di sfida che sono state offerte al giocatore (tipicamente dal superamento di una soglia di livello). Se una è disponibile, puoi **attivarla**, oppure **forzare** la prossima scelta in sospeso del giocatore se non ha ancora scelto.
-- **Sfide di gruppo** — sfide multi-giocatore. Puoi **invitare** altri giocatori a una sfida di gruppo (scegliendo il modello di sfida, l'obiettivo, la ricompensa e gli ospiti), e per gli inviti esistenti: **accettarli**, **rifiutarli** o **annullarli**, a seconda che questo giocatore sia il proponente o un ospite.
-- **Giocatori bloccati** — una lista di blocco personale che questo giocatore mantiene contro altri giocatori. Puoi **bloccare** un giocatore (scegliendolo dall'elenco giocatori del gioco) o **sbloccarne** uno già nella lista. Al momento questa è solo una registrazione — non impedisce ancora che un giocatore bloccato venga invitato a una sfida di gruppo.
+rule "study points for lecture"
+when
+    Action( id == "attend_lecture" )
+    $pc : PointConcept( name == "study_points" )
+then
+    $pc.setScore($pc.getScore() + 10);
+    update($pc);
+end
+```
 
----
+La parte `when` corrisponde a due fatti: l'azione della lezione, e il concetto `study_points` del giocatore (legato a `$pc` così che la parte `then` possa cambiarlo). La parte `then` alza il punteggio e chiama `update` per dire al motore che il fatto è cambiato. Leggere i dati dall'evento funziona allo stesso modo, corrispondendo a un fatto `InputData` e legando la chiave che ti serve.
 
-## 11. Classifiche
+![Il costruttore di regole: blocchi, codice e console](/docs/images/rules-form.png "Costruzione di study_points_lecture")
 
-Le classifiche classificano i giocatori in base a un concetto punteggio. Due tipi:
+Un paio di note su come sono organizzate le regole. Ogni regola salvata è un file a sé, ma un singolo file può contenere più di un blocco `rule "..." ... end`: il motore li compila tutti e restano indipendenti. È permesso, ma rende un file più difficile da leggere e mantenere, quindi l'approccio pulito è una regola per file. Un nome è speciale: una regola chiamata `constants` viene letta come un semplice file di proprietà (righe `chiave = valore`) invece che come DRL, e ogni chiave è pubblicata come costante globale che le tue regole possono usare (dopo averla dichiarata con `global` in cima a una regola). È il posto ordinato dove tenere soglie e numeri regolabili invece di ripetere valori letterali tra le regole.
 
-- **Generale** — una classifica di sempre, aggiornata secondo una pianificazione che definisci tu (un'espressione cron).
-- **Incrementale** — classifica i giocatori all'interno di un periodo ricorrente specifico del concetto punteggio (es. settimanale), senza bisogno di pianificazione.
+> **In Campus Quest.** Il gioco usa nove regole, in due gruppi. Le **regole di punteggio** assegnano punteggi dalle azioni:
+>
+> ```
+> rule "study points for library"          // + hours * 5 study_points on use_library
+> when
+>     Action( id == "use_library" )
+>     InputData( $hours : data["hours"] )
+>     $pc : PointConcept( name == "study_points" )
+> then
+>     Double hours = $hours != null ? ((Number) $hours).doubleValue() : 0.0;
+>     $pc.setScore($pc.getScore() + hours * 5);
+>     update($pc);
+> end
+>
+> rule "credits for assignment"            // +3 credits on submit_assignment
+> when
+>     Action( id == "submit_assignment" )
+>     $pc : PointConcept( name == "credits" )
+> then
+>     $pc.setScore($pc.getScore() + 3);
+>     update($pc);
+> end
+>
+> rule "social points for event"           // +20 social_points on join_event
+> when
+>     Action( id == "join_event" )
+>     $pc : PointConcept( name == "social_points" )
+> then
+>     $pc.setScore($pc.getScore() + 20);
+>     update($pc);
+> end
+> ```
+>
+> Le **regole delle medaglie** conferiscono una medaglia quando una condizione è soddisfatta. Ognuna importa `eu.trentorise.game.notification.BadgeNotification;` e usa una `salience` bassa così da eseguire dopo che le regole di punteggio hanno aggiornato i punteggi. Il pattern è identico ogni volta, quindi eccone una per intero e le altre con le loro righe distintive:
+>
+> ```
+> rule "bookworm badge"
+>     salience -10
+> when
+>     Game( $gameId : id )
+>     Player( $playerId : id )
+>     PointConcept( name == "study_points", score >= 100 )
+>     $bc : BadgeCollectionConcept( name == "achievements", badgeEarned not contains "bookworm" )
+> then
+>     $bc.getBadgeEarned().add("bookworm");
+>     insert( new BadgeNotification($gameId, $playerId, "bookworm") );
+>     update( $bc );
+> end
+> ```
+>
+> - **first_lecture**: condizione `Action( id == "attend_lecture" )`; conferisce `first_lecture` in `achievements`.
+> - **social_butterfly**: condizione `PointConcept( name == "social_points", score >= 20 )`; conferisce `social_butterfly` in `achievements`.
+> - **honor_roll**: condizioni `Action( id == "submit_assignment" )`, `InputData( $grade : data["grade"] )` più `eval( $grade != null && ((Number)$grade).doubleValue() >= 28 )`; conferisce `honor_roll` in `achievements`.
+> - **night_owl**: condizioni `Action( id == "use_library" )`, `InputData( $hours : data["hours"] )` più `eval( ((Number)$hours).doubleValue() >= 3 )`; conferisce `night_owl` nella collezione nascosta `secret_achievements`.
 
-Creane una dandole un nome, scegliendo il tipo e il concetto punteggio, e (per quelle Generali) una pianificazione di aggiornamento. Apri una classifica per vedere la sua **board** — una classifica live, paginata, con i primi tre evidenziati, calcolata dai punteggi attuali nel momento in cui la visualizzi (non solo all'ultimo aggiornamento pianificato).
+## 7. Simula e testa
 
----
+Poiché le regole si attivano solo su eventi reali, altrimenti dovresti inviare eventi a un giocatore reale per scoprire se una regola si comporta bene, il che rischia di corrompere lo stato reale. Il motore evita del tutto questo con la pagina **Scenari**: esegue le tue regole contro un giocatore **sintetico** (inventato) di cui descrivi a mano lo stato iniziale. Imposti qui un punteggio, là una collezione vuota, scegli un'azione da lanciare, e il motore esegue le tue regole reali contro quel giocatore usa e getta senza toccare nessuno di reale.
 
-## 12. Scenari (Simulazione)
+Il valore di una simulazione non è solo che gira, ma che è pienamente **osservabile**. L'output mostra esattamente quali regole si sono **attivate**, cosa è **cambiato** (ogni punteggio prima e dopo, ogni medaglia guadagnata) e un piccolo **grafo** dello stato prima e dopo. Questo trasforma il debug delle regole da congettura a ispezione: se una medaglia che ti aspettavi non è comparsa, puoi vedere se la sua regola si è attivata e, se non l'ha fatto, quale condizione non ha trovato corrispondenza.
 
-Gli scenari permettono di **testare il comportamento delle regole in sicurezza**, senza toccare alcun giocatore reale. Uno scenario definisce uno stato di partenza sintetico (concetti punteggio, medaglie, sfide attive) e una sequenza di azioni da generare; eseguirlo mostra lo stato risultante, quali regole si sono attivate e — se richiesto un output dettagliato — esattamente cosa ha cambiato ciascuna regola. Puoi anche salvare un **risultato atteso** insieme a uno scenario, trasformandolo in un controllo di regressione ripetibile: eseguilo di nuovo in seguito e verifica se il risultato corrisponde ancora a quanto ti aspetti.
+Una simulazione diventa anche un **test di regressione**. Una volta che conosci il risultato corretto, compili il **risultato atteso** e salvi lo scenario; da quel momento passa solo quando un'esecuzione futura produce ancora quel risultato. Rieseguire i tuoi scenari salvati dopo ogni modifica a una regola è il modo per intercettare una regola che hai rotto per sbaglio prima che raggiunga i giocatori reali.
 
-Questo è il modo consigliato per validare le modifiche alle regole prima di affidarti ad esse per i giocatori reali.
+Uno strumento in più affianca la simulazione. L'**analisi d'impatto** è un diagramma statico di come le tue regole si relazionano tra loro (quale output di una regola può attivarne o bloccarne un'altra), calcolato senza eseguire nulla. Man mano che l'insieme delle regole cresce, è il modo più rapido per individuare un'interazione indesiderata, come una regola che ne disattiva silenziosamente un'altra.
 
----
+> **In Campus Quest.** Apri **Scenari**, aggiungine uno chiamato `la lezione raggiunge Sophomore`, e costruisci un giocatore sintetico con l'azione `attend_lecture`, un concetto `study_points` che parte da `95`, e una collezione `achievements` vuota. Simula. Poiché il punteggio parte a una lezione dai 100, i +10 superano la soglia: l'output mostra `study points for lecture`, `first_lecture_badge` e `bookworm_badge` che si attivano, `study_points` che va da 95 a 105, ed entrambe le medaglie guadagnate. Salvalo con quel risultato atteso e da quel momento protegge quelle tre regole.
 
-## 13. Impostazioni account
+![Gli input della simulazione](/docs/images/simulation-inputs.png "Uno studente sintetico a una lezione dai 100 punti")
 
-Da Impostazioni puoi cambiare **username o password**, oppure **disattivare il tuo account**. La disattivazione è immediata per i nuovi accessi, anche se una sessione già in corso resta valida fino alla sua naturale scadenza.
+![Il risultato della simulazione](/docs/images/simulation-output.png "Regole attivate e cambiamenti risultanti")
+
+## 8. Modelli di sfida
+
+Una **sfida** assegna a un singolo giocatore un obiettivo specifico da raggiungere entro una finestra temporale, e un **modello di sfida** è il template riutilizzabile da cui è costruita. Il modello dà un nome a un tipo di sfida e ne dichiara le **variabili**: i valori che cambiano da una sfida concreta all'altra, come il target da raggiungere. Definire il template una volta significa che puoi distribuire molte sfide dello stesso tipo, ognuna con il proprio target e le proprie date, senza ridefinire la forma ogni volta.
+
+Un modello è inerte di per sé; non sfida nessuno finché non viene creata una sfida concreta a partire da esso e assegnata a un giocatore. È in quell'assegnazione che le variabili ricevono i loro valori. Ci sono due modi in cui un modello viene usato: assegnato direttamente a un giocatore, oppure offerto come ricompensa di livello che il giocatore attiva dal suo inventario. Entrambi sono trattati nella sezione 12. Le sfide di gruppo non sono deliberatamente costruite da questi modelli; usano i propri tipi predefiniti, descritti nella sezione 14.
+
+> **In Campus Quest.** Apri **Modelli di sfida** e creane uno chiamato `weekly_study_goal` con una sola variabile, `target` (il numero di study points da raggiungere). La sezione 12 lo assegna a un giocatore e lo collega anche alla ricompensa del passaggio a Sophomore.
+
+![Il form del modello di sfida](/docs/images/challenges-form.png "Il modello weekly_study_goal con una variabile target")
+
+## 9. Giocatori
+
+Un **giocatore** è un partecipante a un gioco, ed è l'unità che porta lo **stato**. Tutto ciò che il motore traccia su qualcuno (i suoi punteggi, le medaglie guadagnate, il livello attuale, le sfide attive e l'inventario) è appeso al suo record di giocatore. Un giocatore esiste solo dentro il suo gioco; la stessa persona che partecipa a due giochi ha due record di giocatore indipendenti.
+
+In produzione crei raramente i giocatori a mano. Lo schema abituale è che la prima volta che la tua applicazione invia un evento per un id mai visto prima, il motore crea automaticamente quel giocatore, così il tuo elenco cresce man mano che le persone reali iniziano a partecipare. Creare i giocatori in anticipo, nella console, serve soprattutto a preparare un cast iniziale noto, come fa questa guida, o a inizializzare gli account prima del lancio. In ogni caso, aprire un giocatore raggiunge la sua pagina di **dettagli**, l'unico posto per ispezionare i suoi totali, medaglie, livello, sfide e inventario.
+
+> **In Campus Quest.** Apri **Giocatori** e aggiungi cinque studenti: `alice`, `bob`, `carol`, `dave` ed `eve`. Ognuno è per ora vuoto (zero punti, nessuna medaglia) perché non è avvenuto alcun evento; la sezione 11 cambia questo. Aprendone uno qualsiasi vedi la pagina di dettaglio a cui tornerai lungo le sezioni successive.
+
+![L'elenco dei giocatori](/docs/images/players-list.png "I cinque studenti di Campus Quest")
+
+## 10. Squadre
+
+Una **squadra** è un gruppo di giocatori con un nome, ma con una svolta importante: una squadra è essa stessa un'**entità con punteggio**. Possiede lo stesso tipo di stato di un giocatore (i propri punteggi, medaglie e livello), quindi non è solo un'etichetta sopra un insieme di membri; può guadagnare, salire di livello ed essere classificata a pieno titolo. Questo permette a un gioco di premiare l'attività collettiva separatamente da quella individuale, e permette a squadre e singoli di comparire insieme nella stessa classifica.
+
+Poiché una squadra guadagna punti come un giocatore, li guadagna nello stesso modo di un giocatore: da eventi **indirizzati alla squadra**. Quando la tua applicazione invia un evento con l'id di una squadra al posto di quello di un giocatore, il motore esegue le regole per la squadra e ne aggiorna i punteggi propri; è così che premi un'attività genuinamente di squadra come una sessione di studio di gruppo. Una possibilità separata e più avanzata è far salire *automaticamente* l'attività individuale di ogni membro nei totali della sua squadra, così che quando un membro frequenta una lezione salga anche il punteggio della squadra. Questo non è automatico e richiede un pattern di regole specifico, che la sezione 16 tratta per intero.
+
+> **In Campus Quest.** Apri **Squadre** e crea `Team Alpha` con membri `alice` e `bob`, e `Team Beta` con `carol` e `dave`. Questo lascia `eve` senza squadra, il che va bene; l'appartenenza è facoltativa. Nella sezione 11 entrambe le squadre guadagnano punti da eventi indirizzati alla squadra.
+
+![Il form della squadra](/docs/images/teams-form.png "Team Alpha con alice e bob")
+
+## 11. Inviare eventi (giocare)
+
+Tutto fin qui è stato progettazione: hai descritto *cosa può succedere* (azioni), *quanto vale* (regole, punti, medaglie, livelli) e *chi gioca* (giocatori e squadre). Niente di tutto ciò fa qualcosa finché il gioco non viene davvero giocato, e giocare è l'unica parte che non vive affatto nella console. Vive nella tua **applicazione**.
+
+Un **evento** è il modo in cui il mondo esterno comunica al motore che è successo qualcosa. Quando uno studente reale frequenta una lezione o consegna un compito, è la tua applicazione (un'app mobile, un sito web, un job di backend) a inviare al motore un breve messaggio che dice "questo giocatore ha appena fatto questa azione". La console è dove *progetti e osservi* il gioco; la tua applicazione è ciò che lo *alimenta*. Ogni evento è una singola chiamata all'API del motore, e nell'istante in cui arriva il motore fa esattamente ciò che hai visto nel simulatore, ma per davvero: esegue le tue regole per quel giocatore, aggiunge punti, conferisce eventuali medaglie e ricalcola il suo livello.
+
+Un evento porta con sé quattro cose: **a quale gioco** appartiene, **quale giocatore** l'ha fatto, **quale azione** è avvenuta (un id dalla sezione 2) e qualsiasi **dato extra** di cui l'azione ha bisogno (un `grade`, un numero di `hours`). In concreto, la tua applicazione effettua il login una volta per ottenere un token di accesso e poi invia gli eventi. Un evento semplice si presenta così:
+
+```
+POST /api/v1/executions
+{
+  "gameId":   "<id del tuo gioco>",
+  "playerId": "alice",
+  "actionId": "attend_lecture",
+  "data":     {}
+}
+```
+
+e uno che porta dei dati si presenta così:
+
+```
+{ "playerId": "bob", "actionId": "submit_assignment", "data": { "grade": 24 } }
+```
+
+Dare punti a una **squadra** funziona in modo identico: invii l'evento con l'id della squadra al posto di quello del giocatore, perché anche una squadra è un'entità con punteggio (sezione 10). Se preferisci che il punteggio di una squadra cresca automaticamente da ciò che fanno i suoi membri, invece di inviare a mano eventi indirizzati alla squadra, quello è il pattern di propagazione della sezione 16.
+
+> **In Campus Quest.** Per riprodurre lo stato d'esempio esatto su cui questa guida si basa, invia:
+>
+> - **alice**: `attend_lecture` dodici volte, poi `submit_assignment` con voto `30`, `use_library` con `4` ore, e un `join_event`.
+> - **bob**: `attend_lecture` sei volte, `submit_assignment` con voto `24`, e un `join_event`.
+> - **carol**: `attend_lecture` tre volte, e `use_library` con `2` ore.
+> - **team-alpha**: `attend_lecture` otto volte e un `join_event`.
+> - **team-beta**: `attend_lecture` cinque volte.
+>
+> Dopodiché, apri **alice**: ha 140 `study_points` (Sophomore), 3 `credits`, 20 `social_points`, e ogni medaglia inclusa la segreta `night_owl`. bob e carol hanno meno, ed entrambe le squadre hanno punti propri. Questo stato accumulato è ciò che le classifiche nella sezione 15 ordinano.
+
+![Un profilo giocatore popolato](/docs/images/execution-result.png "alice dopo i suoi eventi: punti, livello e medaglie")
+
+## 12. Sfide per un giocatore
+
+Dove un modello di sfida (sezione 8) è un template, una **sfida** assegnata è una sua istanza concreta: un obiettivo specifico, con valori di variabile specifici e date specifiche, consegnato a un giocatore. Una sfida ha un **ciclo di vita**. Di solito viene creata in stato `PROPOSED`, cioè al giocatore è stata offerta ma non si è impegnato; il giocatore può poi **accettarla**, portandola a `ASSIGNED`, oppure rifiutarla. Questo passaggio di proposta ti permette di offrire sfide a cui i giocatori aderiscono, invece di imporre loro degli obiettivi.
+
+Ci sono due modi distinti in cui un giocatore arriva ad avere una sfida, e vale la pena distinguerli. Il primo è un'**assegnazione diretta**: tu (o la tua applicazione) create la sfida per il giocatore in modo esplicito. Quando la tua applicazione lo fa tramite l'API, fornisce i valori delle variabili del modello nel campo `data` della richiesta, ad esempio `{"target": 200}`, esattamente come fornisce i dati degli eventi. Il secondo modo è come **ricompensa di livello**: invece di assegnare una sfida fissa, una soglia di livello può offrire al giocatore una *scelta* di sfida, che finisce nel suo inventario perché la attivi quando vuole (sezione 13). La ricompensa di una soglia si configura con un piccolo blocco che specifica quante scelte ottiene il giocatore e quali modelli sono disponibili.
+
+Tutto questo ciclo di vita è disponibile anche tramite l'API del motore, la stessa API autenticata che la tua applicazione usa per inviare eventi. La tua app può assegnare una sfida, e il giocatore può accettarla o rifiutarla, direttamente dalla tua interfaccia; da lì in poi il giocatore fa progredire la sfida semplicemente inviando i normali eventi di azione. Quindi le schermate della console mostrate qui hanno ciascuna una controparte che la tua applicazione può chiamare in produzione.
+
+> **In Campus Quest.** Apri **alice**, clicca **Assegna sfida**, scegli il modello `weekly_study_goal`, chiama l'istanza `alice-weekly`, lascia lo stato iniziale `PROPOSED`, imposta una data di inizio e fine, e salva. Compare sulla sua pagina come `PROPOSED`; cliccare **Accetta** la porta a `ASSIGNED`.
+>
+> Per la ricompensa di livello, torna su **Livelli**, apri il livello, e sulla soglia **Sophomore** aggiungi una configurazione di sfida della soglia: imposta il **numero di scelte** a `1` e aggiungi `weekly_study_goal` ai modelli disponibili. Ora passare a Sophomore consegna al giocatore una scelta, che la sezione 13 riprende.
+
+![Assegnazione di una sfida](/docs/images/assign-challenge-form.png "Proposta di weekly_study_goal ad alice")
+
+## 13. Inventario e scelte del giocatore
+
+L'**inventario** di un giocatore contiene le cose che gli sono state conferite ma non ancora spese, e la cosa principale che contiene sono le **scelte** di sfida. Quando un giocatore guadagna una scelta (di solito superando una soglia di livello configurata con una ricompensa, come nella sezione 12), l'inventario acquisisce un'**attivazione** disponibile: una decisione che il giocatore può prendere. Invece di imporgli una sfida specifica, al giocatore viene data libertà d'azione, e sceglie quale delle sfide offerte attivare.
+
+Attivare una scelta la spende: la sfida scelta diventa attiva sul giocatore, e il conteggio delle attivazioni disponibili cala di conseguenza. È questo il meccanismo che trasforma un passaggio di livello da un cambio di titolo cosmetico in qualcosa che il giocatore *fa*: raggiungere un traguardo gli mette in mano una decisione. Accanto all'attivazione guidata dal giocatore, un comando amministrativo **Forza** può attivare una scelta per suo conto, il che è utile per testare il flusso o per interventi di supporto.
+
+> **In Campus Quest.** Dai a `dave` dieci eventi `attend_lecture` (dal modo API della sezione 11); questo lo porta a 100 `study_points`, oltre la soglia Sophomore, quindi guadagna la scelta lì configurata. Apri **dave** e guarda la sezione **inventario**: mostra **Attivazioni disponibili: 1** e la scelta `weekly_study_goal` con un pulsante **Attiva**. Clicca **Attiva**; la sfida diventa attiva e il conteggio scende a 0. Il pulsante **Forza** fa lo stesso automaticamente.
+
+![L'inventario di un giocatore con una scelta di sfida](/docs/images/player-inventory.png "La scelta di livello di dave, pronta da attivare")
+
+## 14. Sfide di gruppo
+
+Una **sfida di gruppo** mette più giocatori di fronte a un obiettivo condiviso, ed è una funzionalità distinta dalle sfide individuali della sezione 12. La differenza fondamentale è che una sfida di gruppo non è costruita da un modello che definisci tu; scegli invece uno di tre **tipi predefiniti**, ognuno dei quali definisce come si combinano i progressi dei membri e chi vince:
+
+- **groupCooperative**: i membri mettono in comune i loro progressi verso un unico target combinato e vincono insieme.
+- **groupCompetitivePerformance**: i membri competono, e vince chi guadagna di più.
+- **groupCompetitiveTime**: i membri gareggiano per raggiungere il target per primi.
+
+Come le sfide individuali, una sfida di gruppo ha un ciclo di vita di invito. Un giocatore è il **proponente**, che la imposta e **invita** gli altri come **ospiti**; ogni ospite può **accettare** o **rifiutare** prima che inizi, e il proponente può **annullarla** finché è ancora `PROPOSED`. Questo significa che una sfida di gruppo parte solo tra giocatori che hanno aderito. Una volta accettata e in corso, prosegue fino alla sua data di fine, momento in cui il motore la conclude secondo il suo tipo e assegna la ricompensa.
+
+Come per le sfide individuali, l'intero ciclo di vita dell'invito è esposto tramite l'API: la tua applicazione può creare l'invito, gli ospiti possono accettare o rifiutare, e il proponente può annullare, tutto tramite chiamate API invece che dalla console. Questo ti permette di gestire le sfide di gruppo interamente dentro la tua app.
+
+> **In Campus Quest.** Apri **alice** e, nell'area delle sfide di gruppo, clicca **Invita**. Seleziona `bob` come ospite, scegli il tipo `groupCooperative`, imposta il concetto di punteggio `study_points` e un **target** combinato di `300`, imposta date di inizio e fine e una ricompensa, e invia. La sfida compare come `PROPOSED` sia per alice (proponente) sia per bob (ospite); apri **bob**, trova la sfida `study-buddies` e clicca **Accetta** per portarla a `ASSIGNED`.
+
+![Un invito a una sfida di gruppo](/docs/images/group-challenge.png "La sfida cooperativa di alice, accettata da bob")
+
+## 15. Classifiche
+
+Una **classifica** ordina le entità in base a un concetto di punteggio, ed è dove tutto lo stato accumulato giocando diventa finalmente una competizione visibile. Una classifica è calcolata in tempo reale dai punteggi attuali, quindi riflette sempre lo stato più recente. Ce ne sono di due tipi, e la differenza corrisponde direttamente ai periodi dei concetti di punteggio (sezione 3):
+
+- **Generale**: un ordinamento di sempre in base al totale di un concetto.
+- **Incrementale**: un ordinamento su uno dei **periodi** del concetto, che quindi si azzera a ogni finestra. È così che ottieni una classifica "di questa settimana" o "di questo mese" che riparte da zero mentre i totali di sempre continuano a crescere.
+
+Poiché le squadre guadagnano come i giocatori (sezione 10), una classifica può ordinare singoli e squadre insieme. Un interruttore di **ambito** in cima alla classifica passa tra soli **Giocatori**, sole **Squadre** e **Tutti** insieme, con le squadre contrassegnate da un'icona di gruppo così da distinguerle. Separatamente, una classifica generale può portare una pianificazione **cron** e un numero di **posizioni da notificare**; il cron è la pianificazione con cui il motore distribuisce le ricompense di posizione e le notifiche ai primi classificati. La pianificazione governa le ricompense, non l'ordinamento che vedi, che è sempre in tempo reale.
+
+> **In Campus Quest.** Apri **Classifiche** e creane tre. `overall_study` è Generale su `study_points`, con `3` posizioni da notificare e un cron settimanale. `weekly_study` è Incrementale su `study_points` sul periodo `weekly`. `social_monthly` è Incrementale su `social_points` sul periodo `monthly`. Apri `overall_study`, clicca **Mostra**, e imposta l'ambito su **Tutti**: l'ordinamento è `alice` (140), `dave` (100), **Team Alpha** (80), `bob` (60), **Team Beta** (50), `carol` (40), `eve` (0). Le classifiche incrementali rispecchiano per ora quella di sempre perché ogni evento è caduto nella finestra corrente, ma in un gioco reale ogni nuovo periodo parte vuoto e si riempie man mano che i giocatori agiscono.
+
+![Una classifica con l'interruttore dell'ambito](/docs/images/leaderboard.png "overall_study, ambito Tutti: giocatori e squadre ordinati insieme")
+
+## 16. Punteggio delle squadre tramite propagazione (avanzato)
+
+La sezione 10 ha dato punti alle squadre nel modo semplice, con eventi indirizzati direttamente alla squadra. Questa sezione spiega l'alternativa più avanzata: far crescere il punteggio di una squadra **automaticamente** da ciò che fanno i suoi membri, così che quando un membro frequenta una lezione salga anche il totale della sua squadra. Questo non è un comportamento automatico che attivi; è un pattern che scrivi nelle tue regole, e vale la pena capirlo come ricetta anche se Campus Quest stesso mantiene l'approccio semplice.
+
+Il motivo per cui richiede un pattern speciale è che, normalmente, un evento tocca solo il giocatore per cui è stato inviato; niente nel dare punti a un giocatore raggiunge le sue squadre. Per colmare questo divario servono due regole che cooperano. La prima, la regola **lato giocatore**, esegue il suo solito punteggio e poi alza un segnale che dice al motore "esegui questa stessa azione anche per le mie squadre". Il motore risponde rieseguendo l'azione per ciascuna delle squadre del giocatore. La seconda, la regola **lato squadra**, è ciò che assegna effettivamente il punteggio alla squadra quando quella riesecuzione avviene. Le due si distinguono corrispondendo a `Player(team == false)` sul lato giocatore e `Player(team == true)` sul lato squadra.
+
+Il motore trasporta i numeri rilevanti al posto tuo. In termini di regole, il segnale è un fatto `UpdateTeams` che `insert`isci, caricato tramite `addData` con qualunque valore servirà alla regola di squadra; quando il motore riesegue l'azione per una squadra, passa quei valori alla regola lato squadra dentro un fatto `Transmission`. Ecco la regola della lezione della sezione 6 riscritta come coppia che propaga:
+
+```
+// lato giocatore: assegna il punteggio allo studente, poi chiedi al motore di aggiornare le sue squadre
+rule "study points for lecture (player)"
+when
+    Action( id == "attend_lecture" )
+    Player( $pid : id, team == false )
+    $pc : PointConcept( name == "study_points" )
+then
+    $pc.setScore($pc.getScore() + 10);
+    update($pc);
+    UpdateTeams ut = new UpdateTeams();
+    ut.addData("playerId", $pid);
+    ut.addData("points", 10);
+    insert(ut);
+end
+
+// lato squadra: quando la lezione di un membro propaga qui, assegna il punteggio alla squadra
+rule "study points for lecture (team)"
+when
+    Transmission( $points : data["points"] != null )
+    Player( team == true )
+    $pc : PointConcept( name == "study_points" )
+then
+    $pc.setScore($pc.getScore() + ((Number) $points).doubleValue());
+    update($pc);
+end
+```
+
+Sostituire l'unica regola `study_points_lecture` con questa coppia fa sì che ogni lezione che un membro frequenta alzi anche gli `study_points` della sua squadra, senza bisogno di eventi indirizzati alla squadra. La direzione inversa, un'azione di squadra che ricade su ogni membro, funziona allo stesso modo usando un segnale `UpdateMembers` e un fatto `Team` sul lato membro. Due cose sono essenziali: metti i valori che ti servono in `addData` (un `UpdateTeams` vuoto non porta nulla, quindi la regola di squadra non avrebbe niente da leggere), e proteggi sempre le due regole con `team == false` e `team == true` così che ciascuna si attivi solo nel posto giusto.
+
+## 17. Bloccare giocatori
+
+A volte due giocatori non dovrebbero essere accoppiati, ad esempio dopo che qualcuno si è comportato male in un'attività condivisa. Per supportare questo, ogni giocatore può tenere una **lista di bloccati**: altri giocatori con cui non verrà accoppiato. L'effetto concreto immediato è sulle sfide di gruppo (sezione 14): un giocatore nella tua lista di bloccati non compare come opzione quando inviti degli ospiti, così il blocco impedisce silenziosamente l'accoppiamento invece di doverlo far rispettare caso per caso.
+
+Il blocco è **per singolo giocatore** e **unidirezionale**. Il blocco vive sul record di chi blocca e influisce solo sul suo accoppiamento; alice che blocca eve tiene eve fuori dagli inviti di alice, ma non fa nulla per impedire a eve di inserire alice. Annullare un blocco è semplicemente rimuovere la voce dalla lista.
+
+Anche bloccare e sbloccare sono chiamate API, quindi la tua applicazione può gestire direttamente la lista dei bloccati di un giocatore, ad esempio offrendo un comando "blocca questo giocatore" nella tua interfaccia.
+
+> **In Campus Quest.** Apri **alice**, trova l'area dei **giocatori bloccati**, e blocca `eve`; ora compare nella lista dei bloccati di alice e non emergerà quando alice invita ospiti a una sfida di gruppo. Rimuovere `eve` dalla lista toglie il blocco.
+
+![La lista dei bloccati di un giocatore](/docs/images/block-player.png "alice ha bloccato eve")
+
+## 18. Notifiche
+
+Le **notifiche** sono il registro del motore dei momenti significativi del gioco: una medaglia guadagnata, una sfida vinta o persa, una posizione in classifica raggiunta. Vengono prodotte automaticamente man mano che il gioco procede, sia dalle tue regole (ogni regola di medaglia nella sezione 6 ne invia una) sia da task pianificati come le esecuzioni cron delle classifiche. Aiuta essere chiari su dove emergono. La console mostra brevi pop-up per le azioni che compi al suo interno, ma lo *storico* delle notifiche di un giocatore è pensato per essere letto dalla tua applicazione tramite l'API e mostrato nella tua interfaccia, sullo stesso canale che invia gli eventi e legge lo stato. In altre parole, la console è la vista dell'operatore; la vista del giocatore è qualcosa che costruisci tu.
+
+## Conclusione
+
+Ora hai visto l'intero motore, dall'inizio alla fine. Un gioco ti dà un vocabolario di azioni; concetti di punteggio, medaglie e livelli trasformano quelle azioni in punteggi, riconoscimenti e ranghi; le regole tengono insieme tutto, e il simulatore ti permette di dimostrare che si comportano bene prima di toccare qualsiasi giocatore reale. Su queste fondamenta, le sfide (individuali e di gruppo), gli inventari e le scelte danno ai giocatori obiettivi e libertà d'azione; giocatori e squadre accumulano stato dagli eventi che la tua applicazione invia; le classifiche trasformano quello stato in competizione; e i punteggi delle squadre possono persino essere fatti crescere automaticamente.
+
+Il punto da portare a casa è che niente di tutto ciò è specifico dello studio. Campus Quest era solo una lente: ogni concetto qui è riutilizzabile. Sostituisci le tue azioni, i tuoi concetti di punteggio e le tue regole, e gli stessi mattoni modellano qualsiasi esperienza basata su punteggio, che sia un tracker per il fitness, un programma di fidelizzazione dei clienti o una piattaforma di coinvolgimento interna. La console non presuppone mai di cosa parli il tuo gioco; ti dà soltanto i pezzi.
+
+Un buon passo successivo è fare tuo l'esempio. Cambia una regola e riesegui il suo scenario per vedere il test salvato intercettare la differenza; aggiungi una nuova azione e premiala; inventa una medaglia e scrivi la regola che la conferisce. Una volta che i pezzi ti risultano familiari, avvia un nuovo gioco e costruisci per il tuo dominio, e torna a una qualsiasi sezione qui quando ti serve verificare esattamente come si comporta una funzionalità. Questa guida è pensata per essere letta una volta dall'inizio alla fine, e poi tenuta come riferimento.

@@ -59,7 +59,8 @@
   },
   "guide": {
     "back_to_app": "Torna all'app",
-    "load_error": "Impossibile caricare la guida. Riprova più tardi."
+    "load_error": "Impossibile caricare la guida. Riprova più tardi.",
+    "sections": "Sezioni"
   },
   "landing": {
     "hero": {
@@ -467,6 +468,7 @@
       "no_periods": "Nessun periodo definito."
     },
     "form": {
+      "title": "Salva punteggio",
       "periods_title": "Periodi",
       "periods_hint": "Definisci i periodi di calcolo del punteggio (es. settimanale, mensile).",
       "period_name": "Nome periodo",

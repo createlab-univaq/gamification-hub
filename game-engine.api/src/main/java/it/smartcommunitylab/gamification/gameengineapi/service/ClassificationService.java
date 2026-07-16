@@ -3,6 +3,7 @@ package it.smartcommunitylab.gamification.gameengineapi.service;
 import it.smartcommunitylab.gamification.gameengineapi.model.criteria.ClassificationCriteria;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationBoardDTO;
 import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationDTO;
+import it.smartcommunitylab.gamification.gameengineapi.model.dto.ClassificationScope;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -20,6 +21,6 @@ public interface ClassificationService {
     void delete(String gameId, String classificationId);
 
     ClassificationBoardDTO getBoard(String gameId, String classificationId, long timestamp, int periodInstanceIndex,
-            Pageable pageable);
+            ClassificationScope scope, Pageable pageable);
 
 }

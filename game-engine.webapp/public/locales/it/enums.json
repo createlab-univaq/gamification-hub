@@ -1,5 +1,16 @@
 {
-  "ASSIGNED": "ASSEGNATA",
-  "ACTIVE": "ATTIVA",
-  "PROPOSED": "PROPOSTA"
+  "PROPOSED": "Proposta",
+  "ASSIGNED": "Assegnata",
+  "ACTIVE": "Attiva",
+  "COMPLETED": "Completata",
+  "FAILED": "Fallita",
+  "REFUSED": "Rifiutata",
+  "AUTO_DISCARDED": "Scartata automaticamente",
+  "CANCELED": "Annullata",
+  "AVAILABLE": "Disponibile",
+  "GUEST": "Invitato",
+  "PROPOSER": "Proponente",
+  "ALL": "Tutti",
+  "PLAYERS": "Giocatori",
+  "TEAMS": "Squadre"
 }

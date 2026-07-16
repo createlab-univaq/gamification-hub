@@ -52,7 +52,7 @@ public interface ClassificationMapper {
             for (int i = 0; i < board.getContent().size(); i++) {
                 ClassificationPosition position = board.getContent().get(i);
                 positions.add(new ClassificationPositionDTO((int) (offset + i + 1),
-                        position.getPlayerId(), position.getScore()));
+                        position.getPlayerId(), position.getScore(), position.isTeam()));
             }
             boardDTO.setBoard(new PageImpl<>(positions, board.getPageable(), board.getTotalElements()));
         }

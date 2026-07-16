@@ -59,7 +59,8 @@
   },
   "guide": {
     "back_to_app": "Back to app",
-    "load_error": "Could not load the guide. Please try again later."
+    "load_error": "Could not load the guide. Please try again later.",
+    "sections": "Sections"
   },
   "landing": {
     "hero": {
@@ -467,6 +468,7 @@
       "no_periods": "No period defined."
     },
     "form": {
+      "title": "Save point concept",
       "periods_title": "Periods",
       "periods_hint": "Define the score calculation periods (e.g. weekly, monthly).",
       "period_name": "Period name",

@@ -7,7 +7,7 @@ import {LogoutPage} from "../pages/logout/page.tsx";
 import {PublicRoutes} from "./PublicRoutes.tsx";
 import {AppLayout} from "../components/layout/AppLayout.tsx";
 import {GamesListPage} from "../pages/dashboard/list.tsx";
-import {GameUpsertPage} from "../pages/dashboard/upsert.tsx";
+import {GameUpsertPage} from "../pages/games/upsert.tsx";
 import {GameRoutes} from "./GameRoutes.tsx";
 import {GamePage} from "../pages/games/page.tsx";
 import {ErrorPage} from "../pages/error/page.tsx";

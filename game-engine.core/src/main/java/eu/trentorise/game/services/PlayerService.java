@@ -34,6 +34,7 @@ import eu.trentorise.game.model.TeamState;
 import eu.trentorise.game.model.core.ChallengeAssignment;
 import eu.trentorise.game.model.core.ClassificationBoard;
 import eu.trentorise.game.model.core.ClassificationPosition;
+import eu.trentorise.game.model.core.ClassificationScope;
 import eu.trentorise.game.model.core.ComplexSearchQuery;
 import eu.trentorise.game.model.core.RawSearchQuery;
 import eu.trentorise.game.model.core.StringSearchQuery;
@@ -50,6 +51,9 @@ public interface PlayerService {
 	public Page<PlayerState> loadStates(String gameId, Pageable pageable, boolean mergeChallenges,
 			boolean filterHiddenChallenges);
 
+	public Page<PlayerState> loadStates(String gameId, Pageable pageable, boolean mergeChallenges,
+			boolean filterHiddenChallenges, boolean excludeTeams);
+
 	public List<PlayerState> loadStates(String gameId);
 
 	public Page<PlayerState> loadStates(String gameId, String playerId, Pageable pageable,
@@ -58,10 +62,19 @@ public interface PlayerService {
 	public Page<PlayerState> loadStates(String gameId, String playerId, Pageable pageable, boolean mergeGroupChallenges,
 			boolean filterHiddenChallenges);
 
+	public Page<PlayerState> loadStates(String gameId, String playerId, Pageable pageable, boolean mergeGroupChallenges,
+			boolean filterHiddenChallenges, boolean excludeTeams);
+
 	public Page<ClassificationPosition> classifyAllPlayerStates(Game g, String itemType, Pageable pageable);
+
+	public Page<ClassificationPosition> classifyAllPlayerStates(Game g, String itemType, ClassificationScope scope,
+			Pageable pageable);
 
 	public Page<ClassificationPosition> classifyPlayerStatesWithKey(long timestamp, String pointConceptName, String periodName,
 			String key, String gameId, Pageable pageable);
+
+	public Page<ClassificationPosition> classifyPlayerStatesWithKey(long timestamp, String pointConceptName, String periodName,
+			String key, String gameId, ClassificationScope scope, Pageable pageable);
 
 	public PlayerState saveState(PlayerState state);
 
