@@ -51,6 +51,9 @@ public interface PlayerService {
 	public Page<PlayerState> loadStates(String gameId, Pageable pageable, boolean mergeChallenges,
 			boolean filterHiddenChallenges);
 
+	public Page<PlayerState> loadStates(String gameId, Pageable pageable, boolean mergeChallenges,
+			boolean filterHiddenChallenges, boolean excludeTeams);
+
 	public List<PlayerState> loadStates(String gameId);
 
 	public Page<PlayerState> loadStates(String gameId, String playerId, Pageable pageable,
@@ -58,6 +61,9 @@ public interface PlayerService {
 
 	public Page<PlayerState> loadStates(String gameId, String playerId, Pageable pageable, boolean mergeGroupChallenges,
 			boolean filterHiddenChallenges);
+
+	public Page<PlayerState> loadStates(String gameId, String playerId, Pageable pageable, boolean mergeGroupChallenges,
+			boolean filterHiddenChallenges, boolean excludeTeams);
 
 	public Page<ClassificationPosition> classifyAllPlayerStates(Game g, String itemType, Pageable pageable);
 

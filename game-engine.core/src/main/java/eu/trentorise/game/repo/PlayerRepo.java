@@ -50,6 +50,14 @@ public interface PlayerRepo extends
 	@Query("{'gameId':?0, 'metadata.team-name':{$exists:true},'metadata.team-members':{$exists:true}}")
 	public List<StatePersistence> findTeamsByGameId(String gameId);
 
+	@Query("{'gameId':?0, 'metadata.team-name':{$exists:false}}")
+	public Page<StatePersistence> findPlayersByGameId(String gameId,
+			Pageable pageable);
+
+	@Query("{'gameId':?0, 'playerId':{$regex:?1}, 'metadata.team-name':{$exists:false}}")
+	public Page<StatePersistence> findPlayersByGameIdAndPlayerIdLike(String gameId,
+			String playerId, Pageable pageable);
+
 	public List<StatePersistence> deleteByGameIdAndPlayerId(String gameId,
 			String playerId);
 

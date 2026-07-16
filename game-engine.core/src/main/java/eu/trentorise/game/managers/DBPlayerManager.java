@@ -324,6 +324,34 @@ public class DBPlayerManager implements PlayerService {
         return res;
     }
 
+    @Override
+    public Page<PlayerState> loadStates(String gameId, Pageable pageable,
+            boolean mergeChallenges, boolean filterHiddenChallenges, boolean excludeTeams) {
+        if (!excludeTeams) {
+            return loadStates(gameId, pageable, mergeChallenges, filterHiddenChallenges);
+        }
+        PerfMonitor perfMonitor = PerfMonitor.start();
+        Page<StatePersistence> states = playerRepo.findPlayersByGameId(gameId, pageable);
+        List<PlayerState> result = new ArrayList<PlayerState>();
+        for (StatePersistence state : states) {
+            PlayerState playerState = initDefaultLevels(
+                    initConceptsStructure(new PlayerState(state), gameId), gameId);
+            if (mergeChallenges) {
+                playerState = mergeGroupChallenges(playerState, gameId);
+                List<ChallengeConceptPersistence> listCcs = challengeConceptRepo.findByGameIdAndPlayerId(gameId, playerState.getPlayerId());
+                playerState.loadChallengeConcepts(listCcs);
+            }
+            if (filterHiddenChallenges) {
+                playerState = filterHiddenChallenges(playerState);
+            }
+            result.add(playerState);
+        }
+        PageImpl<PlayerState> res =
+                new PageImpl<PlayerState>(result, pageable, states.getTotalElements());
+        perfMonitor.stop(EngineMetrics.LOAD_STATES, gameId, "Loaded states of game " + gameId);
+        return res;
+    }
+
     public Page<PlayerState> loadStates(String gameId, Pageable pageable,
             boolean mergeChallenges) {
         return loadStates(gameId, pageable, mergeChallenges, false);
@@ -370,6 +398,33 @@ public class DBPlayerManager implements PlayerService {
     public Page<PlayerState> loadStates(String gameId, String playerId, Pageable pageable,
             boolean mergeGroupChallenges) {
         return loadStates(gameId, playerId, pageable, mergeGroupChallenges, false);
+    }
+
+    @Override
+    public Page<PlayerState> loadStates(String gameId, String playerId, Pageable pageable,
+            boolean mergeGroupChallenges, boolean filterHiddenChallenges, boolean excludeTeams) {
+        if (!excludeTeams) {
+            return loadStates(gameId, playerId, pageable, mergeGroupChallenges, filterHiddenChallenges);
+        }
+        Page<StatePersistence> states =
+                playerRepo.findPlayersByGameIdAndPlayerIdLike(gameId, playerId, pageable);
+        List<PlayerState> result = new ArrayList<PlayerState>();
+        for (StatePersistence state : states) {
+            PlayerState playerState = initDefaultLevels(
+                    initConceptsStructure(new PlayerState(state), gameId), gameId);
+            if (mergeGroupChallenges) {
+                playerState = mergeGroupChallenges(playerState, gameId);
+                List<ChallengeConceptPersistence> listCcs = challengeConceptRepo.findByGameIdAndPlayerId(gameId, playerId);
+                playerState.loadChallengeConcepts(listCcs);
+            }
+            if (filterHiddenChallenges) {
+                playerState = filterHiddenChallenges(playerState);
+            }
+            result.add(playerState);
+        }
+        PageImpl<PlayerState> res =
+                new PageImpl<PlayerState>(result, pageable, states.getTotalElements());
+        return res;
     }
 
     private PlayerState initConceptsStructure(PlayerState ps, String gameId) {
