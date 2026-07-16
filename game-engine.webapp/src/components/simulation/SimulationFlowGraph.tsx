@@ -60,14 +60,32 @@ export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps
     const onPaneClick = useCallback(() => setSelectedRule(null), []);
 
     return (
-        <Stack sx={{gap: 2}}>
+        <Stack
+            sx={{
+                gap: 2,
+                width:"100%",
+                height:"100%",
+            }}
+            direction={{
+                lg: "row",
+                md: "row",
+                sm: "column",
+                xs: "column"
+            }}
+        >
             <Box sx={{
-                height: "50dvh",
+                height: "100%",
+                minHeight: "60dvh",
+                width:"100%",
+                p:2,
                 border: "1px solid",
                 borderColor: "divider",
                 borderRadius: 2,
                 overflow: "hidden"
             }}>
+                <Typography variant="caption" color="text.secondary" sx={{textAlign: "center"}}>
+                    {t("scenarios.form.graph.details")}
+                </Typography>
                 {nodes.length > 0 && (
                     <ReactFlow
                         nodes={nodes}
@@ -86,15 +104,14 @@ export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps
                 )}
             </Box>
 
-            {selectedRule
-                ? <SimulationNodeDetail rule={selectedRule}/>
-                : <Typography variant="caption" color="text.secondary" sx={{textAlign: "center"}}>
-                    {t("scenarios.form.graph.details")}
-                </Typography>
-            }
-            {selectedStateNode &&
-                <SimulationStateNodeDetail type={selectedStateNode.type} playerState={selectedStateNode}/>
-            }
+           <Stack sx={{width:"100%"}}>
+               {selectedRule &&
+                   <SimulationNodeDetail rule={selectedRule}/>
+               }
+               {selectedStateNode &&
+                   <SimulationStateNodeDetail type={selectedStateNode.type} playerState={selectedStateNode}/>
+               }
+           </Stack>
         </Stack>
     );
 }

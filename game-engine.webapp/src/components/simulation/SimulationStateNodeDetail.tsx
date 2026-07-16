@@ -1,4 +1,4 @@
-import {Card, CardContent, Stack, Typography} from "@mui/material";
+import {Card, CardContent, Chip, Stack, Typography} from "@mui/material";
 import type {PlayerStateDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
 
@@ -10,7 +10,12 @@ interface SimulationStateNodeDetailProps {
 export function SimulationStateNodeDetail({playerState, type}: SimulationStateNodeDetailProps) {
 
     const [t] = useTranslation();
-    const nodeType = type === "start" ? t("scenarios.form.graph.nodes.start") : t("scenarios.form.graph.nodes.end")
+    const isStart = type === "start";
+    const nodeType = isStart ? t("scenarios.form.graph.nodes.start") : t("scenarios.form.graph.nodes.end")
+
+    const PointChip = ({value}:{value:number}) => {
+        return <Chip size={"small"} color={isStart ? "default" : "success"} label={`${value}`} />
+    }
 
     return <Card variant="outlined">
         <CardContent sx={{display: "flex", flexDirection: "column", gap: 1}}>
@@ -20,7 +25,7 @@ export function SimulationStateNodeDetail({playerState, type}: SimulationStateNo
                     <Typography sx={{fontWeight: "bold"}}>{t("sidebar.points")}</Typography>
                     <Stack sx={{px: 2}}>
                         {playerState.pointConcepts.map(pc => {
-                            return <Typography>{pc.name}: {pc.score}</Typography>
+                            return <Typography>{pc.name}: <PointChip value={pc.score ?? 0}/></Typography>
                         })}
                     </Stack>
                 </>

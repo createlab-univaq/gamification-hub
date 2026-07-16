@@ -9,7 +9,7 @@ import {Loading} from "../../components/Loading.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {TeamForm} from "../../components/form/TeamForm.tsx";
 import {useTranslation} from "react-i18next";
-import {Games} from "@mui/icons-material";
+import {Diversity3, Games} from "@mui/icons-material";
 
 export function TeamUpsertPage() {
 
@@ -46,6 +46,7 @@ export function TeamUpsertPage() {
                     href: `/games/${game.id}`
                 },
                 {
+                    icon: <Diversity3/>,
                     label: t("sidebar.teams"),
                     href: `/games/${game.id}/teams`
                 }

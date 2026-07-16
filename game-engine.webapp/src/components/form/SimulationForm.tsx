@@ -358,7 +358,16 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
             />
             <Stack direction={{xs: "column", md: "row"}} sx={{mt: 2, gap: 3}}>
                 {/* ── Form ── */}
-                <Stack sx={{flex: 1, minWidth: 0}}>
+                <Stack
+                    sx={{
+                        flex: 1,
+                        minWidth: 0,
+                        maxWidth: {
+                            lg:"35%",
+                            md:"35%"
+                        }
+                    }}
+                >
                     <Accordion sx={{borderRadius: 0}} defaultExpanded={true}>
                         <AccordionSummary expandIcon={<ExpandMore/>}>
                             <Typography sx={{fontWeight: 600}}>{t("scenarios.form.inputs.title")}</Typography>
@@ -628,7 +637,7 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                         </Box>
                     )}
                     {isPending &&
-                        <Stack sx={{alignItems:"center", justifyContent:"center"}}>
+                        <Stack sx={{alignItems: "center", justifyContent: "center"}}>
                             <Loading/>
                         </Stack>
                     }

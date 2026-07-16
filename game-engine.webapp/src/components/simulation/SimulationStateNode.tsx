@@ -18,7 +18,7 @@ export function SimulationStateNode({id}: NodeProps) {
                 transition: "border-color 0.15s",
             }}
         >
-            <Typography color={"secondary"}>{label}</Typography>
+            <Typography sx={{fontWeight:"bold"}} color={"textPrimary"}>{label}</Typography>
         </Paper>
         {isStart && <Handle type={"source"} position={Position.Bottom}/>}
     </>

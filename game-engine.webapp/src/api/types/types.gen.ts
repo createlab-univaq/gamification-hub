@@ -426,24 +426,24 @@ export type PagePlayerDto = {
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    pageable?: PageableObject;
     sort?: SortObject;
+    pageable?: PageableObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
     offset?: number;
-    unpaged?: boolean;
-    pageSize?: number;
-    pageNumber?: number;
-    paged?: boolean;
     sort?: SortObject;
+    paged?: boolean;
+    unpaged?: boolean;
+    pageNumber?: number;
+    pageSize?: number;
 };
 
 export type SortObject = {
     empty?: boolean;
-    unsorted?: boolean;
     sorted?: boolean;
+    unsorted?: boolean;
 };
 
 export type NotificationDto = {
@@ -515,8 +515,8 @@ export type PageClassificationPositionDto = {
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    pageable?: PageableObject;
     sort?: SortObject;
+    pageable?: PageableObject;
     empty?: boolean;
 };
 

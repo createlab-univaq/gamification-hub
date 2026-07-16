@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(config = EntityMapper.class)
+@Mapper(config = EntityMapper.class, uses = {GameConceptMapperImpl.class})
 public interface GameMapper extends EntityMapper<GameDTO, Game>{
 
     @Override
@@ -15,4 +15,5 @@ public interface GameMapper extends EntityMapper<GameDTO, Game>{
     @Mapping(target = "tasks", ignore = true)
     @Mapping(target = "concepts", ignore = true)
     void updateEntity(@MappingTarget Game entity, GameDTO dto);
+
 }

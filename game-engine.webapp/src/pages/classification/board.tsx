@@ -138,6 +138,7 @@ export function ClassificationBoardPage() {
                                     </TableCell>
                                     <TableCell>
                                         {p.playerId}
+                                        {}
                                     </TableCell>
                                     <TableCell align={"right"}>
                                         {p.score}

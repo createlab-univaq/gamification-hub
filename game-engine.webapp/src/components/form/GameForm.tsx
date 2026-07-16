@@ -44,7 +44,7 @@ export function GameForm({game}: GameFormProps) {
         onSuccess: (data) => {
             // Remove cached game
             localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify({}))
-            navigateTo("/dashboard", {
+            navigateTo(game ? `/games/${data.id}` : "/dashboard", {
                 state: {
                     type: "success",
                     title: t("game.saved.title"),
@@ -93,7 +93,8 @@ export function GameForm({game}: GameFormProps) {
                                required: t("required_field")
                            }}
                 >
-                    <TextField type={"text"} label={t("game.domain")} placeholder={"ilmiodominio.com"} fullWidth={true}/>
+                    <TextField type={"text"} label={t("game.domain")} placeholder={"ilmiodominio.com"}
+                               fullWidth={true}/>
                 </FormInput>
                 {!!game && <FormCheckbox name={"terminated"} defaultValue={true} label={t("game.terminated_label")}/>}
             </Stack>
@@ -103,10 +104,11 @@ export function GameForm({game}: GameFormProps) {
                        alignItems: "center"
                    }}
             >
-                <Button href={"/dashboard"} variant={"contained"}>{t("buttons:turn_back")}</Button>
+                <Button href={game ? `/games/${game.id}`: "/dashboard"} variant={"contained"}>{t("buttons:turn_back")}</Button>
                 <Stack direction={"row"} sx={{gap: 2}}>
                     <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
-                    <Button type={"reset"} onClick={() => initForm(game)} variant={"outlined"}>{t("buttons:reset")}</Button>
+                    <Button type={"reset"} onClick={() => initForm(game)}
+                            variant={"outlined"}>{t("buttons:reset")}</Button>
                 </Stack>
             </Stack>
         </Stack>
