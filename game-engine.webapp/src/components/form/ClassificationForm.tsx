@@ -140,6 +140,7 @@ export function ClassificationForm({gameId, classification}: ClassificationFormP
                 getOptionLabel={(o) => o.label}
                 getOptionValue={(o) => o.value}
                 rules={{required: t("required_field")}}
+                disabled={!!classification}
             />
 
             <AutocompleteFormItem
