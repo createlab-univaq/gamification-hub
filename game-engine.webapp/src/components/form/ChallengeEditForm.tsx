@@ -6,7 +6,9 @@ import {getApiError, translateApiErrorToNotification} from "../../utils/error-ut
 import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
-import {Button, Dialog, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";
+import {Dialog, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";
+import {Close, Save} from "@mui/icons-material";
+import {ButtonIcon} from "../ButtonIcon.tsx";
 import type {ChallengeConceptDto, ChallengeEditDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
 import {toIsoDate} from "../../utils/date-utils.ts";
@@ -87,8 +89,8 @@ export function ChallengeEditForm({gameId, playerId, challenge, onClose}: Challe
                     <FormCheckbox name={"hide"} label={t("form.labels.hidden")} labelPlacement={"end"}/>
 
                     <Stack direction={"row"} sx={{justifyContent: "flex-end", gap: 2}}>
-                        <Button variant={"outlined"} onClick={onClose}>{t("buttons:cancel")}</Button>
-                        <Button type={"submit"} variant={"contained"} loading={isPending}>{t("buttons:save")}</Button>
+                        <ButtonIcon icon={<Close/>} variant={"outlined"} onClick={onClose}>{t("buttons:cancel")}</ButtonIcon>
+                        <ButtonIcon type={"submit"} icon={<Save/>} variant={"contained"} loading={isPending}>{t("buttons:save")}</ButtonIcon>
                     </Stack>
                 </Stack>
             </Form>

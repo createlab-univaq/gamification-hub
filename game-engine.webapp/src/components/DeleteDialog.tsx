@@ -33,7 +33,8 @@ export function DeleteDialog<T>({deleteFn, message, element, setElement}: Delete
             paddingTop: 0,
             gap: 2,
             alignItems: "center",
-            justifyContent: "center"
+            justifyContent: "center",
+            textAlign: "center"
         }}>
             <Typography variant={"h4"}>{t("delete_title")}</Typography>
             <Typography variant={"body1"}>{message}</Typography>

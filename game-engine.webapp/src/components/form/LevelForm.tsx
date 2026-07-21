@@ -8,7 +8,8 @@ import {navigateTo} from "../../utils/navigation-utils.ts";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Button, Card, CardContent, Collapse, Divider, IconButton, Stack, TextField, Typography} from "@mui/material";
-import {Add, Delete, Settings} from "@mui/icons-material";
+import {Add, ArrowBack, Delete, RestartAlt, Save, Settings} from "@mui/icons-material";
+import {ButtonIcon} from "../ButtonIcon.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
 import {useEffect, useState} from "react";
@@ -223,10 +224,10 @@ export function LevelForm({level, gameId}: LevelFormProps) {
                        alignItems: "center"
                    }}
             >
-                <Button href={`/games/${gameId}/levels`} variant={"contained"}>{t("buttons:turn_back")}</Button>
+                <ButtonIcon icon={<ArrowBack/>} href={`/games/${gameId}/levels`} variant={"contained"}>{t("buttons:turn_back")}</ButtonIcon>
                 <Stack direction={"row"} sx={{gap: 2}}>
-                    <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
-                    <Button type={"reset"} onClick={() => initForm(level)} variant={"outlined"}>{t("buttons:reset")}</Button>
+                    <ButtonIcon type={"submit"} icon={<Save/>} variant={"contained"}>{t("buttons:save")}</ButtonIcon>
+                    <ButtonIcon type={"button"} icon={<RestartAlt/>} onClick={() => initForm(level)} variant={"outlined"}>{t("buttons:reset")}</ButtonIcon>
                 </Stack>
             </Stack>
         </Stack>

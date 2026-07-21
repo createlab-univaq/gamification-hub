@@ -418,26 +418,26 @@ export type LoginResponseDto = {
 };
 
 export type PagePlayerDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
     size?: number;
     content?: Array<PlayerDto>;
     number?: number;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    pageable?: PageableObject;
     sort?: SortObject;
+    pageable?: PageableObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
     offset?: number;
+    sort?: SortObject;
+    paged?: boolean;
     pageSize?: number;
     pageNumber?: number;
     unpaged?: boolean;
-    sort?: SortObject;
-    paged?: boolean;
 };
 
 export type SortObject = {
@@ -508,16 +508,16 @@ export type ClassificationPositionDto = {
 };
 
 export type PageClassificationPositionDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
     size?: number;
     content?: Array<ClassificationPositionDto>;
     number?: number;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    pageable?: PageableObject;
     sort?: SortObject;
+    pageable?: PageableObject;
     empty?: boolean;
 };
 

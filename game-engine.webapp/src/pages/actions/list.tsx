@@ -8,7 +8,7 @@ import {PageContainer} from "../../components/layout/PageContainer.tsx";
 import {PageHeader} from "../../components/layout/PageHeader.tsx";
 import {Add, Games} from "@mui/icons-material";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
-import {Stack, Typography} from "@mui/material";
+import {Typography} from "@mui/material";
 import {PageList} from "../../components/PageList.tsx";
 import {useDebounced} from "../../hooks/use-debounced.ts";
 import type {ActionDto} from "../../api/types";
@@ -108,9 +108,7 @@ export function ActionListPage() {
                 return `/games/${game.id}/actions/upsert/${i.name}`
             }}
             renderItem={(action) => {
-                return <Stack sx={{gap: 1}}>
-                    <Typography sx={{fontWeight: "bold", fontSize: "1.2rem"}}>{action.name}</Typography>
-                </Stack>
+                return <Typography variant={"h5"}>{action.name}</Typography>
             }}
             onItemUpdate={() => {
             }}

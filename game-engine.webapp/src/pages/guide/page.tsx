@@ -29,6 +29,7 @@ import {ThemeSwitch} from "../../components/ThemeSwitch.tsx";
 import {AppIcon} from "../../components/logo/AppIcon.tsx";
 import {AppLogo} from "../../components/logo/AppLogo.tsx";
 import {Login} from "@mui/icons-material";
+import {ButtonIcon} from "../../components/ButtonIcon.tsx";
 
 function omitNode<T extends { node?: unknown }>(props: T): Omit<T, "node"> {
     const rest: Record<string, unknown> = {...props}
@@ -160,8 +161,13 @@ export function GuidePage() {
                     <Stack direction={"row"} sx={{alignItems: "center"}}>
                         <LanguageSelector defaultLanguage={"en"}/>
                         <ThemeSwitch/>
-                        <Button variant={"contained"} href={user ? "/dashboard" : "/"}
-                                endIcon={<Login/>}>{t("buttons:turn_back")}</Button>
+                        <ButtonIcon
+                            icon={<Login/>}
+                            variant={"contained"}
+                            href={user ? "/dashboard" : "/"}
+                        >
+                            {t("buttons:turn_back")}
+                        </ButtonIcon>
                     </Stack>
                 </Stack>
             }

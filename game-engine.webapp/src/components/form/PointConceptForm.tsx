@@ -9,7 +9,8 @@ import {getApiError, translateApiErrorToNotification} from "../../utils/error-ut
 import {useEffect} from "react";
 import {Form} from "./Form.tsx";
 import {Button, Card, CardContent, Divider, IconButton, Stack, TextField, Typography} from "@mui/material";
-import {Add, Delete} from "@mui/icons-material";
+import {Add, ArrowBack, Delete, RestartAlt, Save} from "@mui/icons-material";
+import {ButtonIcon} from "../ButtonIcon.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {useTranslation} from "react-i18next";
 
@@ -204,10 +205,10 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
                        alignItems: "center"
                    }}
             >
-                <Button href={`/games/${gameId}/points`} variant={"contained"}>{t("buttons:turn_back")}</Button>
+                <ButtonIcon icon={<ArrowBack/>} href={`/games/${gameId}/points`} variant={"contained"}>{t("buttons:turn_back")}</ButtonIcon>
                 <Stack direction={"row"} sx={{gap: 2}}>
-                    <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
-                    <Button type={"reset"} onClick={() => initForm(pointConcept)} variant={"outlined"}>{t("buttons:reset")}</Button>
+                    <ButtonIcon type={"submit"} icon={<Save/>} variant={"contained"}>{t("buttons:save")}</ButtonIcon>
+                    <ButtonIcon type={"button"} icon={<RestartAlt/>} onClick={() => initForm(pointConcept)} variant={"outlined"}>{t("buttons:reset")}</ButtonIcon>
                 </Stack>
             </Stack>
         </Stack>

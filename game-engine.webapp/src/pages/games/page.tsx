@@ -168,10 +168,10 @@ export function GamePage() {
                                         number: game.concepts?.filter(concept => "icon" in concept || "badgeEarned" in concept).length ?? 0
                                     })}
             />
-            <GameConceptGridElement href={`/games/${game.id}/challenges`} title={t("sidebar.challenges")}
+            <GameConceptGridElement href={`/games/${game.id}/classifications`} title={t("sidebar.classifications")}
                                     content={t("total_amount", {
-                                        entity: t("sidebar.challenges"),
-                                        number: game.concepts?.filter(concept => "modelName" in concept).length ?? 0
+                                        entity: t("sidebar.classifications"),
+                                        number: game.tasks?.length ?? 0
                                     })}
             />
         </Grid>

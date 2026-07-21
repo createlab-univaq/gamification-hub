@@ -7,8 +7,9 @@ import {getApiError, translateApiErrorToNotification} from "../../utils/error-ut
 import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
-import {Add, Delete} from "@mui/icons-material";
+import {Add, ArrowBack, Delete, RestartAlt, Save} from "@mui/icons-material";
 import {Button, Checkbox, FormControlLabel, IconButton, Stack, TextField, Typography} from "@mui/material";
+import {ButtonIcon} from "../ButtonIcon.tsx";
 import type {BadgeCollectionDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
 
@@ -114,11 +115,11 @@ export function BadgeForm({gameId, badge}: BadgeFormProps) {
             </Stack>
 
             <Stack direction={"row"} sx={{justifyContent: "space-between", alignItems: "center"}}>
-                <Button href={`/games/${gameId}/badges`} variant={"contained"}>{t("buttons:turn_back")}</Button>
+                <ButtonIcon icon={<ArrowBack/>} href={`/games/${gameId}/badges`} variant={"contained"}>{t("buttons:turn_back")}</ButtonIcon>
                 <Stack direction={"row"} sx={{gap: 2}}>
-                    <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
-                    <Button type={"reset"} onClick={() => form.reset(toFormValues(badge))}
-                            variant={"outlined"}>{t("buttons:reset")}</Button>
+                    <ButtonIcon type={"submit"} icon={<Save/>} variant={"contained"}>{t("buttons:save")}</ButtonIcon>
+                    <ButtonIcon type={"button"} icon={<RestartAlt/>} onClick={() => form.reset(toFormValues(badge))}
+                            variant={"outlined"}>{t("buttons:reset")}</ButtonIcon>
                 </Stack>
             </Stack>
         </Stack>
