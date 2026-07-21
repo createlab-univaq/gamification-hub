@@ -6,7 +6,9 @@ import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
-import {Button, Dialog, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";
+import {Dialog, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";
+import {AssignmentTurnedIn, Close} from "@mui/icons-material";
+import {ButtonIcon} from "../ButtonIcon.tsx";
 import type {ChallengeAssignmentDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
 import {FormCheckbox} from "./FormCheckbox.tsx";
@@ -110,8 +112,8 @@ export function ChallengeAssignForm({gameId, playerId, open, onClose}: Challenge
                     </FormInput>
                     <FormCheckbox name={"hide"} label={t("form.labels.hidden")}/>
                     <Stack direction={"row"} sx={{justifyContent: "flex-end", gap: 2}}>
-                        <Button variant={"outlined"} onClick={onClose}>{t("buttons:cancel")}</Button>
-                        <Button type={"submit"} variant={"contained"} loading={isPending}>{t("buttons:assign")}</Button>
+                        <ButtonIcon icon={<Close/>} variant={"outlined"} onClick={onClose}>{t("buttons:cancel")}</ButtonIcon>
+                        <ButtonIcon type={"submit"} icon={<AssignmentTurnedIn/>} variant={"contained"} loading={isPending}>{t("buttons:assign")}</ButtonIcon>
                     </Stack>
                 </Stack>
             </Form>

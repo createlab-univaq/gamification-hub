@@ -9,7 +9,9 @@ import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
-import {Button, Stack, TextField} from "@mui/material";
+import {Stack, TextField} from "@mui/material";
+import {ArrowBack, RestartAlt, Save} from "@mui/icons-material";
+import {ButtonIcon} from "../ButtonIcon.tsx";
 import {useTranslation} from "react-i18next";
 import cronstrue from "cronstrue/i18n";
 
@@ -180,12 +182,12 @@ export function ClassificationForm({gameId, classification}: ClassificationFormP
             }
 
             <Stack direction={"row"} sx={{justifyContent: "space-between", alignItems: "center"}}>
-                <Button href={`/games/${gameId}/classifications`}
-                        variant={"contained"}>{t("buttons:turn_back")}</Button>
+                <ButtonIcon icon={<ArrowBack/>} href={`/games/${gameId}/classifications`}
+                        variant={"contained"}>{t("buttons:turn_back")}</ButtonIcon>
                 <Stack direction={"row"} sx={{gap: 2}}>
-                    <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
-                    <Button type={"reset"} onClick={() => form.reset(toFormValues(classification))}
-                            variant={"outlined"}>{t("buttons:reset")}</Button>
+                    <ButtonIcon type={"submit"} icon={<Save/>} variant={"contained"}>{t("buttons:save")}</ButtonIcon>
+                    <ButtonIcon type={"button"} icon={<RestartAlt/>} onClick={() => form.reset(toFormValues(classification))}
+                            variant={"outlined"}>{t("buttons:reset")}</ButtonIcon>
                 </Stack>
             </Stack>
         </Stack>

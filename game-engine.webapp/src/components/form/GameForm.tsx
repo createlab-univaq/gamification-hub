@@ -6,7 +6,9 @@ import {gameClient} from "../../api";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {useEffect} from "react";
 import {Form} from "./Form.tsx";
-import {Button, Stack, TextField} from "@mui/material";
+import {Stack, TextField} from "@mui/material";
+import {ArrowBack, RestartAlt, Save} from "@mui/icons-material";
+import {ButtonIcon} from "../ButtonIcon.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {useNotificationContext} from "../../hooks/use-notification-context";
@@ -104,11 +106,11 @@ export function GameForm({game}: GameFormProps) {
                        alignItems: "center"
                    }}
             >
-                <Button href={game ? `/games/${game.id}`: "/dashboard"} variant={"contained"}>{t("buttons:turn_back")}</Button>
+                <ButtonIcon icon={<ArrowBack/>} href={game ? `/games/${game.id}`: "/dashboard"} variant={"contained"}>{t("buttons:turn_back")}</ButtonIcon>
                 <Stack direction={"row"} sx={{gap: 2}}>
-                    <Button type={"submit"} variant={"contained"}>{t("buttons:save")}</Button>
-                    <Button type={"reset"} onClick={() => initForm(game)}
-                            variant={"outlined"}>{t("buttons:reset")}</Button>
+                    <ButtonIcon type={"submit"} icon={<Save/>} variant={"contained"}>{t("buttons:save")}</ButtonIcon>
+                    <ButtonIcon type={"button"} icon={<RestartAlt/>} onClick={() => initForm(game)}
+                            variant={"outlined"}>{t("buttons:reset")}</ButtonIcon>
                 </Stack>
             </Stack>
         </Stack>

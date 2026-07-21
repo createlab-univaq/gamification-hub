@@ -5,7 +5,9 @@ import {getApiError, translateApiErrorToNotification} from "../../utils/error-ut
 import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
-import {Button, Dialog, DialogContent, DialogTitle, Stack} from "@mui/material";
+import {Dialog, DialogContent, DialogTitle, Stack} from "@mui/material";
+import {Block, Close} from "@mui/icons-material";
+import {ButtonIcon} from "../ButtonIcon.tsx";
 import type {PlayerBlackListDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
 
@@ -76,8 +78,8 @@ export function BlockPlayerForm({gameId, playerId, excludedIds, open, onClose}: 
                         rules={{required: t("required_field")}}
                     />
                     <Stack direction={"row"} sx={{justifyContent: "flex-end", gap: 2}}>
-                        <Button variant={"outlined"} onClick={onClose}>{t("buttons:cancel")}</Button>
-                        <Button type={"submit"} variant={"contained"} loading={isPending}>{t("buttons:block")}</Button>
+                        <ButtonIcon icon={<Close/>} variant={"outlined"} onClick={onClose}>{t("buttons:cancel")}</ButtonIcon>
+                        <ButtonIcon type={"submit"} icon={<Block/>} variant={"contained"} loading={isPending}>{t("buttons:block")}</ButtonIcon>
                     </Stack>
                 </Stack>
             </Form>

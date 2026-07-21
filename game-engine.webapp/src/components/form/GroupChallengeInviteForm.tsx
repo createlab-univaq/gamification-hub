@@ -6,7 +6,9 @@ import {useNotificationContext} from "../../hooks/use-notification-context";
 import {Form} from "./Form.tsx";
 import {FormInput} from "./FormInput.tsx";
 import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
-import {Button, Dialog, DialogContent, DialogTitle, Divider, Stack, TextField, Typography} from "@mui/material";
+import {Dialog, DialogContent, DialogTitle, Divider, Stack, TextField, Typography} from "@mui/material";
+import {Close, GroupAdd} from "@mui/icons-material";
+import {ButtonIcon} from "../ButtonIcon.tsx";
 import type {ChallengeInvitationDto, GroupChallengeDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
 
@@ -170,8 +172,8 @@ export function GroupChallengeInviteForm({gameId, playerId, open, onClose}: Grou
                     </Stack>
 
                     <Stack direction={"row"} sx={{justifyContent: "flex-end", gap: 2}}>
-                        <Button variant={"outlined"} onClick={onClose}>{t("buttons:cancel")}</Button>
-                        <Button type={"submit"} variant={"contained"} loading={isPending}>{t("buttons:invite")}</Button>
+                        <ButtonIcon icon={<Close/>} variant={"outlined"} onClick={onClose}>{t("buttons:cancel")}</ButtonIcon>
+                        <ButtonIcon type={"submit"} icon={<GroupAdd/>} variant={"contained"} loading={isPending}>{t("buttons:invite")}</ButtonIcon>
                     </Stack>
                 </Stack>
             </Form>

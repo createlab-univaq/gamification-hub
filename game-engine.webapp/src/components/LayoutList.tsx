@@ -71,10 +71,11 @@ export function LayoutList<T>({
                     }}
                 >
                     <Stack direction={"row"} sx={{
-                        width: isGrid ? "100%" : "fit-content",
+                        width: isGrid ? "100%" : "auto",
                         alignItems: isGrid ? "flex-start" : "center",
                         gap: 1,
-                        flexGrow: isGrid ? 1 : 0
+                        flexGrow: 1,
+                        minWidth: 0
                     }}>
                         {selection &&
                             <Checkbox
@@ -86,7 +87,9 @@ export function LayoutList<T>({
                                 }}
                             />
                         }
-                        {itemElement}
+                        <Box sx={{minWidth: 0, flexGrow: 1, overflowWrap: "anywhere"}}>
+                            {itemElement}
+                        </Box>
                     </Stack>
                     {hasButtons &&
                         <Stack
@@ -95,7 +98,8 @@ export function LayoutList<T>({
                                 width: isGrid ? "100%" : "fit-content",
                                 justifyContent: "space-between",
                                 gap: isGrid ? 1 : 0,
-                                mt: isGrid ? 1 : 0
+                                mt: isGrid ? 1 : 0,
+                                flexShrink: 0
                             }}
                         >
                             {hasUpdateButton &&
