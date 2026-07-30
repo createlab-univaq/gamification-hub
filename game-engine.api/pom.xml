@@ -8,11 +8,11 @@
         <version>4.0.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>it.smartcommunitylab.gamification</groupId>
-    <artifactId>game-engine-api</artifactId>
+    <groupId>it.createlab</groupId>
+    <artifactId>gamificationhub.api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>game-engine.api</name>
-    <description>game-engine.api</description>
+    <name>gamificationhub.api</name>
+    <description>GamificationHub REST API</description>
     <profiles>
         <profile>
             <id>local</id>
@@ -115,8 +115,8 @@
         </dependency>
 
         <dependency>
-            <groupId>it.smartcommunitylab.gamification</groupId>
-            <artifactId>game-engine.core</artifactId>
+            <groupId>it.createlab</groupId>
+            <artifactId>gamificationhub.core</artifactId>
             <version>5.0.0-SNAPSHOT</version>
         </dependency>
 

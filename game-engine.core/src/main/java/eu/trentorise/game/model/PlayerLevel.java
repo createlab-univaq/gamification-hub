@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import org.springframework.data.annotation.PersistenceConstructor;
+
+import org.springframework.data.annotation.PersistenceCreator;
 
 import eu.trentorise.game.model.Level.Threshold;
 
@@ -68,7 +69,7 @@ public class PlayerLevel {
         return levelRange;
     }
 
-    @PersistenceConstructor
+    @PersistenceCreator
     private PlayerLevel(String levelName, String pointConcept, String levelValue,
             Double toNextLevel, Double startLevelScore, Double endLevelScore) {
         this.levelName = levelName;
