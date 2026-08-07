@@ -101,7 +101,7 @@ export function ClassificationListPage() {
                 return <Stack
                     sx={{
                         gap: 1,
-                        width: layout === "grid" ? "100%" : undefined,
+                        width: layout === "grid" ? "100%" : "fit-content",
                         flexGrow: layout === "grid" ? 1 : 0,
                         justifyContent: "space-between",
                         height: "100%"
