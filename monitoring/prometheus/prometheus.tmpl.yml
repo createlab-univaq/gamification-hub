@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 10s
+
+scrape_configs:
+  - job_name: gamification-api
+    scrape_interval: __SCRAPE_INTERVAL__
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - __API_TARGET__

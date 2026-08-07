@@ -1,6 +1,0 @@
-# Scrape targets for the gamification API, reached through the host gateway.
-# The API listens on 8081 and is published as 8081:8081, so this one address holds
-# whether it runs from the IDE, from compose or on Coolify.
-# Prod: change the address here (hot-reloaded), or set PROMETHEUS_TARGETS to another targets dir.
-- targets:
-    - host.docker.internal:8081
