@@ -3,6 +3,9 @@ services:
     build:
       context: ./monitoring/prometheus
       dockerfile: Dockerfile
+      args:
+        SCRAPE_INTERVAL: ${SCRAPE_INTERVAL:-5s}
+        API_TARGET: ${API_TARGET:-host.docker.internal:8081}
     container_name: gamification-prometheus
     ports:
       - "9090:9090"
