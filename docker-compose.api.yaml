@@ -1,0 +1,15 @@
+services:
+  gamification-api:
+    container_name: "gamification-api"
+    env_file:
+      - game-engine.api/.env.prod
+    build:
+      dockerfile: game-engine.api/Dockerfile
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s

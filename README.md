@@ -66,7 +66,7 @@ docker compose -f docker-compose.local.yaml up -d mongo
 MongoDB is exposed on `localhost:50000`.
 
 ### 2. Start the backend API
-From `game-engine.api`, run the Spring Boot app (defaults to the `local` profile, listens on port `8080`):
+From `game-engine.api`, run the Spring Boot app (defaults to the `local` profile, listens on port `8081`):
 ```
 cd game-engine.api
 mvn spring-boot:run
@@ -79,10 +79,10 @@ cd game-engine.webapp
 npm install
 npm run dev
 ```
-The dev server runs on `http://localhost:5173` and proxies `/api` requests to the backend on port `8080`.
+The dev server runs on `http://localhost:5173` and proxies `/api` requests to the backend on port `8081`.
 
 ### Running everything with Docker (local development)
-Alternatively, build and run the full stack (MongoDB, API, webapp and monitoring) with `docker-compose.local.yaml` — this is the compose file meant for local development; it bundles the split `docker-compose.backend.yaml` and `docker-compose.frontend.yaml` together with a local-only MongoDB:
+Alternatively, build and run the full stack (MongoDB, API, webapp and monitoring) with `docker-compose.local.yaml` — this is the compose file meant for local development; it bundles the split `docker-compose.api.yaml`, `docker-compose.frontend.yaml` and `docker-compose.monitoring.yaml` together with a local-only MongoDB:
 ```
 docker compose -f docker-compose.local.yaml up --build
 ```
@@ -91,4 +91,4 @@ The API takes a .env.prod file to run. Ask the administrator to provid the file 
 
 ### Deployment
 
-`docker-compose.backend.yaml` and `docker-compose.frontend.yaml` are deployed separately (e.g. as two Coolify resources) and don't include MongoDB — it's expected to run as its own managed database resource. See [documentation](documentation) for details.
+`docker-compose.api.yaml`, `docker-compose.frontend.yaml` and `docker-compose.monitoring.yaml` are deployed separately (e.g. as three Coolify resources) and don't include MongoDB — it's expected to run as its own managed database resource. Keeping monitoring apart means it can be redeployed without restarting the API; the two reach each other over `host.docker.internal`. See [documentation](documentation) for details.
