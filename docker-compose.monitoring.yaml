@@ -1,12 +1,12 @@
 services:
   prometheus:
-    image: prom/prometheus:latest
+    build:
+      context: ./monitoring/prometheus
+      dockerfile: Dockerfile
     container_name: gamification-prometheus
     ports:
       - "9090:9090"
     volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ${PROMETHEUS_TARGETS:-./monitoring/prometheus/targets}:/etc/prometheus/targets:ro
       - prometheus-data:/prometheus
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -40,21 +40,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - loki
-
-  gamification-api:
-    container_name: "gamification-api"
-    env_file:
-      - game-engine.api/.env.prod
-    build:
-      dockerfile: game-engine.api/Dockerfile
-    ports:
-      - "8081:8081"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
 
 volumes:
   prometheus-data:

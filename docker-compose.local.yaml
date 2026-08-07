@@ -1,6 +1,7 @@
 include:
-  - docker-compose.backend.yaml
+  - docker-compose.api.yaml
   - docker-compose.frontend.yaml
+  - docker-compose.monitoring.yaml
 
 services:
   mongo:
