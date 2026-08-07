@@ -12,7 +12,7 @@ export default defineConfig({
       react(),
       ...(skipApiCodegen ? [] : [heyApiPlugin({
         config:{
-          input: 'http://localhost:8080/v3/api-docs',
+          input: 'http://localhost:8081/v3/api-docs',
           output: 'src/api/types/',
           plugins:[
               '@hey-api/typescript'
@@ -22,7 +22,7 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      '/api': {target: 'http://localhost:8080', changeOrigin: true},
+      '/api': {target: 'http://localhost:8081', changeOrigin: true},
     },
   },
   optimizeDeps: {

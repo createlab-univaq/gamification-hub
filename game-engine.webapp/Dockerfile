@@ -28,7 +28,7 @@ COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Internal compose network address of the API service; override via environment if split out.
-ENV API_UPSTREAM=http://gamification-api:8080
+ENV API_UPSTREAM=http://gamification-api:8081
 # Restrict envsubst to this one variable so nginx's own $-prefixed directives are never touched.
 ENV NGINX_ENVSUBST_FILTER=^API_UPSTREAM$
 

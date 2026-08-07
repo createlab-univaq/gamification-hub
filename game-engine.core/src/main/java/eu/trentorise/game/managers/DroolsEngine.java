@@ -352,6 +352,8 @@ public class DroolsEngine implements GameEngine {
                                      Map<String, Object> data, String executionId, long executionMoment,
                                      List<Object> factObjects, boolean showDetailedChanges) {
 
+        PerfMonitor perfMonitor = PerfMonitor.start();
+
         // Load challenges from DB (same as execute)
         List<ChallengeConceptPersistence> listCcs =
                 challengeConceptRepo.findByGameIdAndPlayerId(gameId, state.getPlayerId());
@@ -459,6 +461,10 @@ public class DroolsEngine implements GameEngine {
         finalState.setState(newState);
 
         List<ConceptChange> changes = computeDiff(beforeState, challengesBefore, finalState);
+
+        perfMonitor.stop(EngineMetrics.SIMULATIONS, "game",
+                game != null ? "%s (%s)".formatted(game.getName(), gameId) : gameId,
+                String.format("simulation for game %s of player %s", gameId, state.getPlayerId()));
 
         return new SimulationResult(beforeState, finalState, firedRules, changes);
     }

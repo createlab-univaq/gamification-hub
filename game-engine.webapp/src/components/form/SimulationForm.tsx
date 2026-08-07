@@ -33,6 +33,7 @@ import {PageHeader} from "../layout/PageHeader.tsx";
 import {useTranslation} from "react-i18next";
 import {useGame} from "../../hooks/use-game.ts";
 import {Loading} from "../Loading.tsx";
+import {navigateTo} from "../../utils/navigation-utils.ts";
 
 interface SimulationFormProps {
     gameId: string
@@ -271,6 +272,16 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                 : scenarioClient.createScenario(gameId, payload)
         },
         onSuccess: (data) => {
+            if(!scenario) {
+                navigateTo(`/games/${gameId}/scenarios/upsert/${data.id}`, {
+                    state:{
+                        type: "success",
+                        title: t("scenarios.form.save.title"),
+                        content: t("scenarios.form.save.message", {name: data.name})
+                    }
+                })
+                return
+            }
             setNotification({
                 notification: {
                     type: "success",
