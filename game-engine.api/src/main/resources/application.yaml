@@ -1,3 +1,8 @@
+server:
+  # Kept the same inside the container, on the host and in the Prometheus target,
+  # so one address works whether the API runs from the IDE, from compose or on Coolify.
+  port: ${SERVER_PORT:8081}
+
 spring:
   application:
     name: Gamification-API
@@ -27,3 +32,13 @@ management:
     web:
       exposure:
         include: health,metrics,prometheus
+  metrics:
+    distribution:
+      # Publish histogram buckets for HTTP requests so Prometheus can compute
+      # latency percentiles; without these only count/sum/max are exported.
+      percentiles-histogram:
+        http.server.requests: true
+      minimum-expected-value:
+        http.server.requests: 5ms
+      maximum-expected-value:
+        http.server.requests: 10s

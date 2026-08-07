@@ -12,6 +12,7 @@ import io.micrometer.core.instrument.Metrics;
 public class EngineMetrics {
 
     public static final String EXECUTIONS = "engine.metrics.executions";
+    public static final String SIMULATIONS = "engine.metrics.simulations";
     public static final String RULE_INSERT = "engine.metrics.rule-insert";
     public static final String LOAD_STATES = "engine.metrics.load-states";
     public static final String RULE_LISTENER = "engine.metrics.rule-listener";
