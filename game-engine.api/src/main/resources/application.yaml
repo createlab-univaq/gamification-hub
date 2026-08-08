@@ -2,6 +2,7 @@ server:
   # Kept the same inside the container, on the host and in the Prometheus target,
   # so one address works whether the API runs from the IDE, from compose or on Coolify.
   port: ${SERVER_PORT:8081}
+  forward-headers-strategy: ${SERVER_FORWARD_HEADERS_STRATEGY:framework}
 
 spring:
   application:
