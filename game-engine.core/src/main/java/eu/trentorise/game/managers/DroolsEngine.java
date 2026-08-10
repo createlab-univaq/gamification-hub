@@ -444,7 +444,7 @@ public class DroolsEngine implements GameEngine {
         if (guard.isTripped()) {
             EngineMetrics.emitAbortedExecution(guard.getReasonTag(), "simulation");
             throw new RuleExecutionLimitException(String.format(
-                    "simulation aborted for game %s: %s", gameId, guard.getReason()));
+                    "simulation aborted for game %s: %s", gameId, guard.getReason()), guard.getReasonTag());
         }
 
         firedRules = simulationChangesListener.getFiredRule();

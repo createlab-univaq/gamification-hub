@@ -84,7 +84,13 @@ export function PopupNotification({message, title, type, isOpen, setOpen}: Notif
     >
         <Card sx={{
             px: "2rem",
-            background: PopupNotificationGradients[type]
+            background: PopupNotificationGradients[type],
+            maxWidth:{
+                lg:"45%",
+                mg:"45%",
+                sm:"100%",
+                xs:"100%"
+            }
         }}>
             <Stack direction={"row"} sx={{
                 py: "0.5rem",

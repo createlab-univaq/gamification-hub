@@ -48,6 +48,8 @@ public final class ErrorCodes {
     // Execution / simulation
     public static final String GAME_EXECUTION_FAILED = "game_execution_failed";
     public static final String RULE_SIMULATION = "rule_simulation";
+    public static final String SIMULATION_EXCEEDED_MAXIMUM_FIRINGS = "maximum_simulation_firing_reached";
+    public static final String SIMULATION_TIMEOUT = "simulation_timeout";
 
     // Import / export
     public static final String IMPORT_ERROR = "import_error";

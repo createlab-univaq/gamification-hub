@@ -125,7 +125,7 @@ public class QueueGameWorkflow extends GameWorkflow implements InitializingBean,
             return future.get(executionTimeoutMs + TIMEOUT_GRACE_MS, TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {
             onTimeout.run();
-            throw new RuleExecutionLimitException(timeoutMessage);
+            throw new RuleExecutionLimitException(timeoutMessage, ExecutionGuard.REASON_TIMEOUT);
         } catch (ExecutionException e) {
             Throwable cause = e.getCause();
             if (cause instanceof RuntimeException re) {
@@ -134,7 +134,7 @@ public class QueueGameWorkflow extends GameWorkflow implements InitializingBean,
             throw new RuntimeException(cause);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuleExecutionLimitException("execution interrupted: " + timeoutMessage);
+            throw new RuleExecutionLimitException("execution interrupted: " + timeoutMessage, ExecutionGuard.REASON_FIRINGS);
         }
     }
 

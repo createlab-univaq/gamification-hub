@@ -1,5 +1,7 @@
 package it.createlab.gamificationhub.api.service.impl;
 
+import eu.trentorise.game.core.ExecutionGuard;
+import eu.trentorise.game.core.RuleExecutionLimitException;
 import eu.trentorise.game.model.BadgeCollectionConcept;
 import eu.trentorise.game.model.ChallengeConcept;
 import eu.trentorise.game.model.PlayerState;
@@ -10,7 +12,10 @@ import it.createlab.gamificationhub.api.exception.ErrorCodes;
 import it.createlab.gamificationhub.api.exception.RequestException;
 import it.createlab.gamificationhub.api.model.dto.BadgeCollectionDTO;
 import it.createlab.gamificationhub.api.model.dto.PointConceptDTO;
-import it.createlab.gamificationhub.api.model.dto.simulation.*;
+import it.createlab.gamificationhub.api.model.dto.simulation.ChallengeConceptDTO;
+import it.createlab.gamificationhub.api.model.dto.simulation.SimulationRequestDTO;
+import it.createlab.gamificationhub.api.model.dto.simulation.SimulationResultDTO;
+import it.createlab.gamificationhub.api.model.dto.simulation.SyntheticStateDTO;
 import it.createlab.gamificationhub.api.model.mapper.SimulationResultMapper;
 import it.createlab.gamificationhub.api.model.mapper.TimeMapper;
 import it.createlab.gamificationhub.api.service.SimulationService;
@@ -99,6 +104,15 @@ public class SimulationServiceImpl implements SimulationService {
                     simulationRequestDTO.getSyntheticState().getActionIds(),
                     simulationRequestDTO.isShowDetailedChanges());
             return simulationResultMapper.toDTO(result);
+        } catch (RuleExecutionLimitException rel) {
+            switch (rel.getLimitType()) {
+                case ExecutionGuard.REASON_FIRINGS ->
+                        throw new RequestException("Rule Simulation Error", rel.getLocalizedMessage(), ErrorCodes.SIMULATION_EXCEEDED_MAXIMUM_FIRINGS, HttpStatus.EXPECTATION_FAILED);
+                case ExecutionGuard.REASON_TIMEOUT ->
+                        throw new RequestException("Rule Simulation Error", rel.getLocalizedMessage(), ErrorCodes.SIMULATION_TIMEOUT, HttpStatus.EXPECTATION_FAILED);
+                default ->
+                        throw new RequestException("Rule Simulation Error", rel.getLocalizedMessage(), ErrorCodes.RULE_SIMULATION, HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             throw new RequestException("Rule Simulation Error", e.getLocalizedMessage(), ErrorCodes.RULE_SIMULATION, HttpStatus.BAD_REQUEST);
         }
