@@ -89,6 +89,12 @@
   "rule_simulation": "The simulation could not be completed.",
   "rule_simulation_title": "Simulation error!",
 
+  "maximum_simulation_firing_reached": "The simulation exceded the maximum number of rule firings allowed. Make sure that no loop exists between 2 or more rules.",
+  "maximum_simulation_firing_reached_title": "Simulation Error!",
+
+  "simulation_timeout": "The simulation exceeded the maximum amount of time for an execution. Make sure that there is no infinite loops inside your game rules.",
+  "simulation_timeout_title": "Simulation Error!",
+
   "import_error": "The import could not be completed.",
   "import_error_title": "Import error!",
 
