@@ -17,6 +17,8 @@ i18n
         },
         ns:["errors", "commons", "buttons", "enums"],
         defaultNS: "commons",
+        supportedLngs: ["en", "it"],
+        load: "languageOnly",
         fallbackLng: "en",
         interpolation: {
             escapeValue: false
