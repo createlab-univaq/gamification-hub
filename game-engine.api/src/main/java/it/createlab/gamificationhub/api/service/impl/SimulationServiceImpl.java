@@ -6,7 +6,9 @@ import eu.trentorise.game.model.BadgeCollectionConcept;
 import eu.trentorise.game.model.ChallengeConcept;
 import eu.trentorise.game.model.PlayerState;
 import eu.trentorise.game.model.PointConcept;
+import eu.trentorise.game.model.core.GameConcept;
 import eu.trentorise.game.model.simulation.SimulationResult;
+import eu.trentorise.game.services.GameService;
 import eu.trentorise.game.services.Workflow;
 import it.createlab.gamificationhub.api.exception.ErrorCodes;
 import it.createlab.gamificationhub.api.exception.RequestException;
@@ -26,7 +28,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -39,7 +43,28 @@ public class SimulationServiceImpl implements SimulationService {
 
     private final TimeMapper timeMapper;
 
-    private PlayerState buildSyntheticState(String gameId, SyntheticStateDTO dto) {
+    private final GameService gameService;
+
+    private void copyPeriodDefinitions(PointConcept target, Set<GameConcept> definitions) {
+        definitions.stream()
+                .filter(gc -> gc instanceof PointConcept && target.getName().equals(gc.getName()))
+                .map(gc -> (PointConcept) gc)
+                .findFirst()
+                .ifPresent(definition -> {
+                    Map<String, ? extends PointConcept.Period> periods = definition.getPeriods();
+                    periods.forEach((id, period) -> {
+                        if (period.getStart() == null) {
+                            return;
+                        }
+                        period.getEnd().ifPresentOrElse(
+                                end -> target.addPeriod(id, period.getStart(), end, period.getPeriod()),
+                                () -> target.addPeriod(id, period.getStart(), period.getPeriod(),
+                                        period.getCapacity()));
+                    });
+                });
+    }
+
+    private PlayerState buildSyntheticState(String gameId, SyntheticStateDTO dto, long executionMoment) {
         if (Objects.isNull(dto) || Objects.isNull(gameId) || gameId.isBlank()) {
             return null;
         }
@@ -47,8 +72,10 @@ public class SimulationServiceImpl implements SimulationService {
                 dto.getPlayerId() != null ? dto.getPlayerId() : "synthetic-player");
         state.setState(new HashSet<>());
         if (dto.getPointConcepts() != null) {
+            Set<GameConcept> definitions = gameService.readConceptInstances(gameId);
             for (PointConceptDTO pc : dto.getPointConcepts()) {
-                PointConcept pointConcept = new PointConcept(pc.getName());
+                PointConcept pointConcept = new PointConcept(pc.getName(), executionMoment);
+                copyPeriodDefinitions(pointConcept, definitions);
                 pointConcept.setScore(pc.getScore());
                 state.getState().add(pointConcept);
             }
@@ -96,8 +123,8 @@ public class SimulationServiceImpl implements SimulationService {
     public SimulationResultDTO simulate(SimulationRequestDTO simulationRequestDTO) {
         log.info("Request to simulate game={}", simulationRequestDTO.getGameId());
         try {
-            long executionMoment = Objects.requireNonNullElse(simulationRequestDTO.getExecutionMoment(), Instant.now().toEpochMilli());
-            PlayerState syntheticState = buildSyntheticState(simulationRequestDTO.getGameId(), simulationRequestDTO.getSyntheticState());
+            long executionMoment = Objects.requireNonNullElse(simulationRequestDTO.getExecutionMoment(), Instant.now()).toEpochMilli();
+            PlayerState syntheticState = buildSyntheticState(simulationRequestDTO.getGameId(), simulationRequestDTO.getSyntheticState(), executionMoment);
             SimulationResult result = workflow.simulate(
                     simulationRequestDTO.getGameId(), syntheticState,
                     simulationRequestDTO.getData(), executionMoment,

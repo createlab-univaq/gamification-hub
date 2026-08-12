@@ -1,6 +1,7 @@
 package it.createlab.gamificationhub.api.model.entity;
 
 import it.createlab.gamificationhub.api.model.dto.simulation.SyntheticStateDTO;
+import java.time.Instant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
@@ -23,5 +24,7 @@ public class SimulationScenario extends BaseEntity<String> {
     private SyntheticStateDTO syntheticState;
 
     private SyntheticStateDTO expectedOutput;
+
+    private Instant executionMoment;
 
 }

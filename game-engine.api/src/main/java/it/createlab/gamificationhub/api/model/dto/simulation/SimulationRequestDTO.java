@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.Map;
 
 @Data
@@ -19,7 +20,7 @@ public class SimulationRequestDTO {
 
     private Map<String, Object> data;
 
-    private Long executionMoment;
+    private Instant executionMoment;
 
     // When true, each fired rule includes the concepts it changed and the rule that caused it.
     // Adds per-rule snapshot overhead — use only for debugging/analysis, not production calls.
