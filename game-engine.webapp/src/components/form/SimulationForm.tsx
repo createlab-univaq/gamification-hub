@@ -1,5 +1,5 @@
-import {useMutation} from "@tanstack/react-query";
-import {scenarioClient, simulationClient} from "../../api";
+import {useMutation, useQuery} from "@tanstack/react-query";
+import {badgeClient, challengeClient, pointConceptClient, scenarioClient, simulationClient} from "../../api";
 import {useNotificationContext} from "../../hooks/use-notification-context";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {useFieldArray, useForm} from "react-hook-form";
@@ -13,7 +13,6 @@ import {
     IconButton,
     Stack,
     TextField,
-    Tooltip,
     Typography,
 } from "@mui/material";
 import {Add, ArrowBack, Delete, ExpandMore, Games, PlayArrow, Save, Science} from "@mui/icons-material";
@@ -34,6 +33,7 @@ import {useTranslation} from "react-i18next";
 import {useGame} from "../../hooks/use-game.ts";
 import {Loading} from "../Loading.tsx";
 import {navigateTo} from "../../utils/navigation-utils.ts";
+import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
 
 interface SimulationFormProps {
     gameId: string
@@ -41,7 +41,7 @@ interface SimulationFormProps {
 }
 
 type PointConceptRow = { name: string; score: string }
-type BadgeCollectionRow = { name: string; badges: string }
+type BadgeCollectionRow = { name: string; badges: string[] }
 type ChallengeRow = { name: string; modelName: string; state: string; fields: KVRow[] }
 
 type KVRow = { key: string; value: string }
@@ -77,7 +77,7 @@ function matchExpectations(values: SimulationFormValues, finalState?: PlayerStat
         if (!actual) {
             return false
         }
-        const expectedBadges = bc.badges ? bc.badges.split(",").map(b => b.trim()).filter(Boolean) : []
+        const expectedBadges = (bc.badges ?? []).map(b => b.trim()).filter(Boolean)
         if (!expectedBadges.every(b => actual.badges?.includes(b))) {
             return false
         }
@@ -114,7 +114,7 @@ function buildRequest(gameId: string, values: SimulationFormValues): SimulationR
                 .filter(bc => bc.name)
                 .map(bc => ({
                     name: bc.name,
-                    badges: bc.badges ? bc.badges.split(",").map(b => b.trim()).filter(Boolean) : []
+                    badges: (bc.badges ?? []).map(b => b.trim()).filter(Boolean)
                 })),
             challenges: values.challenges
                 .filter(c => c.name)
@@ -146,7 +146,7 @@ function buildExpectedState(values: SimulationFormValues): SyntheticStateDto {
             .filter(bc => bc.name)
             .map(bc => ({
                 name: bc.name,
-                badges: bc.badges ? bc.badges.split(",").map(b => b.trim()).filter(Boolean) : []
+                badges: (bc.badges ?? []).map(b => b.trim()).filter(Boolean)
             })),
         challenges: values.expectedChallenges
             .filter(c => c.name)
@@ -170,7 +170,7 @@ function toFormValues(scenario: SimulationScenarioDto): SimulationFormValues {
         pointConcepts: (state.pointConcepts ?? []).map(pc => ({name: pc.name ?? "", score: String(pc.score ?? 0)})),
         badgeCollections: (state.badgeCollections ?? []).map(bc => ({
             name: bc.name ?? "",
-            badges: (bc.badges ?? []).join(", ")
+            badges: bc.badges ?? []
         })),
         challenges: (state.challenges ?? []).map(c => ({
             name: c.name ?? "",
@@ -186,7 +186,7 @@ function toFormValues(scenario: SimulationScenarioDto): SimulationFormValues {
         })),
         expectedBadgeCollections: (expected.badgeCollections ?? []).map(bc => ({
             name: bc.name ?? "",
-            badges: (bc.badges ?? []).join(", ")
+            badges: bc.badges ?? []
         })),
         expectedChallenges: (expected.challenges ?? []).map(c => ({
             name: c.name ?? "",
@@ -225,6 +225,26 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
     const expectedPointConcepts = useFieldArray({control: form.control, name: "expectedPointConcepts"})
     const expectedBadgeCollections = useFieldArray({control: form.control, name: "expectedBadgeCollections"})
     const expectedChallenges = useFieldArray({control: form.control, name: "expectedChallenges"})
+
+    const {data: pointConceptOptions, isLoading: pointConceptsLoading} = useQuery({
+        queryKey: ["get-point-concept", gameId],
+        queryFn: () => pointConceptClient.getPointConcepts(gameId),
+        enabled: !!gameId
+    })
+    const {data: badgeOptions, isLoading: badgesLoading} = useQuery({
+        queryKey: ["get-badges", gameId],
+        queryFn: () => badgeClient.getBadges(gameId),
+        enabled: !!gameId
+    })
+    const {data: challengeModels, isLoading: challengeModelsLoading} = useQuery({
+        queryKey: ["get-challenges", gameId],
+        queryFn: () => challengeClient.getChallenges(gameId),
+        enabled: !!gameId
+    })
+
+    // Badge names offered for a row are the ones belonging to the collection that row names.
+    const badgesOf = (collectionName?: string) =>
+        badgeOptions?.find(bc => bc.name === collectionName)?.badges ?? []
 
     useEffect(() => {
         resetForm(scenario)
@@ -309,8 +329,8 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
         }}>
             <PageHeader
                 title={
-                    <FormInput name={"name"}>
-                        <TextField label={t("name")} placeholder={t("scenarios.form.name_placeholder")}/>
+                    <FormInput name={"name"} rules={{required:t("required_field")}}>
+                        <TextField label={t("name")} placeholder={t("scenarios.form.name_placeholder")} required={true}/>
                     </FormInput>
                 }
                 buttons={[
@@ -393,8 +413,14 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                     <Stack sx={{gap: 1}}>
                                         {actions.fields.map((field, i) => (
                                             <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
-                                                <TextField size="small" fullWidth placeholder="action.id"
-                                                           {...form.register(`actionIds.${i}.value`)}/>
+                                                <AutocompleteFormItem
+                                                    name={`actionIds.${i}.value`}
+                                                    placeholder="action.id"
+                                                    options={game.actions ?? []}
+                                                    getOptionLabel={(a) => a}
+                                                    freeSolo={true}
+                                                    size="small"
+                                                    fullWidth={true}/>
                                                 <IconButton size="small" color="error"
                                                             onClick={() => actions.remove(i)}>
                                                     <Delete fontSize="small"/>
@@ -418,8 +444,16 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                     <Stack sx={{gap: 1}}>
                                         {pointConcepts.fields.map((field, i) => (
                                             <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
-                                                <TextField size="small" placeholder="Name" sx={{flex: 2}}
-                                                           {...form.register(`pointConcepts.${i}.name`)}/>
+                                                <AutocompleteFormItem
+                                                    name={`pointConcepts.${i}.name`}
+                                                    placeholder="Name"
+                                                    options={pointConceptOptions ?? []}
+                                                    getOptionLabel={(pc) => pc.name ?? ""}
+                                                    getOptionValue={(pc) => pc.name}
+                                                    loading={pointConceptsLoading}
+                                                    freeSolo={true}
+                                                    size="small"
+                                                    sx={{flex: 2}}/>
                                                 <TextField size="small" placeholder="Score" type="number"
                                                            slotProps={{htmlInput: {step: "any"}}}
                                                            sx={{flex: 1}}
@@ -447,13 +481,26 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                     <Stack sx={{gap: 1}}>
                                         {badgeCollections.fields.map((field, i) => (
                                             <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
-                                                <TextField size="small" placeholder="Name" sx={{flex: 1}}
-                                                           {...form.register(`badgeCollections.${i}.name`)}/>
-                                                <Tooltip title="Comma-separated badge names">
-                                                    <TextField size="small" placeholder="badge1, badge2"
-                                                               sx={{flex: 2}}
-                                                               {...form.register(`badgeCollections.${i}.badges`)}/>
-                                                </Tooltip>
+                                                <AutocompleteFormItem
+                                                    name={`badgeCollections.${i}.name`}
+                                                    placeholder="Name"
+                                                    options={badgeOptions ?? []}
+                                                    getOptionLabel={(bc) => bc.name ?? ""}
+                                                    getOptionValue={(bc) => bc.name}
+                                                    loading={badgesLoading}
+                                                    freeSolo={true}
+                                                    size="small"
+                                                    sx={{flex: 1}}/>
+                                                <AutocompleteFormItem
+                                                    name={`badgeCollections.${i}.badges`}
+                                                    placeholder="badges"
+                                                    options={badgesOf(form.watch(`badgeCollections.${i}.name`))}
+                                                    getOptionLabel={(b) => b}
+                                                    loading={badgesLoading}
+                                                    multiple={true}
+                                                    freeSolo={true}
+                                                    size="small"
+                                                    sx={{flex: 2}}/>
                                                 <IconButton size="small" color="error"
                                                             onClick={() => badgeCollections.remove(i)}>
                                                     <Delete fontSize="small"/>
@@ -461,7 +508,7 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                             </Stack>
                                         ))}
                                         <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
-                                                onClick={() => badgeCollections.append({name: "", badges: ""})}>
+                                                onClick={() => badgeCollections.append({name: "", badges: []})}>
                                             {t("buttons:scenarios.add_badge_collection")}
                                         </Button>
                                     </Stack>
@@ -479,6 +526,8 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                             <ChallengeCard key={field.id} index={i} namePrefix="challenges"
                                                            control={form.control}
                                                            register={form.register}
+                                                           challengeModels={challengeModels}
+                                                           challengeModelsLoading={challengeModelsLoading}
                                                            onRemove={() => challenges.remove(i)}/>
                                         ))}
                                         <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
@@ -561,8 +610,16 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                     <Stack sx={{gap: 1}}>
                                         {expectedPointConcepts.fields.map((field, i) => (
                                             <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
-                                                <TextField size="small" placeholder="Name" sx={{flex: 2}}
-                                                           {...form.register(`expectedPointConcepts.${i}.name`)}/>
+                                                <AutocompleteFormItem
+                                                    name={`expectedPointConcepts.${i}.name`}
+                                                    placeholder="Name"
+                                                    options={pointConceptOptions ?? []}
+                                                    getOptionLabel={(pc) => pc.name ?? ""}
+                                                    getOptionValue={(pc) => pc.name}
+                                                    loading={pointConceptsLoading}
+                                                    freeSolo={true}
+                                                    size="small"
+                                                    sx={{flex: 2}}/>
                                                 <TextField size="small" placeholder="Score" type="number"
                                                            slotProps={{htmlInput: {step: "any"}}}
                                                            sx={{flex: 1}}
@@ -590,13 +647,26 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                     <Stack sx={{gap: 1}}>
                                         {expectedBadgeCollections.fields.map((field, i) => (
                                             <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
-                                                <TextField size="small" placeholder="Name" sx={{flex: 1}}
-                                                           {...form.register(`expectedBadgeCollections.${i}.name`)}/>
-                                                <Tooltip title="Comma-separated badge names">
-                                                    <TextField size="small" placeholder="badge1, badge2"
-                                                               sx={{flex: 2}}
-                                                               {...form.register(`expectedBadgeCollections.${i}.badges`)}/>
-                                                </Tooltip>
+                                                <AutocompleteFormItem
+                                                    name={`expectedBadgeCollections.${i}.name`}
+                                                    placeholder="Name"
+                                                    options={badgeOptions ?? []}
+                                                    getOptionLabel={(bc) => bc.name ?? ""}
+                                                    getOptionValue={(bc) => bc.name}
+                                                    loading={badgesLoading}
+                                                    freeSolo={true}
+                                                    size="small"
+                                                    sx={{flex: 1}}/>
+                                                <AutocompleteFormItem
+                                                    name={`expectedBadgeCollections.${i}.badges`}
+                                                    placeholder="badges"
+                                                    options={badgesOf(form.watch(`expectedBadgeCollections.${i}.name`))}
+                                                    getOptionLabel={(b) => b}
+                                                    loading={badgesLoading}
+                                                    multiple={true}
+                                                    freeSolo={true}
+                                                    size="small"
+                                                    sx={{flex: 2}}/>
                                                 <IconButton size="small" color="error"
                                                             onClick={() => expectedBadgeCollections.remove(i)}>
                                                     <Delete fontSize="small"/>
@@ -604,7 +674,7 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                             </Stack>
                                         ))}
                                         <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
-                                                onClick={() => expectedBadgeCollections.append({name: "", badges: ""})}>
+                                                onClick={() => expectedBadgeCollections.append({name: "", badges: []})}>
                                             {t("buttons:scenarios.add_badge_collection")}
                                         </Button>
                                     </Stack>
@@ -622,6 +692,8 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                             <ChallengeCard key={field.id} index={i} namePrefix="expectedChallenges"
                                                            control={form.control}
                                                            register={form.register}
+                                                           challengeModels={challengeModels}
+                                                           challengeModelsLoading={challengeModelsLoading}
                                                            onRemove={() => expectedChallenges.remove(i)}/>
                                         ))}
                                         <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}

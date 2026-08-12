@@ -10,8 +10,11 @@ import it.createlab.gamificationhub.api.exception.ErrorCodes;
 import it.createlab.gamificationhub.api.model.criteria.PointConceptCriteria;
 import it.createlab.gamificationhub.api.model.dto.PointConceptDTO;
 import it.createlab.gamificationhub.api.model.mapper.*;
+import it.createlab.gamificationhub.api.service.PlayerStateSyncService;
+import it.createlab.gamificationhub.api.utils.GameConceptUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
@@ -20,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -35,9 +39,12 @@ public class PointConceptController extends BaseGameController {
 
     protected final PointConceptMapper pointConceptMapper;
 
-    public PointConceptController(GameService gameService, GameMapper gameMapper, PointConceptMapper pointConceptMapper) {
+    protected final PlayerStateSyncService playerStateSyncService;
+
+    public PointConceptController(GameService gameService, GameMapper gameMapper, PointConceptMapper pointConceptMapper, PlayerStateSyncService playerStateSyncService) {
         super(gameService, gameMapper);
         this.pointConceptMapper = pointConceptMapper;
+        this.playerStateSyncService = playerStateSyncService;
     }
 
     @Operation(summary = "List point concepts", description = "Lists the game's point concepts, filtered by the given criteria.")
@@ -70,14 +77,14 @@ public class PointConceptController extends BaseGameController {
     @Operation(summary = "Add a point concept", description = "Creates a new point concept (score initialized to 0).")
     @PostMapping
     public ResponseEntity<PointConceptDTO> addPoint(@PathVariable String gameId,
-                                                    @RequestBody PointConceptDTO dto) {
+                                                    @RequestBody @Valid PointConceptDTO dto) {
         log.info("REST request to add point={} to game={}", dto, gameId);
         if(!Objects.isNull(dto.getId())) {
             throw new EntityCreationException("Point Concept", "A new point concept cannot already have an ID", ErrorCodes.POINT_CONCEPT_CREATION);
         }
         Game game = findGameByIdOrThrow(gameId);
         PointConcept point = pointConceptMapper.toEntity(dto);
-        point.setId(UUID.randomUUID().toString().replaceAll("-", "").strip());
+        point.setId(GameConceptUtils.newId());
         point.setScore(0.0);
         gameService.addConceptInstance(game.getId(), point);
         return ResponseEntity.status(HttpStatus.CREATED).body(pointConceptMapper.toDTO(point));
@@ -85,7 +92,7 @@ public class PointConceptController extends BaseGameController {
 
     @Operation(summary = "Update a point concept", description = "Updates an existing point concept.")
     @PatchMapping("/{pointId}")
-    public ResponseEntity<PointConceptDTO> updatePoint(@PathVariable String gameId, @PathVariable String pointId, @RequestBody PointConceptDTO pointConceptDTO) {
+    public ResponseEntity<PointConceptDTO> updatePoint(@PathVariable String gameId, @PathVariable String pointId, @RequestBody @Valid PointConceptDTO pointConceptDTO) {
         log.info("REST request to update point={} of game={} with={}", pointId, gameId, pointConceptDTO);
         Game game = findGameByIdOrThrow(gameId);
         Set<GameConcept> concepts = gameService.readConceptInstances(game.getId());
@@ -96,6 +103,9 @@ public class PointConceptController extends BaseGameController {
                 .findFirst()
                 .map(gc -> (PointConcept) gc)
                 .orElseThrow(() -> new EntityNotFoundException("PointConcept", pointId, ErrorCodes.POINT_CONCEPT_NOT_FOUND));
+
+        // Captured before the mapper replaces the map, so periods the designer removed can be unset.
+        Set<String> previousPeriodIds = new HashSet<>(pc.getPeriods().keySet());
 
         // Update the point-concept
         pointConceptDTO.setId(pointId);
@@ -110,6 +120,9 @@ public class PointConceptController extends BaseGameController {
         filteredConcepts.add(pc);
         game.setConcepts(filteredConcepts);
         gameService.saveGameDefinition(game);
+
+        // Players hold their own copy of the concept, which is never refreshed on load.
+        playerStateSyncService.syncPointConceptPeriods(game.getId(), pc, previousPeriodIds);
 
         return ResponseEntity.ok(pointConceptMapper.toDTO(pc));
     }

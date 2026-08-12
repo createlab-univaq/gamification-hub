@@ -9,6 +9,7 @@ import it.createlab.gamificationhub.api.exception.EntityNotFoundException;
 import it.createlab.gamificationhub.api.exception.ErrorCodes;
 import it.createlab.gamificationhub.api.model.dto.BadgeCollectionDTO;
 import it.createlab.gamificationhub.api.model.mapper.*;
+import it.createlab.gamificationhub.api.utils.GameConceptUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Builder;
@@ -77,7 +78,7 @@ public class BadgeCollectionConceptController extends BaseGameController {
         }
         Game game = findGameByIdOrThrow(gameId);
         BadgeCollectionConcept badge = badgeCollectionMapper.toEntity(dto);
-        badge.setId(UUID.randomUUID().toString().replaceAll("-", "").strip());
+        badge.setId(GameConceptUtils.newId());
         gameService.addConceptInstance(game.getId(), badge);
         return ResponseEntity.status(HttpStatus.CREATED).body(badgeCollectionMapper.toDTO(badge));
     }

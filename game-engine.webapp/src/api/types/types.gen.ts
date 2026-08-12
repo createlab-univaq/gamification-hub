@@ -68,7 +68,7 @@ export type ChallengeConceptDto = {
 
 export type PeriodDto = {
     identifier?: string;
-    start?: number;
+    start: number;
     end?: number;
     period?: number;
     capacity?: number;
@@ -336,6 +336,7 @@ export type ImportGameDto = {
     game: GamePersistanceDto;
     challengeModels: Array<ChallengeDto>;
     rules: Array<RuleDto>;
+    scenarios?: Array<SimulationScenarioDto>;
 };
 
 export type Level = {
@@ -423,20 +424,20 @@ export type PagePlayerDto = {
     size?: number;
     content?: Array<PlayerDto>;
     number?: number;
+    sort?: SortObject;
+    pageable?: PageableObject;
+    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    numberOfElements?: number;
-    pageable?: PageableObject;
-    sort?: SortObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
     offset?: number;
-    pageSize?: number;
-    pageNumber?: number;
     sort?: SortObject;
     paged?: boolean;
+    pageNumber?: number;
+    pageSize?: number;
     unpaged?: boolean;
 };
 
@@ -513,11 +514,11 @@ export type PageClassificationPositionDto = {
     size?: number;
     content?: Array<ClassificationPositionDto>;
     number?: number;
+    sort?: SortObject;
+    pageable?: PageableObject;
+    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    numberOfElements?: number;
-    pageable?: PageableObject;
-    sort?: SortObject;
     empty?: boolean;
 };
 

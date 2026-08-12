@@ -86,8 +86,8 @@ export function PopupNotification({message, title, type, isOpen, setOpen}: Notif
             px: "2rem",
             background: PopupNotificationGradients[type],
             maxWidth:{
-                lg:"45%",
-                mg:"45%",
+                lg:"80%",
+                mg:"80%",
                 sm:"100%",
                 xs:"100%"
             }

@@ -97,7 +97,7 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
             if (!row.identifier) return
             periodMap[row.identifier] = {
                 identifier: row.identifier,
-                start: fromDateInput(row.start),
+                start: fromDateInput(row.start)!,
                 end: fromDateInput(row.end),
                 period: row.periodDays ? row.periodDays * DAY_MS : undefined,
                 capacity: row.capacity
@@ -151,9 +151,10 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
                                     <TextField label={t("points.form.period_name")} fullWidth={true} required={true}/>
                                 </FormInput>
                                 <Stack direction={"row"} sx={{gap: 2, width: "100%"}}>
-                                    <FormInput name={`periods.${i}.start`}>
+                                    <FormInput name={`periods.${i}.start`} rules={{required:t("required_field")}}>
                                         <TextField label={t("points.form.start")} type={"date"}
                                                    fullWidth={true}
+                                                   required={true}
                                                    slotProps={{inputLabel: {shrink: true}}}/>
                                     </FormInput>
                                     <FormInput name={`periods.${i}.end`}>
