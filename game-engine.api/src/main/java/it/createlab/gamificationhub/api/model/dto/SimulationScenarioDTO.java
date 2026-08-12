@@ -1,6 +1,7 @@
 package it.createlab.gamificationhub.api.model.dto;
 
 import it.createlab.gamificationhub.api.model.dto.simulation.SyntheticStateDTO;
+import java.time.Instant;
 import lombok.Data;
 
 @Data
@@ -15,5 +16,7 @@ public class SimulationScenarioDTO {
     private SyntheticStateDTO syntheticState;
 
     private SyntheticStateDTO expectedOutput;
+
+    private Instant executionMoment;
 
 }

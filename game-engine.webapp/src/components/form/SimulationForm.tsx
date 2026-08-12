@@ -34,6 +34,7 @@ import {useGame} from "../../hooks/use-game.ts";
 import {Loading} from "../Loading.tsx";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
+import {toDateTimeInput, toIsoDate} from "../../utils/date-utils.ts";
 
 interface SimulationFormProps {
     gameId: string
@@ -48,6 +49,7 @@ type KVRow = { key: string; value: string }
 
 export type SimulationFormValues = {
     name: string
+    executionMoment: string
     actionIds: { value: string }[]
     pointConcepts: PointConceptRow[]
     badgeCollections: BadgeCollectionRow[]
@@ -133,6 +135,7 @@ function buildRequest(gameId: string, values: SimulationFormValues): SimulationR
         data: values.data.length
             ? Object.fromEntries(values.data.filter(r => r.key).map(r => [r.key, parseValue(r.value)]))
             : undefined,
+        executionMoment: values.executionMoment ? toIsoDate(values.executionMoment) : undefined,
         showDetailedChanges: true,
     };
 }
@@ -166,6 +169,7 @@ function toFormValues(scenario: SimulationScenarioDto): SimulationFormValues {
     const expected = scenario.expectedOutput ?? {}
     return {
         name: scenario.name ?? "",
+        executionMoment: scenario.executionMoment ? toDateTimeInput(scenario.executionMoment) : "",
         actionIds: (state.actionIds ?? []).map(value => ({value})),
         pointConcepts: (state.pointConcepts ?? []).map(pc => ({name: pc.name ?? "", score: String(pc.score ?? 0)})),
         badgeCollections: (state.badgeCollections ?? []).map(bc => ({
@@ -204,6 +208,7 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
     const form = useForm<SimulationFormValues>({
         defaultValues: {
             name: "",
+            executionMoment: "",
             actionIds: [],
             pointConcepts: [],
             badgeCollections: [],
@@ -285,7 +290,8 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
             const payload: SimulationScenarioDto = {
                 name: values.name,
                 syntheticState: buildRequest(gameId, values).syntheticState,
-                expectedOutput: buildExpectedState(values)
+                expectedOutput: buildExpectedState(values),
+                executionMoment: values.executionMoment ? toIsoDate(values.executionMoment) : undefined
             }
             return scenario?.id
                 ? scenarioClient.updateScenario(gameId, scenario.id, payload)
@@ -329,9 +335,15 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
         }}>
             <PageHeader
                 title={
-                    <FormInput name={"name"} rules={{required:t("required_field")}}>
-                        <TextField label={t("name")} placeholder={t("scenarios.form.name_placeholder")} required={true}/>
-                    </FormInput>
+                    <Stack direction={"row"} sx={{gap:2}}>
+                        <FormInput name={"name"} rules={{required:t("required_field")}}>
+                            <TextField label={t("name")} placeholder={t("scenarios.form.name_placeholder")} required={true}/>
+                        </FormInput>
+                        <FormInput name={"executionMoment"}>
+                            <TextField type={"datetime-local"} label={t("scenarios.form.execution_moment")}
+                                       slotProps={{inputLabel: {shrink: true}}}/>
+                        </FormInput>
+                    </Stack>
                 }
                 buttons={[
                     {

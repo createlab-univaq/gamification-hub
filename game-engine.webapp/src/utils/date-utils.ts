@@ -12,6 +12,11 @@ export function toIsoDate(date: string | number | Date) {
     return new Date(date).toISOString()
 }
 
+export function toDateTimeInput(date: string | number | Date) {
+    const parsed = new Date(date)
+    return new Date(parsed.getTime() - parsed.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
+}
+
 type TimeFormat = "seconds" | "minutes" | "hours" | "days"
 
 const MILLISECONDS_TO_TIME_RECORD = {

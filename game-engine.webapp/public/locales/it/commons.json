@@ -225,6 +225,7 @@
     },
     "form": {
       "name_placeholder": "La mia simulazione",
+      "execution_moment": "Momento di esecuzione (default: adesso)",
       "save": {
         "title": "Scenario salvato!",
         "message": "Lo scenario \"{{name}}\" è stato salvato con successo"

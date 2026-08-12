@@ -89,6 +89,7 @@ export type SimulationScenarioDto = {
     name?: string;
     syntheticState?: SyntheticStateDto;
     expectedOutput?: SyntheticStateDto;
+    executionMoment?: string;
 };
 
 export type SyntheticStateDto = {
@@ -386,7 +387,7 @@ export type SimulationRequestDto = {
     data?: {
         [key: string]: unknown;
     };
-    executionMoment?: number;
+    executionMoment?: string;
     showDetailedChanges?: boolean;
 };
 
@@ -426,9 +427,9 @@ export type PagePlayerDto = {
     number?: number;
     sort?: SortObject;
     pageable?: PageableObject;
-    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     empty?: boolean;
 };
 
@@ -516,9 +517,9 @@ export type PageClassificationPositionDto = {
     number?: number;
     sort?: SortObject;
     pageable?: PageableObject;
-    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     empty?: boolean;
 };
 
