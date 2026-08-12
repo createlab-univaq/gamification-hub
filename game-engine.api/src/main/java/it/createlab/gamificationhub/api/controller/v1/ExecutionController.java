@@ -72,7 +72,7 @@ public class ExecutionController extends BaseGameController {
             );
             return ResponseEntity.ok(playerStateMapper.toDTO(state));
         } catch (Exception e) {
-            log.error("Game execution interrupted by unexpected error {}", e.getLocalizedMessage());
+            log.error("Game execution interrupted by unexpected error", e);
             throw new RequestException("Game execution failed", "Could not advance game state due to an error", ErrorCodes.GAME_EXECUTION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -1,10 +1,12 @@
 import type {Control, UseFormRegister} from "react-hook-form";
-import {useFieldArray} from "react-hook-form";
+import {useFieldArray, useWatch} from "react-hook-form";
 import {Button, Card, CardContent, IconButton, MenuItem, Select, Stack, TextField, Typography} from "@mui/material";
 import {Add, Delete} from "@mui/icons-material";
 import {useTranslation} from "react-i18next";
 import type {SimulationFormValues} from "./SimulationForm.tsx";
 import {CHALLENGE_STATES} from "../../utils/enum-utils.ts";
+import type {ChallengeDto} from "../../api/types";
+import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
 
 type ChallengeArrayName = "challenges" | "expectedChallenges"
 
@@ -14,11 +16,24 @@ interface ChallengeCardProps {
     control: Control<SimulationFormValues>
     register: UseFormRegister<SimulationFormValues>
     onRemove: () => void
+    challengeModels?: ChallengeDto[]
+    challengeModelsLoading?: boolean
 }
 
-export function ChallengeCard({index, namePrefix, control, register, onRemove}: ChallengeCardProps) {
+export function ChallengeCard({
+                                  index,
+                                  namePrefix,
+                                  control,
+                                  register,
+                                  onRemove,
+                                  challengeModels,
+                                  challengeModelsLoading
+                              }: ChallengeCardProps) {
     const [t] = useTranslation()
     const fields = useFieldArray({control, name: `${namePrefix}.${index}.fields` as "challenges.0.fields"})
+    const modelName = useWatch({control, name: `${namePrefix}.${index}.modelName` as "challenges.0.modelName"})
+    // A challenge model's variables are the field keys that model expects.
+    const variables = challengeModels?.find(m => m.name === modelName)?.variables ?? []
 
     return (
         <Card variant="outlined">
@@ -27,8 +42,16 @@ export function ChallengeCard({index, namePrefix, control, register, onRemove}: 
                     <Stack direction="row" sx={{gap: 1, alignItems: "center"}}>
                         <TextField size="small" placeholder="Name" sx={{flex: 2}}
                                    {...register(`${namePrefix}.${index}.name` as "challenges.0.name")}/>
-                        <TextField size="small" placeholder="Model name" sx={{flex: 2}}
-                                   {...register(`${namePrefix}.${index}.modelName` as "challenges.0.modelName")}/>
+                        <AutocompleteFormItem
+                            name={`${namePrefix}.${index}.modelName`}
+                            placeholder="Model name"
+                            options={challengeModels ?? []}
+                            getOptionLabel={(m) => m.name ?? ""}
+                            getOptionValue={(m) => m.name}
+                            loading={challengeModelsLoading}
+                            freeSolo={true}
+                            size="small"
+                            sx={{flex: 2}}/>
                         <Select size="small" displayEmpty sx={{flex: 1}} defaultValue=""
                                 {...register(`${namePrefix}.${index}.state` as "challenges.0.state")}>
                             <MenuItem value=""><em>State</em></MenuItem>
@@ -44,8 +67,14 @@ export function ChallengeCard({index, namePrefix, control, register, onRemove}: 
                     )}
                     {fields.fields.map((field, j) => (
                         <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
-                            <TextField size="small" placeholder="key" sx={{flex: 1}}
-                                       {...register(`${namePrefix}.${index}.fields.${j}.key` as "challenges.0.fields.0.key")}/>
+                            <AutocompleteFormItem
+                                name={`${namePrefix}.${index}.fields.${j}.key`}
+                                placeholder="key"
+                                options={variables}
+                                getOptionLabel={(v) => v}
+                                freeSolo={true}
+                                size="small"
+                                sx={{flex: 1}}/>
                             <TextField size="small" placeholder="value" sx={{flex: 2}}
                                        {...register(`${namePrefix}.${index}.fields.${j}.value` as "challenges.0.fields.0.value")}/>
                             <IconButton size="small" color="error" onClick={() => fields.remove(j)}>

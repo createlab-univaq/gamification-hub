@@ -1,5 +1,6 @@
 package it.createlab.gamificationhub.api.model.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -16,6 +17,7 @@ public class PointConceptDTO {
 
     private double score = 0.0;
 
+    @Valid
     private Map<String, PeriodDTO> periods = new HashMap<>();
 
 }

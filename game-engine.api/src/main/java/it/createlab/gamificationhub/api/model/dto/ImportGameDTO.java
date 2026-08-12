@@ -15,4 +15,6 @@ public class ImportGameDTO {
     @NotNull
     private List<RuleDTO> rules;
 
+    private List<SimulationScenarioDTO> scenarios;
+
 }
