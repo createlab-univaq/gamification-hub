@@ -268,7 +268,7 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
                     },
                     {
                         label: t("sidebar.rules"),
-                        href: `/games/${game.id}`,
+                        href: `/games/${game.id}/rules`,
                         icon: <Rule/>
                     }
                 ]}
