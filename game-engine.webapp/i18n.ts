@@ -14,6 +14,9 @@ i18n
         detection: {
             order: ["localStorage", "navigator"],
             caches: ["localStorage"],
+            // The platform is translated per language, not per region, and the guide and
+            // the locale files are fetched by this code, so en-US has to become en.
+            convertDetectedLanguage: (lng) => lng.split("-")[0],
         },
         ns:["errors", "commons", "buttons", "enums"],
         defaultNS: "commons",
