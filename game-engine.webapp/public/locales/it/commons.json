@@ -462,6 +462,14 @@
       "title": "Punteggio salvato!",
       "message": "Il punteggio \"{{name}}\" è stato salvato con successo"
     },
+    "periods": {
+      "windows_one": "{{count}} finestra",
+      "windows_other": "{{count}} finestre",
+      "window": "Finestra",
+      "score": "Punteggio",
+      "open": "Aperta",
+      "total": "Punteggio totale: {{score}}"
+    },
     "details": {
       "validity": "Validità",
       "duration": "Durata",

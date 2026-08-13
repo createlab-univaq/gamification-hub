@@ -468,6 +468,14 @@
       "kept_instances": "Kept instances",
       "no_periods": "No period defined."
     },
+    "periods": {
+      "windows_one": "{{count}} window",
+      "windows_other": "{{count}} windows",
+      "window": "Window",
+      "score": "Score",
+      "open": "Open",
+      "total": "Total score: {{score}}"
+    },
     "form": {
       "title": "Save point concept",
       "periods_title": "Periods",

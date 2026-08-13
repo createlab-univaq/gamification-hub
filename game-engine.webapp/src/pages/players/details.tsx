@@ -7,7 +7,7 @@ import {useMutation, useQuery} from "@tanstack/react-query";
 import {groupChallengeClient, playerBlackListClient, playerChallengeClient, playerClient, playerInventoryClient, queryClient} from "../../api";
 import {Loading} from "../../components/Loading.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {Box, Button, Card, CardContent, Chip, Stack, Typography} from "@mui/material";
+import {Box, Button, Card, CardActionArea, CardContent, Chip, Stack, Typography} from "@mui/material";
 import {Add, Block, Bolt, Check, Close, Delete, Edit, Games, Groups, People, PlayArrow} from "@mui/icons-material";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
@@ -16,7 +16,8 @@ import {ChallengeEditForm} from "../../components/form/ChallengeEditForm.tsx";
 import {GroupChallengeInviteForm} from "../../components/form/GroupChallengeInviteForm.tsx";
 import {BlockPlayerForm} from "../../components/form/BlockPlayerForm.tsx";
 import {useState} from "react";
-import type {ChallengeConceptDto, GroupChallengeDto, PlayerStateDto} from "../../api/types";
+import type {ChallengeConceptDto, GroupChallengeDto, PlayerStateDto, PointConceptDto} from "../../api/types";
+import {PeriodInstancesDialog} from "../../components/PeriodInstancesDialog.tsx";
 import {useTranslation} from "react-i18next";
 import {type ChallengeState, ChallengeStateChipColorRecord} from "../../utils/enum-utils.ts";
 import {formatDate} from "../../utils/date-utils.ts";
@@ -40,6 +41,7 @@ export function PlayerDetailsPage() {
     const [assignOpen, setAssignOpen] = useState(false)
     const [inviteOpen, setInviteOpen] = useState(false)
     const [blockOpen, setBlockOpen] = useState(false)
+    const [periodsItem, setPeriodsItem] = useState<PointConceptDto>()
 
     const invalidate = ["get-player", game.id, playerId]
 
@@ -134,6 +136,7 @@ export function PlayerDetailsPage() {
                                   onClose={() => setInviteOpen(false)}/>
         <BlockPlayerForm gameId={game.id!} playerId={playerId!} excludedIds={[playerId!, ...blockedPlayers]}
                          open={blockOpen} onClose={() => setBlockOpen(false)}/>
+        <PeriodInstancesDialog concept={periodsItem} setConcept={setPeriodsItem}/>
 
         <PageHeader
             title={data?.playerId}
@@ -170,14 +173,25 @@ export function PlayerDetailsPage() {
                 <Typography variant={"subtitle1"} sx={{fontWeight: 600}}>{t("sidebar.points")}</Typography>
                 {pointConcepts.length
                     ? <Stack direction={"row"} sx={{gap: 2, flexWrap: "wrap"}}>
-                        {pointConcepts.map(pc => (
-                            <Card key={`pc-${pc.name}`} variant={"outlined"}>
+                        {pointConcepts.map(pc => {
+                            const windows = Object.values(pc.periods ?? {})
+                                .reduce((total, period) => total + (period.instances ?? []).length, 0)
+                            const content = (
                                 <CardContent sx={{minWidth: "6rem"}}>
                                     <Typography sx={{fontWeight: "bold"}}>{pc.name}</Typography>
                                     <Typography variant={"h5"}>{pc.score ?? 0}</Typography>
+                                    {windows > 0 &&
+                                        <Typography variant={"caption"} color={"text.secondary"}>
+                                            {t("points.periods.windows", {count: windows})}
+                                        </Typography>}
                                 </CardContent>
+                            )
+                            return <Card key={`pc-${pc.name}`} variant={"outlined"}>
+                                {windows > 0
+                                    ? <CardActionArea onClick={() => setPeriodsItem(pc)}>{content}</CardActionArea>
+                                    : content}
                             </Card>
-                        ))}
+                        })}
                     </Stack>
                     : <Typography color={"text.secondary"}>{t("points.empty_list")}</Typography>}
             </Stack>

@@ -2,6 +2,7 @@ package it.createlab.gamificationhub.api.model.mapper;
 
 import eu.trentorise.game.model.PointConcept;
 import it.createlab.gamificationhub.api.model.dto.PeriodDTO;
+import it.createlab.gamificationhub.api.model.dto.PeriodInstanceDTO;
 import it.createlab.gamificationhub.api.model.dto.PointConceptDTO;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -49,6 +50,22 @@ public interface PointConceptMapper extends EntityMapper<PointConceptDTO, PointC
     @AfterMapping
     default void updatePeriods(@MappingTarget PointConcept entity, PointConceptDTO dto) {
         entity.setPeriods(create(dto).getPeriods());
+    }
+
+    @AfterMapping
+    default void fillPeriodInstances(@MappingTarget PointConceptDTO dto, PointConcept entity) {
+        if (dto.getPeriods() == null) {
+            return;
+        }
+        dto.getPeriods().forEach((key, period) -> period.setInstances(
+                entity.getPeriodInstances(key).stream().map(instance -> {
+                    PeriodInstanceDTO instanceDto = new PeriodInstanceDTO();
+                    instanceDto.setIndex(instance.getIndex());
+                    instanceDto.setStart(instance.getStart());
+                    instanceDto.setEnd(instance.getEnd());
+                    instanceDto.setScore(instance.getScore());
+                    return instanceDto;
+                }).toList()));
     }
 
     default Map<String, PeriodDTO> periodsToDto(Map<String, ? extends PointConcept.Period> periods) {

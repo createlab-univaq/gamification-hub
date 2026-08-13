@@ -203,7 +203,7 @@ public class DroolsEngine implements GameEngine {
         cmds.add(commands.newQuery("retrieveMember", "getMember"));
 
         // set gameId as constant
-        kSession.setGlobal("utils", new Utility(gameId));
+        kSession.setGlobal("utils", new Utility(gameId, executionMoment));
 
         kSession = loadGameConstants(kSession, gameId);
 
@@ -436,7 +436,7 @@ public class DroolsEngine implements GameEngine {
         ExecutionGuard guard = new ExecutionGuard(maxRuleFirings, executionTimeoutMs);
         kSession.addEventListener(guard);
 
-        kSession.setGlobal("utils", new Utility(gameId));
+        kSession.setGlobal("utils", new Utility(gameId, executionMoment));
         kSession = loadGameConstants(kSession, gameId);
 
         ExecutionResults results = kSession.execute(commands.newBatchExecution(cmds));

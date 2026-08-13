@@ -72,6 +72,14 @@ export type PeriodDto = {
     end?: number;
     period?: number;
     capacity?: number;
+    instances?: Array<PeriodInstanceDto>;
+};
+
+export type PeriodInstanceDto = {
+    index?: number;
+    start?: number;
+    end?: number;
+    score?: number;
 };
 
 export type PointConceptDto = {
@@ -156,61 +164,16 @@ export type ValidationMessageDto = {
     level?: 'ERROR' | 'WARNING' | 'INFO';
 };
 
-export type ChallengeChoice = {
-    modelName?: string;
-    state?: 'AVAILABLE' | 'ACTIVE';
-};
-
-export type Inventory = {
-    challengeChoices?: Array<ChallengeChoice>;
-    challengeActivationActions?: number;
-};
-
-export type PlayerDto = {
-    playerId?: string;
-    gameId?: string;
-    levels?: Array<PlayerLevel>;
-    state?: Array<GameConcept>;
-    customData?: {
-        data?: {
-            [key: string]: unknown;
-        };
-        empty?: boolean;
-        [key: string]: unknown;
-    };
-    inventory?: Inventory;
-};
-
-export type PlayerLevel = {
-    levelName?: string;
-    levelValue?: string;
-    levelIndex?: number;
-    pointConcept?: string;
-    startLevelScore?: number;
-    endLevelScore?: number;
-    toNextLevel?: number;
-};
-
-export type ItemChoiceDto = {
-    type?: string;
-    name?: string;
-};
-
-export type ChallengeChoiceDto = {
-    modelName?: string;
-    state?: string;
-};
-
-export type InventoryDto = {
-    challengeChoices?: Array<ChallengeChoiceDto>;
-    challengeActivationActions?: number;
-};
-
 export type AttendeeDto = {
     playerId?: string;
     role?: string;
     challengeScore?: number;
     valuationTime?: string;
+};
+
+export type ChallengeChoiceDto = {
+    modelName?: string;
+    state?: string;
 };
 
 export type GroupChallengeDto = {
@@ -230,6 +193,35 @@ export type GroupChallengeDto = {
     reward?: RewardDto;
 };
 
+export type InventoryDto = {
+    challengeChoices?: Array<ChallengeChoiceDto>;
+    challengeActivationActions?: number;
+};
+
+export type PlayerLevelDto = {
+    levelName?: string;
+    levelValue?: string;
+    levelIndex?: number;
+    pointConcept?: string;
+    startLevelScore?: number;
+    endLevelScore?: number;
+    toNextLevel?: number;
+};
+
+export type PlayerStateDto = {
+    playerId?: string;
+    gameId?: string;
+    pointConcepts?: Array<PointConceptDto>;
+    badgeCollections?: Array<BadgeCollectionDto>;
+    challenges?: Array<ChallengeConceptDto>;
+    levels?: Array<PlayerLevelDto>;
+    inventory?: InventoryDto;
+    customData?: {
+        [key: string]: unknown;
+    };
+    groupChallenges?: Array<GroupChallengeDto>;
+};
+
 export type RewardDto = {
     percentage?: number;
     threshold?: number;
@@ -240,6 +232,11 @@ export type RewardDto = {
     calculationPeriodName?: string;
     targetPointConceptName?: string;
     targetPeriodName?: string;
+};
+
+export type ItemChoiceDto = {
+    type?: string;
+    name?: string;
 };
 
 export type ChallengeInvitationDto = {
@@ -371,16 +368,6 @@ export type ExecutionDto = {
     executionMoment?: string;
 };
 
-export type PlayerStateDto = {
-    playerId?: string;
-    gameId?: string;
-    pointConcepts?: Array<PointConceptDto>;
-    badgeCollections?: Array<BadgeCollectionDto>;
-    challenges?: Array<ChallengeConceptDto>;
-    inventory?: InventoryDto;
-    groupChallenges?: Array<GroupChallengeDto>;
-};
-
 export type SimulationRequestDto = {
     gameId: string;
     syntheticState: SyntheticStateDto;
@@ -419,11 +406,11 @@ export type LoginResponseDto = {
     token?: string;
 };
 
-export type PagePlayerDto = {
+export type PagePlayerSummaryDto = {
     totalElements?: number;
     totalPages?: number;
     size?: number;
-    content?: Array<PlayerDto>;
+    content?: Array<PlayerSummaryDto>;
     number?: number;
     sort?: SortObject;
     pageable?: PageableObject;
@@ -440,6 +427,12 @@ export type PageableObject = {
     pageNumber?: number;
     pageSize?: number;
     unpaged?: boolean;
+};
+
+export type PlayerSummaryDto = {
+    playerId?: string;
+    gameId?: string;
+    levels?: Array<PlayerLevelDto>;
 };
 
 export type SortObject = {
@@ -1242,13 +1235,13 @@ export type GetPlayersResponses = {
     /**
      * OK
      */
-    200: PagePlayerDto;
+    200: PagePlayerSummaryDto;
 };
 
 export type GetPlayersResponse = GetPlayersResponses[keyof GetPlayersResponses];
 
 export type AddPlayerData = {
-    body: PlayerDto;
+    body: PlayerStateDto;
     path: {
         gameId: string;
     };
@@ -1260,7 +1253,7 @@ export type AddPlayerResponses = {
     /**
      * OK
      */
-    200: PlayerDto;
+    200: PlayerStateDto;
 };
 
 export type AddPlayerResponse = AddPlayerResponses[keyof AddPlayerResponses];
