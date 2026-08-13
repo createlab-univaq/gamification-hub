@@ -9,7 +9,7 @@ import {FormInput} from "./FormInput.tsx";
 import {Stack, TextField} from "@mui/material";
 import {ArrowBack, RestartAlt, Save} from "@mui/icons-material";
 import {ButtonIcon} from "../ButtonIcon.tsx";
-import type {PlayerDto} from "../../api/types";
+import type {PlayerStateDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
 
 interface PlayerFormProps {
@@ -26,7 +26,7 @@ export function PlayerForm({gameId}: PlayerFormProps) {
         }
     })
 
-    const {mutate, isPending} = useMutation<PlayerDto, Error, { gameId: string, player: PlayerDto }>({
+    const {mutate, isPending} = useMutation<PlayerStateDto, Error, { gameId: string, player: PlayerStateDto }>({
         mutationKey: ["create-player", gameId],
         mutationFn: ({gameId, player}) => playerClient.addPlayer(gameId, player),
         onSuccess: (data) => {

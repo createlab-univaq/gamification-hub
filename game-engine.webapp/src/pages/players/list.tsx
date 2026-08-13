@@ -1,7 +1,7 @@
 import {useGame} from "../../hooks/use-game";
 import {useNotificationContext} from "../../hooks/use-notification-context";
 import {useState} from "react";
-import type {PlayerDto} from "../../api/types";
+import type {PlayerSummaryDto} from "../../api/types";
 import type {GetFilter} from "../../api/filters/filters.ts";
 import {keepPreviousData, useMutation, useQuery} from "@tanstack/react-query";
 import {playerClient, queryClient} from "../../api";
@@ -20,8 +20,8 @@ import {useTranslation} from "react-i18next";
 export function PlayerListPage() {
     const game = useGame()
     const {setNotification} = useNotificationContext()
-    const [deletePlayer, setDeletePlayer] = useState<PlayerDto>()
-    const [filters, setFilters] = useState<GetFilter<PlayerDto>[]>([])
+    const [deletePlayer, setDeletePlayer] = useState<PlayerSummaryDto>()
+    const [filters, setFilters] = useState<GetFilter<PlayerSummaryDto>[]>([])
     const [t] = useTranslation()
     const {isLoading, data, error} = useQuery({
         queryKey: ["get-players", game.id, filters],

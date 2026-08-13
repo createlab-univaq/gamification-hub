@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -188,6 +189,15 @@ public class PointConcept extends GameConcept {
 
 	public Double getPeriodScore(String periodIdentifier, long moment) {
 		return periods.containsKey(periodIdentifier) ? periods.get(periodIdentifier).getScore(moment) : 0d;
+	}
+
+	/*
+	 * Read-only view of the instances already accumulated by a period. Unlike the
+	 * retrieval methods it does not create the instance it is asked about.
+	 */
+	public List<PeriodInstance> getPeriodInstances(String periodIdentifier) {
+		PeriodInternal p = periods.get(periodIdentifier);
+		return p != null ? new ArrayList<PeriodInstance>(p.instances.values()) : new ArrayList<PeriodInstance>();
 	}
 
 	public PeriodInstance getPeriodInstance(String periodIdentifier, long moment) {
