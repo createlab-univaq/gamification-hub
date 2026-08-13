@@ -27,9 +27,9 @@ const FullscreenNotificationGradients = {
 } satisfies Record<NotificationType, (theme: Theme) => string>
 
 const PopupNotificationGradients = {
-    error: (theme: Theme) => `linear-gradient(to right, ${theme.palette.error.light} 0rem, ${theme.palette.background.paper} 2rem, ${theme.palette.background.paper}) 100%`,
-    success: (theme: Theme) => `linear-gradient(to right, ${theme.palette.success.main} 0rem, ${theme.palette.background.paper} 2rem, ${theme.palette.background.paper}) 100%`,
-    warning: (theme: Theme) => `linear-gradient(to right, ${theme.palette.warning.main} 0rem, ${theme.palette.background.paper} 2rem, ${theme.palette.background.paper}) 100%`
+    error: (theme: Theme) => `linear-gradient(to bottom, ${theme.palette.error.light} 0rem, ${theme.palette.background.paper} 2rem, ${theme.palette.background.paper}) 100%`,
+    success: (theme: Theme) => `linear-gradient(to bottom, ${theme.palette.success.main} 0rem, ${theme.palette.background.paper} 2rem, ${theme.palette.background.paper}) 100%`,
+    warning: (theme: Theme) => `linear-gradient(to bottom, ${theme.palette.warning.main} 0rem, ${theme.palette.background.paper} 2rem, ${theme.palette.background.paper}) 100%`
 } satisfies Record<NotificationType, (theme: Theme) => string>
 
 
@@ -70,27 +70,21 @@ export function FullScreenNotification({message, title, type, isOpen, setOpen}: 
 export function PopupNotification({message, title, type, isOpen, setOpen}: NotificationProps) {
 
     function SlideTransition(props: SlideProps) {
-        return <Slide {...props} direction="left"/>;
+        return <Slide {...props} direction="down"/>;
     }
 
     return <Snackbar open={isOpen}
                      key={isOpen ? "popup-open" : "popup-closed"}
                      autoHideDuration={3000}
                      onClose={() => setOpen(false)}
-                     anchorOrigin={{vertical: "top", horizontal: "right"}}
+                     anchorOrigin={{vertical: "top", horizontal: "center"}}
                      slots={{
                          transition: SlideTransition
                      }}
     >
         <Card sx={{
             px: "2rem",
-            background: PopupNotificationGradients[type],
-            maxWidth:{
-                lg:"80%",
-                mg:"80%",
-                sm:"100%",
-                xs:"100%"
-            }
+            background: PopupNotificationGradients[type]
         }}>
             <Stack direction={"row"} sx={{
                 py: "0.5rem",

@@ -123,10 +123,12 @@ export function ImpactAnalysisGraph({impactAnalysis}: ImpactAnalysisGraphProps) 
         </Stack>;
     }
 
-    return <Stack direction="row" sx={{height: "60dvh", width: "100%", minWidth: "40rem", gap: 2}}>
+    return <Stack direction={{xs: "column", md: "row"}}
+                  sx={{height: {md: "60dvh"}, width: "100%", minWidth: 0, gap: 2}}>
         <Box sx={{
-            flex: 1,
+            flex: {xs: "0 0 auto", md: 1},
             minWidth: 0,
+            height: {xs: "60dvh", md: "100%"},
             border: "1px solid",
             borderColor: "divider",
             borderRadius: 2,
@@ -148,7 +150,8 @@ export function ImpactAnalysisGraph({impactAnalysis}: ImpactAnalysisGraphProps) 
             </ReactFlow>
         </Box>
         <Stack sx={{gap: 1}}>
-            <Card variant="outlined" sx={{width: "15rem", flexShrink: 0, alignSelf: "flex-start"}}>
+            <Card variant="outlined"
+                  sx={{width: {xs: "100%", md: "15rem"}, flexShrink: 0, alignSelf: "flex-start"}}>
                 <CardContent>
                     <Typography variant="subtitle2"
                                 sx={{fontWeight: 700}}>{t("impact_analysis.links.title")}</Typography>
