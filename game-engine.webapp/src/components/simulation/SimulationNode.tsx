@@ -12,7 +12,7 @@ export function SimulationNode({data, selected, width}: NodeProps) {
     const [t] = useTranslation();
 
     return <>
-        <Handle type="target" position={Position.Top} style={{background: "#555"}}/>
+        <Handle type="target" position={Position.Top} style={{background: "#555"}} isConnectable={false}/>
         <Stack
             sx={{
                 width: width,
@@ -63,6 +63,6 @@ export function SimulationNode({data, selected, width}: NodeProps) {
                 )}
             </Stack>
         </Stack>
-        <Handle type="source" position={Position.Bottom} style={{background: "#555"}}/>
+        <Handle type="source" position={Position.Bottom} style={{background: "#555"}} isConnectable={false}/>
     </>
 }

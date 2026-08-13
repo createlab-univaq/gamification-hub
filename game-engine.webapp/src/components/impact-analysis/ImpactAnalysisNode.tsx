@@ -10,7 +10,7 @@ export function ImpactAnalysisNode({data, selected, width}: NodeProps) {
     const [t] = useTranslation()
 
     return <>
-        <Handle type="target" position={Position.Top} style={{opacity: 0}}/>
+        <Handle type="target" position={Position.Top} style={{opacity: 0}} isConnectable={false}/>
         <Stack
             sx={{
                 width: width,
@@ -54,6 +54,6 @@ export function ImpactAnalysisNode({data, selected, width}: NodeProps) {
                 )}
             </Stack>
         </Stack>
-        <Handle type="source" position={Position.Bottom} style={{opacity: 0}}/>
+        <Handle type="source" position={Position.Bottom} style={{opacity: 0}} isConnectable={false}/>
     </>
 }

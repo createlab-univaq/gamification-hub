@@ -9,7 +9,7 @@ export function SimulationStateNode({id}: NodeProps) {
     const label = isStart ? t("scenarios.form.graph.nodes.start") : t("scenarios.form.graph.nodes.end")
 
     return <>
-        {!isStart && <Handle type={"target"} position={Position.Top}/>}
+        {!isStart && <Handle type={"target"} position={Position.Top} isConnectable={false}/>}
         <Paper
             sx={{
                 p: 1.5, cursor: "pointer",
@@ -20,6 +20,6 @@ export function SimulationStateNode({id}: NodeProps) {
         >
             <Typography sx={{fontWeight:"bold"}} color={"textPrimary"}>{label}</Typography>
         </Paper>
-        {isStart && <Handle type={"source"} position={Position.Bottom}/>}
+        {isStart && <Handle type={"source"} position={Position.Bottom} isConnectable={false}/>}
     </>
 }

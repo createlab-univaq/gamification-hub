@@ -29,6 +29,7 @@ export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps
     const [selectedRule, setSelectedRule] = useState<FiredRuleDto | null>(null);
     const [selectedStateNode, setSelectedStateNode] = useState<PlayerStateDto & { type: "start" | "end" }>()
     const [t] = useTranslation()
+    const isSelected = selectedRule || selectedStateNode;
 
     useEffect(() => {
         let cancelled = false;
@@ -77,17 +78,22 @@ export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps
                 height: "100%",
                 minHeight: "60dvh",
                 width:"100%",
+                display: "flex",
+                flexDirection: "column",
                 p:2,
                 border: "1px solid",
                 borderColor: "divider",
                 borderRadius: 2,
                 overflow: "hidden"
             }}>
-                <Typography variant="caption" color="text.secondary" sx={{textAlign: "center"}}>
-                    {t("scenarios.form.graph.details")}
-                </Typography>
+                <Stack sx={{gap:2}}>
+                    <Typography variant="h6">
+                        {t("scenarios.form.outputs.count", {count: simulationResult.firedRules?.length ?? 0})}
+                    </Typography>
+                </Stack>
                 {nodes.length > 0 && (
                     <ReactFlow
+                        style={{flex: 1, minHeight: 0}}
                         nodes={nodes}
                         edges={edges}
                         onNodesChange={onNodesChange}
@@ -99,19 +105,24 @@ export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps
                         fitView={true}
                     >
                         <Background/>
-                        <Controls orientation={"horizontal"}/>
+                        <Controls/>
                     </ReactFlow>
                 )}
+                <Typography variant="caption" color="text.secondary">
+                    {t("scenarios.form.graph.details")}
+                </Typography>
             </Box>
 
-           <Stack sx={{width:"100%"}}>
-               {selectedRule &&
-                   <SimulationNodeDetail rule={selectedRule}/>
-               }
-               {selectedStateNode &&
-                   <SimulationStateNodeDetail type={selectedStateNode.type} playerState={selectedStateNode}/>
-               }
-           </Stack>
+            {isSelected &&
+                <Stack sx={{width:"100%"}}>
+                    {selectedRule &&
+                        <SimulationNodeDetail rule={selectedRule}/>
+                    }
+                    {selectedStateNode &&
+                        <SimulationStateNodeDetail type={selectedStateNode.type} playerState={selectedStateNode}/>
+                    }
+                </Stack>
+            }
         </Stack>
     );
 }

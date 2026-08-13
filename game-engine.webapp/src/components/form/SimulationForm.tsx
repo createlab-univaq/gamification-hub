@@ -737,9 +737,6 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                         </Stack>
                     }
                     {result && <>
-                        <Typography variant="h6">
-                            {t("scenarios.form.outputs.count", {count: result.firedRules?.length ?? 0})}
-                        </Typography>
                         {result.firedRules?.length === 0
                             ?
                             <Typography color="text.secondary">{t("scenarios.form.outputs.no_rules_fired")}</Typography>
