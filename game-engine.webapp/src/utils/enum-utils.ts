@@ -23,6 +23,16 @@ export const CHALLENGE_CHOICE_STATES = ["AVAILABLE", "ACTIVE"] as const
 
 export type ChallengeChoiceState = typeof CHALLENGE_CHOICE_STATES[number];
 
+// The only models a group challenge invitation accepts. The engine validates against
+// this same list, so a value outside it is rejected whatever the game defines.
+export const GROUP_CHALLENGE_MODELS = [
+    "groupCompetitivePerformance",
+    "groupCompetitiveTime",
+    "groupCooperative"
+] as const
+
+export type GroupChallengeModel = typeof GROUP_CHALLENGE_MODELS[number];
+
 export const ATTENDEE_ROLES = ["GUEST", "PROPOSER"] as const
 
 export type AttendeeRole = typeof ATTENDEE_ROLES[number];

@@ -86,12 +86,12 @@ Due meccanismi vale la pena conoscerli fin da subito. Primo, la **salience** è 
 
 Componi le regole nella pagina **Regole**, che tiene sincronizzate due rappresentazioni: un **costruttore a blocchi** visuale a sinistra, dove trascini condizioni e conseguenze, e un pannello di **codice DRL** accanto, dove puoi digitare la regola direttamente. Modificare l'una aggiorna l'altra. Un pulsante **valida** compila la regola e segnala i problemi in un pannello console, e **salva** la memorizza. Validare prima di salvare è l'abitudine che intercetta refusi ed errori di tipo prima che raggiungano un giocatore.
 
-La regola utile più semplice aggiunge a un punteggio quando avviene un'azione. Questa assegna 10 `study_points` per ogni lezione frequentata:
+Prima della prima regola, due parole sulle poche righe che stanno sopra a ognuna, perché sono il motivo più frequente per cui una regola apparentemente corretta si rifiuta di compilare. Una regola viene compilata come un piccolo file sorgente, quindi ogni tipo che nomina deve essere risolvibile. Dichiarare `package eu.trentorise.game.model` in cima è ciò che ti permette di scrivere `Action`, `InputData`, `PointConcept` e `BadgeCollectionConcept` senza importarli, perché è il package in cui quei tipi vivono. Tutto ciò che sta fuori va importato per nome: `eu.trentorise.game.notification.BadgeNotification` per inviare la notifica di una medaglia, oppure `eu.trentorise.game.core.Utility` insieme a `global Utility utils;` se vuoi scrivere nel log da una regola. Se ometti la riga del package devi importare ogni tipo che nomini, concetti compresi. La validazione segnala un tipo non risolto come errore prima che tu possa salvare, quindi nulla di rotto arriva a un giocatore, ma saperlo trasforma un errore misterioso in uno ovvio.
+
+La regola utile più semplice aggiunge a un punteggio quando avviene un'azione. Questa assegna 10 `study_points` per ogni lezione frequentata, e sopra non le serve altro che la riga del package:
 
 ```
 package eu.trentorise.game.model
-import eu.trentorise.game.core.Utility;
-global Utility utils;
 
 rule "study points for lecture"
 when
@@ -109,7 +109,7 @@ La parte `when` corrisponde a due fatti: l'azione della lezione, e il concetto `
 
 Un paio di note su come sono organizzate le regole. Ogni regola salvata è un file a sé, ma un singolo file può contenere più di un blocco `rule "..." ... end`: il motore li compila tutti e restano indipendenti. È permesso, ma rende un file più difficile da leggere e mantenere, quindi l'approccio pulito è una regola per file. Un nome è speciale: una regola chiamata `constants` viene letta come un semplice file di proprietà (righe `chiave = valore`) invece che come DRL, e ogni chiave è pubblicata come costante globale che le tue regole possono usare (dopo averla dichiarata con `global` in cima a una regola). È il posto ordinato dove tenere soglie e numeri regolabili invece di ripetere valori letterali tra le regole.
 
-> **In Campus Quest.** Il gioco usa nove regole, in due gruppi. Le **regole di punteggio** assegnano punteggi dalle azioni:
+> **In Campus Quest.** Il gioco usa nove regole, in due gruppi. Gli esempi qui sotto mostrano solo i blocchi `rule ... end`; ognuna è salvata come regola a sé e porta la stessa intestazione descritta sopra, cioè la riga del `package` più un import per tutto ciò che sta fuori da quel package. Ricordati di mettere gli import necessari in ogni regola che scrivi, altrimenti non verrà validata. Le **regole di punteggio** assegnano punteggi dalle azioni:
 >
 > ```
 > rule "study points for library"          // + hours * 5 study_points on use_library
@@ -142,9 +142,12 @@ Un paio di note su come sono organizzate le regole. Ogni regola salvata è un fi
 > end
 > ```
 >
-> Le **regole delle medaglie** conferiscono una medaglia quando una condizione è soddisfatta. Ognuna importa `eu.trentorise.game.notification.BadgeNotification;` e usa una `salience` bassa così da eseguire dopo che le regole di punteggio hanno aggiornato i punteggi. Il pattern è identico ogni volta, quindi eccone una per intero e le altre con le loro righe distintive:
+> Le **regole delle medaglie** conferiscono una medaglia quando una condizione è soddisfatta, e ognuna deve importare il tipo della notifica perché vive fuori dal package del modello. Usano una `salience` bassa così da eseguire dopo che le regole di punteggio hanno aggiornato i punteggi. Il pattern è identico ogni volta, quindi eccone una per intero, intestazione compresa, e le altre con le loro righe distintive:
 >
 > ```
+> package eu.trentorise.game.model
+> import eu.trentorise.game.notification.BadgeNotification;
+>
 > rule "bookworm badge"
 >     salience -10
 > when
@@ -276,9 +279,11 @@ Attivare una scelta la spende: la sfida scelta diventa attiva sul giocatore, e i
 
 Una **sfida di gruppo** mette più giocatori di fronte a un obiettivo condiviso, ed è una funzionalità distinta dalle sfide individuali della sezione 12. La differenza fondamentale è che una sfida di gruppo non è costruita da un modello che definisci tu; scegli invece uno di tre **tipi predefiniti**, ognuno dei quali definisce come si combinano i progressi dei membri e chi vince:
 
-- **groupCooperative**: i membri mettono in comune i loro progressi verso un unico target combinato e vincono insieme.
-- **groupCompetitivePerformance**: i membri competono, e vince chi guadagna di più.
-- **groupCompetitiveTime**: i membri gareggiano per raggiungere il target per primi.
+- **groupCooperative**, mostrato come *Cooperativa, il punteggio combinato deve raggiungere l'obiettivo*: i progressi di tutti si sommano e il totale viene confrontato con l'obiettivo. Se lo raggiunge vincono tutti i membri, se resta sotto non vince nessuno. Il motore limita anche il contributo di ciascuno a quanto manca ancora, così che l'ultimo ad agire non possa sforare per conto di tutti.
+- **groupCompetitivePerformance**, mostrato come *Competitiva, vince il punteggio più alto*: i membri vengono confrontati fra loro e vince il punteggio più alto. Qui non è l'obiettivo a decidere l'esito: vince semplicemente chi ha guadagnato di più durante la sfida, e in caso di parità la vittoria è condivisa.
+- **groupCompetitiveTime**, mostrato come *Competitiva, vincono tutti quelli che raggiungono l'obiettivo*: ogni membro viene misurato sull'obiettivo per conto proprio. Vince chiunque lo raggiunga, quindi è una gara contro il traguardo più che fra i partecipanti, e può finire con tutti vincitori o con nessuno.
+
+In tutti e tre, ciò che viene misurato è il progresso che un membro fa sul concetto di punteggio scelto **durante** la sfida, non il totale che aveva già, e il progresso registrato non supera mai l'obiettivo.
 
 Come le sfide individuali, una sfida di gruppo ha un ciclo di vita di invito. Un giocatore è il **proponente**, che la imposta e **invita** gli altri come **ospiti**; ogni ospite può **accettare** o **rifiutare** prima che inizi, e il proponente può **annullarla** finché è ancora `PROPOSED`. Questo significa che una sfida di gruppo parte solo tra giocatori che hanno aderito. Una volta accettata e in corso, prosegue fino alla sua data di fine, momento in cui il motore la conclude secondo il suo tipo e assegna la ricompensa.
 
@@ -310,6 +315,8 @@ Il motivo per cui richiede un pattern speciale è che, normalmente, un evento to
 Il motore trasporta i numeri rilevanti al posto tuo. In termini di regole, il segnale è un fatto `UpdateTeams` che `insert`isci, caricato tramite `addData` con qualunque valore servirà alla regola di squadra; quando il motore riesegue l'azione per una squadra, passa quei valori alla regola lato squadra dentro un fatto `Transmission`. Ecco la regola della lezione della sezione 6 riscritta come coppia che propaga:
 
 ```
+package eu.trentorise.game.model
+
 // lato giocatore: assegna il punteggio allo studente, poi chiedi al motore di aggiornare le sue squadre
 rule "study points for lecture (player)"
 when

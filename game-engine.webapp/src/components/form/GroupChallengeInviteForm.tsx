@@ -11,6 +11,7 @@ import {Close, GroupAdd} from "@mui/icons-material";
 import {ButtonIcon} from "../ButtonIcon.tsx";
 import type {ChallengeInvitationDto, GroupChallengeDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
+import {GROUP_CHALLENGE_MODELS} from "../../utils/enum-utils.ts";
 
 interface GroupChallengeInviteFormProps {
     gameId: string
@@ -21,6 +22,7 @@ interface GroupChallengeInviteFormProps {
 
 type InviteFormValues = {
     guestIds: string[]
+    challengeName: string
     challengeModelName: string
     challengeStart: string
     challengeEnd: string
@@ -41,7 +43,7 @@ export function GroupChallengeInviteForm({gameId, playerId, open, onClose}: Grou
     const [t] = useTranslation()
     const form = useForm<InviteFormValues>({
         defaultValues: {
-            guestIds: [], challengeModelName: "", challengeStart: "", challengeEnd: "",
+            guestIds: [], challengeName: "", challengeModelName: "", challengeStart: "", challengeEnd: "",
             challengeTarget: 0, pointConceptName: "", periodName: "", percentage: 0, threshold: 0
         }
     })
@@ -73,6 +75,7 @@ export function GroupChallengeInviteForm({gameId, playerId, open, onClose}: Grou
         mutationFn: (values: InviteFormValues) => {
             const payload: ChallengeInvitationDto = {
                 guestIds: values.guestIds,
+                challengeName: values.challengeName,
                 challengeModelName: values.challengeModelName,
                 challengeStart: toIso(values.challengeStart),
                 challengeEnd: toIso(values.challengeEnd),
@@ -124,9 +127,19 @@ export function GroupChallengeInviteForm({gameId, playerId, open, onClose}: Grou
                         loading={playersLoading}
                         rules={{validate: (v) => (Array.isArray(v) && v.length > 0) || t("players.groups.challenges.invite_form.guest_required")}}
                     />
-                    <FormInput name={"challengeModelName"} rules={{required: t("required_field")}}>
-                        <TextField label={t("players.groups.challenges.invite_form.model_name")} fullWidth={true} type={"text"} required={true}/>
+                    <FormInput name={"challengeName"} rules={{required: t("required_field")}}>
+                        <TextField label={t("players.groups.challenges.invite_form.name")} fullWidth={true} type={"text"} required={true}
+                                   placeholder={t("players.groups.challenges.invite_form.name_placeholder")}/>
                     </FormInput>
+                    <AutocompleteFormItem
+                        name={"challengeModelName"}
+                        label={t("players.groups.challenges.invite_form.model_name")}
+                        options={[...GROUP_CHALLENGE_MODELS]}
+                        getOptionLabel={(m) => t(`enums:${m}`)}
+                        getOptionValue={(m) => m}
+                        required={true}
+                        rules={{required: t("required_field")}}
+                    />
                     <AutocompleteFormItem
                         name={"pointConceptName"}
                         label={t("players.groups.challenges.invite_form.point_concept")}
@@ -143,8 +156,13 @@ export function GroupChallengeInviteForm({gameId, playerId, open, onClose}: Grou
                         getOptionLabel={(p) => p}
                         getOptionValue={(p) => p}
                     />
-                    <FormInput name={"challengeTarget"} rules={{min: 0}}>
+                    <FormInput name={"challengeTarget"}
+                               rules={{
+                                   required: t("required_field"),
+                                   validate: (v) => Number(v) > 0 || t("players.groups.challenges.invite_form.target_positive")
+                               }}>
                         <TextField label={t("players.groups.challenges.invite_form.target")} fullWidth={true} type={"number"}
+                                   required={true}
                                    slotProps={{htmlInput: {min: 0, step: "any"}}}/>
                     </FormInput>
                     <Stack direction={"row"} sx={{gap: 2}}>
@@ -152,7 +170,14 @@ export function GroupChallengeInviteForm({gameId, playerId, open, onClose}: Grou
                             <TextField label={t("players.groups.challenges.invite_form.start")} fullWidth={true} type={"datetime-local"}
                                        slotProps={{inputLabel: {shrink: true}}}/>
                         </FormInput>
-                        <FormInput name={"challengeEnd"}>
+                        <FormInput name={"challengeEnd"}
+                                   rules={{
+                                       validate: (v) => {
+                                           const start = form.getValues("challengeStart")
+                                           return !v || !start || new Date(v) > new Date(start)
+                                               || t("players.groups.challenges.invite_form.end_before_start")
+                                       }
+                                   }}>
                             <TextField label={t("players.groups.challenges.invite_form.end")} fullWidth={true} type={"datetime-local"}
                                        slotProps={{inputLabel: {shrink: true}}}/>
                         </FormInput>

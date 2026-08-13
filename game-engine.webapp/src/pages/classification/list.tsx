@@ -16,6 +16,7 @@ import {useDebounced} from "../../hooks/use-debounced.ts";
 import type {ClassificationDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
 import type {GetFilter} from "../../api/filters/filters.ts";
+import {navigateTo} from "../../utils/navigation-utils.ts";
 
 export function ClassificationListPage() {
     const game = useGame()
@@ -128,8 +129,11 @@ export function ClassificationListPage() {
                         variant={"outlined"}
                         startIcon={<Leaderboard/>}
                         sx={{alignSelf: "flex-start"}}
-                        href={`/games/${game.id}/classifications/${classification.id}/board`}
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            navigateTo(`/games/${game.id}/classifications/${classification.id}/board`)
+                        }}
                     >
                         {t("leaderboards.checkout")}
                     </Button>

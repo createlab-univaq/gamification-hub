@@ -1,7 +1,7 @@
 import type {SxProps} from "@mui/material";
 import {Card, CardActionArea, CardContent, CardHeader} from "@mui/material";
 import type {ReactNode} from "react";
-import {navigateTo} from "../utils/navigation-utils.ts";
+import {RouterLink} from "./RouterLink.tsx";
 
 interface LinkCardProps {
     href: string,
@@ -23,8 +23,15 @@ export function LinkCard({href, children, title, sx}: LinkCardProps) {
             ...sx
         }}
     >
-        <CardActionArea onClick={() => navigateTo(href)} component={"div"}
-                        sx={{flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "stretch"}}>
+        <CardActionArea component={RouterLink} href={href}
+                        sx={{
+                            flexGrow: 1,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "stretch",
+                            color: "inherit",
+                            textDecoration: "none"
+                        }}>
             {title && <CardHeader title={title}/>}
             <CardContent sx={{flexGrow: 1, width: "100%", display: "flex", flexDirection: "column"}}>
                 {children}

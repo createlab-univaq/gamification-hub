@@ -33,6 +33,7 @@
     "labels": {
       "challenge_select":"Challenge model",
       "instance_name": "Instance name",
+      "end_before_start": "The end must come after the start",
       "initial_state": "Initial state",
       "start": "Start",
       "end": "End",
@@ -397,6 +398,10 @@
           "title": "Invite to a group challenge",
           "guests": "Guests",
           "guest_required": "Select at least one guest",
+          "name": "Challenge name",
+          "name_placeholder": "Library sprint",
+          "target_positive": "The target must be greater than zero",
+          "end_before_start": "The end must come after the start",
           "model_name": "Group challenge model",
           "point_concept": "Point concept",
           "period": "Period",

@@ -108,6 +108,8 @@ export function LayoutList<T>({
                                     endIcon={isGrid ? <Edit/> : undefined}
                                     sx={{flex: isGrid ? 1 : "unset"}}
                                     onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
                                         onItemUpdate(item, e)
                                     }}
                                 >

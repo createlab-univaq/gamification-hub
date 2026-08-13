@@ -23,7 +23,6 @@ import {ClassificationBoardPage} from "../pages/classification/board.tsx";
 import {BadgeListPage} from "../pages/badges/list.tsx";
 import {BadgeUpsertPage} from "../pages/badges/upsert.tsx";
 import {BadgeDetailsPage} from "../pages/badges/details.tsx";
-import {ImpactAnalysisPage} from "../pages/rules/impact-analysis.tsx";
 import {LevelListPage} from "../pages/levels/list.tsx";
 import {UpsertLevelPage} from "../pages/levels/upsert.tsx";
 import {ActionListPage} from "../pages/actions/list.tsx";
@@ -42,6 +41,8 @@ import {LandingPage} from "../pages/landing/page.tsx";
 const BlocklyRuleUpsertPage = lazy(() => import("../pages/rules/upsert.tsx").then(m => ({default: m.BlocklyRuleUpsertPage})));
 // eslint-disable-next-line react-refresh/only-export-components
 const SimulationPage = lazy(() => import("../pages/scenarios/page.tsx").then(m => ({default: m.SimulationPage})));
+// eslint-disable-next-line react-refresh/only-export-components
+const ImpactAnalysisPage = lazy(() => import("../pages/rules/impact-analysis.tsx").then(m => ({default: m.ImpactAnalysisPage})));
 
 export const router = createBrowserRouter([
     {
@@ -135,7 +136,8 @@ export const router = createBrowserRouter([
                             },
                             {
                                 path: "impact-analysis",
-                                element: <ImpactAnalysisPage/>
+                                element: <Suspense
+                                    fallback={<Loading fullScreen={true}/>}><ImpactAnalysisPage/></Suspense>
                             },
                             // BADGES
                             {

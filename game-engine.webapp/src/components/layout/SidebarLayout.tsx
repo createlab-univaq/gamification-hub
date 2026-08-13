@@ -2,7 +2,7 @@ import {type PropsWithChildren, useMemo, useState} from "react";
 import {Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, Stack, Toolbar, Typography} from "@mui/material";
 import {useWindowSize} from "../../hooks/use-window-size.ts";
 import {getSidebarItems} from "./sidebarItems.ts";
-import {useLocation} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import {SIDEBAR_OPEN_KEY} from "../../utils/storage-utils.ts";
 import {getBaseGamePath} from "../../utils/navigation-utils.ts";
 import {useTranslation} from "react-i18next";
@@ -68,7 +68,7 @@ export function SidebarLayout() {
         <Box sx={{overflowX: "hidden", overflowY: "hidden"}}>
             {width < 800 &&
                 <Stack direction={"row"} sx={{p: 1}}>
-                    <a href={"/dashboard"} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                    <Link to={"/dashboard"} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
                         <AppIcon
                             sx={{
                                 width: "3rem"
@@ -90,7 +90,7 @@ export function SidebarLayout() {
                                 }
                             }}
                         />
-                    </a>
+                    </Link>
                 </Stack>
             }
             <List

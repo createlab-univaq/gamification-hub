@@ -42,7 +42,12 @@ export function AutocompleteFormItem<T>({
                                         }: AutocompleteFormItemProps<T>) {
     const {control} = useFormContext()
     const toValue = getOptionValue ?? ((option: T) => option as unknown)
-    const labelOf = (option: T | string) => typeof option === "string" ? option : getOptionLabel(option)
+    // A string that is one of the options still has a label of its own, so only a value
+    // the user typed under freeSolo is shown raw.
+    const labelOf = (option: T | string) =>
+        typeof option === "string" && !options.includes(option as T)
+            ? option
+            : getOptionLabel(option as T)
     const valueOf = (option: T | string) => typeof option === "string" ? option : toValue(option)
 
     return <Controller

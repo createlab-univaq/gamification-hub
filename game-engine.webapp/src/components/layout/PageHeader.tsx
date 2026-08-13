@@ -18,6 +18,8 @@ export interface PageHeaderProps {
     sx?:SxProps<Theme>
 }
 
+const CRUMB_SX = {py: 0.2, px: 0.5}
+
 export function PageHeader({buttons, subTitle, title, breadcrumbs, sx}: PageHeaderProps) {
 
     const Title = typeof title === "string" ? <Typography variant={"h4"}>{title}</Typography> : title
@@ -30,17 +32,16 @@ export function PageHeader({buttons, subTitle, title, breadcrumbs, sx}: PageHead
         {(breadcrumbs && breadcrumbs.length) &&
             <Stack direction={"row"}>
                 <Breadcrumbs component={"span"} separator={<ChevronRight/>} sx={{gap: 0}}>
-                    {breadcrumbs.map(b => {
-                        return <Button
-                            sx={{
-                                py: 0.2,
-                                px: 0.5
-                            }}
-                            href={b.href}
-                            variant={"text"}
-                            disabled={!b.href}
-                            startIcon={b.icon}
-                        >
+                    {breadcrumbs.map((b, index) => {
+                        const key = `breadcrumb-${index}-${b.label}`
+                        if (!b.href) {
+                            return <Button key={key} component={"span"} aria-current={"page"} variant={"text"}
+                                           startIcon={b.icon}
+                                           sx={{...CRUMB_SX, color: "text.primary", pointerEvents: "none"}}>
+                                {b.label}
+                            </Button>
+                        }
+                        return <Button key={key} href={b.href} variant={"text"} startIcon={b.icon} sx={CRUMB_SX}>
                             {b.label}
                         </Button>
                     })}

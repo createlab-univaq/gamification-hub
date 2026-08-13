@@ -1,6 +1,12 @@
 import type {Theme} from '@mui/material/styles'
+import {RouterLink} from "../components/RouterLink"
 
 export const commonComponents = {
+    MuiButtonBase: {
+        defaultProps: {
+            LinkComponent: RouterLink,
+        },
+    },
     MuiCssBaseline: {
         styleOverrides: (theme: Theme) => ({
             '*::-webkit-scrollbar': {

@@ -134,7 +134,7 @@ public class PointConceptController extends BaseGameController {
         log.info("Delete point={} from game={}", pointId, gameId);
         Game game = findGameByIdOrThrow(gameId);
         Set<GameConcept> filteredConcepts = game.getConcepts().stream()
-                .filter(gc -> gc instanceof PointConcept && !pointId.equals(gc.getId()))
+                .filter(gc -> !(gc instanceof PointConcept && pointId.equals(gc.getId())))
                 .collect(Collectors.toSet());
         game.setConcepts(filteredConcepts);
         gameService.saveGameDefinition(game);

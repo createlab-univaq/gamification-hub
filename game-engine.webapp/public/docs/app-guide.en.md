@@ -86,12 +86,12 @@ Two mechanics are worth knowing up front. First, **salience** is a rule's priori
 
 You author rules on the **Rules** page, which keeps two representations in sync: a visual **block builder** on the left, where you drag conditions and consequences, and a **DRL code** panel beside it, where you can type the rule directly. Editing either updates the other. A **validate** button compiles the rule and reports problems in a console panel, and **save** stores it. Validating before saving is the habit that catches typos and type errors before they ever reach a player.
 
-The simplest useful rule adds to a score when an action happens. This one gives 10 `study_points` for every lecture attended:
+Before the first rule, a word about the few lines that sit above every one of them, because they are the most common reason a rule that looks correct refuses to compile. A rule is compiled as a small source file, so every type it names must be resolvable. Declaring `package eu.trentorise.game.model` at the top is what lets you write `Action`, `InputData`, `PointConcept` and `BadgeCollectionConcept` without importing them, since that is the package those types live in. Anything outside it has to be imported by name: `eu.trentorise.game.notification.BadgeNotification` to send a badge notification, or `eu.trentorise.game.core.Utility` together with `global Utility utils;` if you want to log from a rule. Leave the package line out and you must import every type you name, the concepts included. Validate reports an unresolved type as an error before you can save, so nothing broken reaches a player, but knowing this turns a puzzling failure into an obvious one.
+
+The simplest useful rule adds to a score when an action happens. This one gives 10 `study_points` for every lecture attended, and needs nothing above it but the package line:
 
 ```
 package eu.trentorise.game.model
-import eu.trentorise.game.core.Utility;
-global Utility utils;
 
 rule "study points for lecture"
 when
@@ -109,7 +109,7 @@ The `when` part matches two facts: the lecture action, and the player's `study_p
 
 A couple of notes on how rules are organised. Each saved rule is its own file, but a single file may hold more than one `rule "..." ... end` block: the engine compiles them all and they stay independent. That is allowed, yet it makes a file harder to read and maintain, so the clean approach is one rule per file. One name is special: a rule called `constants` is read as a plain properties file (`key = value` lines) instead of DRL, and each key is published as a global constant your rules can use (after declaring it with `global` at the top of a rule). It is the tidy place to keep thresholds and tunable numbers rather than repeating literals across rules.
 
-> **In Campus Quest.** The game uses nine rules, in two groups. The **point rules** award scores from actions:
+> **In Campus Quest.** The game uses nine rules, in two groups. The snippets below show only the `rule ... end` blocks; each is saved as its own rule and carries the same header described above, meaning the `package` line plus an import for anything outside that package. Make sure to put the necessary imports in every rule you write, or it will not validate. The **point rules** award scores from actions:
 >
 > ```
 > rule "study points for library"          // + hours * 5 study_points on use_library
@@ -142,9 +142,12 @@ A couple of notes on how rules are organised. Each saved rule is its own file, b
 > end
 > ```
 >
-> The **badge rules** grant a badge once a condition is met. Each imports `eu.trentorise.game.notification.BadgeNotification;` and uses a low `salience` so it runs after the point rules have updated scores. The pattern is identical every time, so here is one in full and the rest as their distinctive lines:
+> The **badge rules** grant a badge once a condition is met, and each one has to import the notification type because it lives outside the model package. They use a low `salience` so they run after the point rules have updated scores. The pattern is identical every time, so here is one in full, header included, and the rest as their distinctive lines:
 >
 > ```
+> package eu.trentorise.game.model
+> import eu.trentorise.game.notification.BadgeNotification;
+>
 > rule "bookworm badge"
 >     salience -10
 > when
@@ -276,9 +279,11 @@ Activating a choice spends it: the chosen challenge becomes active on the player
 
 A **group challenge** sets several players against a shared objective, and it is a distinct feature from the individual challenges of section 12. The key difference is that a group challenge is not built from a model you define; instead you pick one of three **built-in types**, each defining how the members' progress combines and who wins:
 
-- **groupCooperative**: the members pool their progress toward one combined target and win together.
-- **groupCompetitivePerformance**: the members compete, and whoever gains the most wins.
-- **groupCompetitiveTime**: the members race to reach the target first.
+- **groupCooperative**, shown as *Cooperative, the combined score must reach the target*: everyone's progress is added together and compared with the target. If the total reaches it, every member wins; if it falls short, nobody does. The engine also caps each member's contribution at what is still missing, so the last person to act cannot overshoot on everyone's behalf.
+- **groupCompetitivePerformance**, shown as *Competitive, highest score wins*: the members are ranked against each other and the highest score wins. The target is not what decides the outcome here, so the winner is simply whoever gained most during the challenge, and a tie is shared rather than broken.
+- **groupCompetitiveTime**, shown as *Competitive, everyone reaching the target wins*: each member is measured against the target on their own. Everybody who reaches it wins, so this is a race against the goal rather than against each other, and it can end with all of them winning or none.
+
+In all three, what is measured is the progress a member makes on the chosen point concept **during** the challenge, not the total they already had, and a member's recorded progress never exceeds the target.
 
 Like individual challenges, a group challenge has an invitation lifecycle. One player is the **proposer**, who sets it up and **invites** the others as **guests**; each guest may **accept** or **decline** before it begins, and the proposer may **cancel** it while it is still `PROPOSED`. This means a group challenge only starts among players who have opted in. Once it is accepted and running, it proceeds until its end date, at which point the engine settles it according to its type and awards the reward.
 
@@ -310,6 +315,8 @@ The reason it takes a special pattern is that, normally, an event only touches t
 The engine carries the relevant numbers across for you. In rule terms, the flag is an `UpdateTeams` fact you `insert`, loaded via `addData` with whatever values the team rule will need; when the engine re-runs the action for a team, it hands those values to the team-side rule inside a `Transmission` fact. Here is the lecture rule from section 6 rewritten as a propagating pair:
 
 ```
+package eu.trentorise.game.model
+
 // player side: score the student, then ask the engine to update their teams
 rule "study points for lecture (player)"
 when
