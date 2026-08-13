@@ -26,7 +26,7 @@ interface SimulationFlowGraphProps {
 export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps) {
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-    const [selectedRule, setSelectedRule] = useState<FiredRuleDto | null>(null);
+    const [selectedRule, setSelectedRule] = useState<FiredRuleDto>();
     const [selectedStateNode, setSelectedStateNode] = useState<PlayerStateDto & { type: "start" | "end" }>()
     const [t] = useTranslation()
     const isSelected = selectedRule || selectedStateNode;
@@ -47,7 +47,12 @@ export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps
 
     const onNodeClick = useCallback((_: unknown, node: SimulationNodeType) => {
         if (node.id === "__start__" || node.id == "__end__") {
-            setSelectedRule(null);
+            setSelectedRule(undefined);
+            const type = node.id.replaceAll("_", "") as "start" | "end" 
+            if(selectedStateNode && selectedStateNode.type === type) {
+                setSelectedStateNode(undefined)
+                return;
+            }
             setSelectedStateNode({
                 ...(node.data.state ?? {}),
                 type: node.id.replaceAll("_", "") as "start" | "end"
@@ -55,10 +60,15 @@ export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps
             return;
         }
         setSelectedStateNode(undefined)
+        const firedRule = (node.data as { rule: FiredRuleDto }).rule ?? undefined
+        if(selectedRule && selectedRule.ruleName === firedRule.ruleName) {
+            setSelectedRule(undefined)
+            return;
+        }
         setSelectedRule((node.data as { rule: FiredRuleDto }).rule ?? null);
-    }, []);
+    }, [selectedRule, selectedStateNode]);
 
-    const onPaneClick = useCallback(() => setSelectedRule(null), []);
+    const onPaneClick = useCallback(() => setSelectedRule(undefined), []);
 
     return (
         <Stack
