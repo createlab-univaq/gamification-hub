@@ -29,6 +29,7 @@ import {AppIcon} from "../../components/logo/AppIcon.tsx";
 import {AppLogo} from "../../components/logo/AppLogo.tsx";
 import {Login} from "@mui/icons-material";
 import {ButtonIcon} from "../../components/ButtonIcon.tsx";
+import {RouterLink} from "../../components/RouterLink.tsx";
 
 function omitNode<T extends { node?: unknown }>(props: T): Omit<T, "node"> {
     const rest: Record<string, unknown> = {...props}
@@ -143,7 +144,7 @@ export function GuidePage() {
                     alignItems: "center",
                     justifyContent: "space-between",
                 }}>
-                    <Stack direction={"row"} component={"a"} href={user ? "/dashboard" : "/"}
+                    <Stack direction={"row"} component={RouterLink} href={user ? "/dashboard" : "/"}
                            sx={{alignItems: "center", gap: 1, p: 1}}>
                         <AppIcon sx={{width: "2.5rem"}}/>
                         <AppLogo

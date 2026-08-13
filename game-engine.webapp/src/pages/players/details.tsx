@@ -98,11 +98,14 @@ export function PlayerDetailsPage() {
 
     const pointConcepts = data?.pointConcepts ?? []
     const badges = data?.badgeCollections ?? []
-    const challenges = data?.challenges ?? []
     const inventory = data?.inventory
     const choices = inventory?.challengeChoices ?? []
     const groups = data?.groupChallenges ?? []
     const blockedPlayers = blackList?.blockedPlayers ?? []
+    // A group challenge is also merged into the player's state as an ordinary challenge.
+    // It belongs in the group section, where the role decides what may be done with it.
+    const groupNames = new Set(groups.map(g => g.instanceName))
+    const challenges = (data?.challenges ?? []).filter(c => !groupNames.has(c.name))
 
     function roleOf(gc: GroupChallengeDto): string | undefined {
         return (gc.attendees ?? []).find(a => a.playerId === playerId)?.role

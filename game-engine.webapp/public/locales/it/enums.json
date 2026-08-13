@@ -1,4 +1,7 @@
 {
+  "groupCompetitivePerformance": "Competitiva, vince il punteggio più alto",
+  "groupCompetitiveTime": "Competitiva, vincono tutti quelli che raggiungono l'obiettivo",
+  "groupCooperative": "Cooperativa, il punteggio combinato deve raggiungere l'obiettivo",
   "PROPOSED": "Proposta",
   "ASSIGNED": "Assegnata",
   "ACTIVE": "Attiva",

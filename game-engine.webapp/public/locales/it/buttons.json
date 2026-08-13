@@ -9,6 +9,7 @@
   "deactivate_account": "Disattiva utente",
   "import": "Importa",
   "export": "Esporta",
+  "refresh": "Ricarica",
   "confirm": "Conferma",
   "simulate": "Simula",
   "static_analysis": "Analisi statica",

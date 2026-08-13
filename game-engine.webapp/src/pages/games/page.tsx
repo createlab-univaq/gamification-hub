@@ -4,10 +4,11 @@ import {useGame} from "../../hooks/use-game";
 import type {GridSize} from "@mui/material";
 import {Grid, Stack, Typography} from "@mui/material";
 import {LinkCard} from "../../components/LinkCard.tsx";
-import {Delete, Download, Edit, Games, PlayArrow} from "@mui/icons-material";
+import {Delete, Download, Edit, Games, PlayArrow, Refresh} from "@mui/icons-material";
 import {DeleteDialog} from "../../components/DeleteDialog.tsx";
 import {useMutation} from "@tanstack/react-query";
-import {gameClient} from "../../api";
+import {gameClient, queryClient} from "../../api";
+import {gameQueryKey} from "../../components/GameContext.tsx";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {navigateTo} from "../../utils/navigation-utils.ts";
 import {useNotificationContext} from "../../hooks/use-notification-context";
@@ -42,6 +43,13 @@ export function GamePage() {
     const {setNotification} = useNotificationContext()
     const [deleteElement, setDeleteElement] = useState<GameDto>()
     const [t] = useTranslation()
+
+    // The game is cached for the session, so an edit made elsewhere needs an explicit
+    // refresh to show up here and in everything that reads the game from context.
+    const {mutate: refresh, isPending: isRefreshing} = useMutation({
+        mutationKey: ["refresh-game", game.id],
+        mutationFn: () => queryClient.invalidateQueries({queryKey: gameQueryKey(game.id)})
+    })
 
     const {mutate: exportGame, isPending: isExporting} = useMutation({
         mutationKey: ["export-game", game.id],
@@ -112,6 +120,13 @@ export function GamePage() {
                     children: t("buttons:update"),
                     href: `/upsert-game/${game.id}`,
                     variant: "contained"
+                },
+                {
+                    endIcon: <Refresh/>,
+                    children: t("buttons:refresh"),
+                    variant: "outlined",
+                    loading: isRefreshing,
+                    onClick: () => refresh()
                 },
                 {
                     endIcon: <Download/>,

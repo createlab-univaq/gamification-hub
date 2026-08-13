@@ -33,6 +33,7 @@
     "labels": {
       "challenge_select":"Modello di sfida",
       "instance_name": "Nome istanza",
+      "end_before_start": "La fine deve essere successiva all'inizio",
       "initial_state": "Stato iniziale",
       "start": "Inizio",
       "end": "Fine",
@@ -397,6 +398,10 @@
           "title": "Invita a una sfida di gruppo",
           "guests": "Ospiti",
           "guest_required": "Seleziona almeno un ospite",
+          "name": "Nome della sfida",
+          "name_placeholder": "Sprint in biblioteca",
+          "target_positive": "L'obiettivo deve essere maggiore di zero",
+          "end_before_start": "La fine deve essere successiva all'inizio",
           "model_name": "Modello sfida di gruppo",
           "point_concept": "Punteggio",
           "period": "Periodo",

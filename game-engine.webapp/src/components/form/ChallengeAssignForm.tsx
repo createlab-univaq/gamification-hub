@@ -91,8 +91,8 @@ export function ChallengeAssignForm({gameId, playerId, open, onClose}: Challenge
                         rules={{required: t("required_field")}}
                         loading={modelsLoading}
                     />
-                    <FormInput name={"instanceName"}>
-                        <TextField label={t("form.labels.instance_name")} fullWidth={true} type={"text"}/>
+                    <FormInput name={"instanceName"} rules={{required: t("required_field")}}>
+                        <TextField label={t("form.labels.instance_name")} fullWidth={true} type={"text"} required={true}/>
                     </FormInput>
                     <AutocompleteFormItem
                         name={"challengeType"}
@@ -102,12 +102,20 @@ export function ChallengeAssignForm({gameId, playerId, open, onClose}: Challenge
                         getOptionValue={(o) => o}
                         rules={{required: t("required_field")}}
                     />
-                    <FormInput name={"start"}>
-                        <TextField label={t("form.labels.start")} fullWidth={true} type={"date"}
+                    <FormInput name={"start"} rules={{required: t("required_field")}}>
+                        <TextField label={t("form.labels.start")} fullWidth={true} type={"date"} required={true}
                                    slotProps={{inputLabel: {shrink: true}}}/>
                     </FormInput>
-                    <FormInput name={"end"}>
-                        <TextField label={t("form.labels.end")} fullWidth={true} type={"date"}
+                    <FormInput name={"end"}
+                               rules={{
+                                   required: t("required_field"),
+                                   validate: (v) => {
+                                       const start = form.getValues("start")
+                                       return !v || !start || new Date(v) > new Date(start)
+                                           || t("form.labels.end_before_start")
+                                   }
+                               }}>
+                        <TextField label={t("form.labels.end")} fullWidth={true} type={"date"} required={true}
                                    slotProps={{inputLabel: {shrink: true}}}/>
                     </FormInput>
                     <FormCheckbox name={"hide"} label={t("form.labels.hidden")}/>

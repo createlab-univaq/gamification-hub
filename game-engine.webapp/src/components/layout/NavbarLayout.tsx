@@ -10,6 +10,7 @@ import {useSidebarContext} from "../../hooks/use-sidebar-context.ts";
 import {AppLogo} from "../logo/AppLogo.tsx";
 import {useWindowSize} from "../../hooks/use-window-size.ts";
 import {AppIcon} from "../logo/AppIcon.tsx";
+import {Link} from "react-router-dom";
 
 export function NavbarLayout() {
 
@@ -99,7 +100,7 @@ export function NavbarLayout() {
             </Stack>
             <Stack direction={"row"}>
                 <Button variant={"text"} onClick={() => setOpen(!isOpen)}><Menu/></Button>
-                <a href={"/dashboard"} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                <Link to={"/dashboard"} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
                     <AppIcon
                         sx={{
                             width: "3.5rem"
@@ -121,7 +122,7 @@ export function NavbarLayout() {
                             }
                         }}
                     />
-                </a>
+                </Link>
             </Stack>
         </Stack>
     </AppBar>
