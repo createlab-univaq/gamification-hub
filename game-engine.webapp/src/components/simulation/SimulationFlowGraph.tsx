@@ -20,10 +20,11 @@ const nodeTypes = {ruleNode: SimulationNode, stateNode: SimulationStateNode};
 // ── Main component ────────────────────────────────────────────────────────────
 
 interface SimulationFlowGraphProps {
-    simulationResult: SimulationResultDto
+    simulationResult: SimulationResultDto,
+    passed?: boolean
 }
 
-export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps) {
+export function SimulationFlowGraph({simulationResult, passed}: SimulationFlowGraphProps) {
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
     const [selectedRule, setSelectedRule] = useState<FiredRuleDto>();
@@ -96,10 +97,13 @@ export function SimulationFlowGraph({simulationResult}: SimulationFlowGraphProps
                 borderRadius: 2,
                 overflow: "hidden"
             }}>
-                <Stack sx={{gap:2}}>
-                    <Typography variant="h6">
-                        {t("scenarios.form.outputs.count", {count: simulationResult.firedRules?.length ?? 0})}
-                    </Typography>
+                <Stack>
+                    {passed !== undefined &&
+                        <Typography variant={"h6"} sx={{color: passed ? "success.dark" : "error.dark"}}>
+                            {t(passed ? "scenarios.form.test.success.title" : "scenarios.form.test.error.title")}
+                        </Typography>
+                    }
+                    <Typography variant={passed === undefined ? "h6" : "caption"}>{t("scenarios.form.outputs.count", {count: simulationResult.firedRules?.length ?? 0})}</Typography>
                 </Stack>
                 {nodes.length > 0 && (
                     <ReactFlow

@@ -59,7 +59,7 @@ export function PlayerForm({gameId}: PlayerFormProps) {
                     required: t("required_field")
                 }}
             >
-                <TextField required={true} type={"text"} fullWidth={true} label={t("players.form.player_name")}/>
+                <TextField required={true} autoFocus={true} type={"text"} fullWidth={true} label={t("players.form.player_name")}/>
             </FormInput>
             <Stack direction={"row"}
                    sx={{

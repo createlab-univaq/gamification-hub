@@ -82,7 +82,7 @@ export function TeamForm({gameId, team}: TeamFormProps) {
                 rules={{required: t("required_field")}}
             >
                 <TextField required={true} type={"text"} fullWidth={true} label={t("teams.form.team_name")}
-                           disabled={!!team}/>
+                           disabled={!!team} autoFocus={true}/>
             </FormInput>
 
             <Stack sx={{gap: 1}}>

@@ -31,7 +31,7 @@
   },
   "form": {
     "labels": {
-      "challenge_select":"Modello di sfida",
+      "challenge_select": "Modello di sfida",
       "instance_name": "Nome istanza",
       "end_before_start": "La fine deve essere successiva all'inizio",
       "initial_state": "Stato iniziale",
@@ -116,7 +116,7 @@
       "title": "Gioco salvato!",
       "message": "Il gioco \"{{name}}\" è stato salvato con successo"
     },
-    "deleted":{
+    "deleted": {
       "title": "Gioco eliminato!",
       "message": "Il gioco è stato eliminato con successo"
     }
@@ -167,7 +167,7 @@
   "console": {
     "saving": "Salvataggio in corso...",
     "validation": {
-      "start":"Validazione in corso...",
+      "start": "Validazione in corso...",
       "title": "Validazione completata",
       "success": "La regola è stata compilata con successo. Nessun errore trovato",
       "warning": "Regola compilata con avvisi"
@@ -257,6 +257,21 @@
           "end": "Stato Finale",
           "caused_by": "Causata da {{rule}}",
           "changes": "{{count}} cambiamenti"
+        }
+      },
+      "test": {
+        "success": {
+          "title": "La simulazione è andata a buon fine.",
+          "detail": "Tutti i valori attesi corrispondono alla simulazione.",
+          "hint": "Corrisponde: {{expected}}"
+        },
+        "error": {
+          "title": "La simulazione è fallita. Controlla il tuo risultato aspettato per vedere quali valori sono errati.",
+          "detail": "Uno o più valori attesi non corrispondono.",
+          "hint": "Atteso {{expected}}, la simulazione ha prodotto {{actual}}"
+        },
+        "missing": {
+          "hint": "Nessun elemento con questo nome è tornato dalla simulazione."
         }
       }
     }
@@ -358,8 +373,8 @@
       }
     },
     "inventories": {
-      "title":"Inventario",
-      "available_choices": "Azioni di attivazione disponibili: {{count}}" ,
+      "title": "Inventario",
+      "available_choices": "Azioni di attivazione disponibili: {{count}}",
       "choices": {
         "empty_list": "Nessuna scelta disponibile",
         "forced": {
@@ -477,27 +492,29 @@
     },
     "details": {
       "validity": "Validità",
-      "duration": "Durata",
-      "kept_instances": "Istanze mantenute",
+      "duration": "Durata finestra",
+      "kept_instances": "Finestre mantenute",
       "no_periods": "Nessun periodo definito."
     },
     "form": {
       "title": "Salva punteggio",
       "periods_title": "Periodi",
-      "periods_hint": "Definisci i periodi di calcolo del punteggio (es. settimanale, mensile).",
+      "periods_hint": "Un periodo ripete una finestra di durata fissa dentro un arco di validità. Inizio e Fine delimitano l'arco; lasciando Fine vuota resta aperto.",
       "period_name": "Nome periodo",
       "start": "Inizio",
       "end": "Fine",
-      "period_days": "Periodo (giorni)",
-      "capacity": "Capacità",
+      "period_days": "Durata finestra (giorni)",
+      "period_days_positive": "Una finestra deve durare più di zero giorni.",
+      "capacity": "Finestre mantenute",
+      "capacity_min": "Le finestre mantenute non possono essere negative.",
       "add_period": "Aggiungi periodo"
     }
   },
-  "error_page":{
+  "error_page": {
     "title": "Qualcosa è andato storto",
     "message": "La pagina a cui stai cercando di accedere non esiste."
   },
-  "import":{
+  "import": {
     "modal": {
       "title": "Importa Giochi",
       "errors": "Uno o più files non possono essere caricati. Il formato del JSON non è corretto",
