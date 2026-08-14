@@ -37,6 +37,15 @@ function omitNode<T extends { node?: unknown }>(props: T): Omit<T, "node"> {
     return rest as Omit<T, "node">
 }
 
+// An image on its own line still arrives wrapped in a paragraph, and the img renderer turns it into
+// a figure. A figure cannot live inside a <p>, so those paragraphs render as a plain box instead.
+function isImageParagraph(node?: unknown) {
+    const children = (node as { children?: { type: string, tagName?: string, value?: string }[] })?.children ?? []
+    return children.length > 0 && children.every(child =>
+        (child.type === "element" && child.tagName === "img")
+        || (child.type === "text" && (child.value ?? "").trim() === ""))
+}
+
 function cellAlign(align?: string | null) {
     return align === "left" || align === "right" || align === "center" ? align : undefined
 }
@@ -193,7 +202,9 @@ export function GuidePage() {
                                         sx={{mt: 5, mb: 2, scrollMarginTop: "1rem"}}
                                         {...omitNode(props)}>{children}</Typography>,
                                 h3: (props) => <Typography variant={"h5"} sx={{mt: 3, mb: 1.5}} {...omitNode(props)}/>,
-                                p: (props) => <Typography variant={"body1"} sx={{mb: 2}} {...omitNode(props)}/>,
+                                p: (props) => isImageParagraph(props.node)
+                                    ? <Box {...omitNode(props)}/>
+                                    : <Typography variant={"body1"} sx={{mb: 2}} {...omitNode(props)}/>,
                                 li: (props) => <Typography component={"li"} variant={"body1"}
                                                            sx={{mb: 0.5}} {...omitNode(props)}/>,
                                 table: (props) =>

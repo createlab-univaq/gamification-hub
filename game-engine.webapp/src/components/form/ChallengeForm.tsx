@@ -82,7 +82,7 @@ export function ChallengeForm({gameId, challenge}: ChallengeFormProps) {
                 name={"name"}
                 rules={{required: t("required_field")}}
             >
-                <TextField required={true} type={"text"} fullWidth={true} label={t("name")}/>
+                <TextField required={true} autoFocus={true} type={"text"} fullWidth={true} label={t("name")}/>
             </FormInput>
 
             <Stack sx={{gap: 1}}>

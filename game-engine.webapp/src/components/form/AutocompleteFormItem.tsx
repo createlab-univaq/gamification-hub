@@ -3,6 +3,9 @@ import type {SxProps, Theme} from "@mui/material";
 import type {RegisterOptions} from "react-hook-form";
 import {Controller, useFormContext} from "react-hook-form";
 
+// Shared so that an empty multi-select keeps the same value across renders.
+const NOTHING_SELECTED: never[] = []
+
 interface AutocompleteFormItemProps<T> {
     name: string
     options: T[]
@@ -21,6 +24,10 @@ interface AutocompleteFormItemProps<T> {
     fullWidth?: boolean
     size?: "small" | "medium"
     sx?: SxProps<Theme>
+    // Notified of what the user types, so the options can be fetched as they search.
+    onInputChange?: (input: string) => void
+    // Hides options that are already picked. Only meaningful with multiple.
+    filterSelectedOptions?: boolean
 }
 
 export function AutocompleteFormItem<T>({
@@ -39,37 +46,34 @@ export function AutocompleteFormItem<T>({
                                             fullWidth,
                                             size,
                                             sx,
+                                            onInputChange,
+                                            filterSelectedOptions,
                                         }: AutocompleteFormItemProps<T>) {
     const {control} = useFormContext()
     const toValue = getOptionValue ?? ((option: T) => option as unknown)
-    // A string that is one of the options still has a label of its own, so only a value
-    // the user typed under freeSolo is shown raw.
-    const labelOf = (option: T | string) =>
-        typeof option === "string" && !options.includes(option as T)
-            ? option
-            : getOptionLabel(option as T)
     const valueOf = (option: T | string) => typeof option === "string" ? option : toValue(option)
+    // What the form stores is not an option but the value extracted from one, so label it by
+    // looking the option back up. Free text typed under freeSolo matches nothing and is shown
+    // as it was typed.
+    const labelOf = (option: T | string) => {
+        const match = options.find(o => valueOf(o) === valueOf(option))
+        if (match !== undefined) {
+            return getOptionLabel(match)
+        }
+        return typeof option === "string" ? option : getOptionLabel(option)
+    }
 
     return <Controller
         name={name}
         control={control}
         rules={rules}
         render={({field, fieldState}) => {
-            // Resolve the option object that corresponds to a stored value. Under freeSolo an
-            // unmatched value is kept as typed, so editing a saved record cannot silently drop it.
-            const resolve = (stored: unknown): T | string | null => {
-                const match = options.find(o => toValue(o) === stored)
-                if (match !== undefined) {
-                    return match
-                }
-                if (freeSolo && typeof stored === "string" && stored !== "") {
-                    return stored
-                }
-                return null
-            }
+            // Handed straight to Autocomplete rather than resolved into options first: deriving it
+            // would produce a new value on every render, and Autocomplete discards whatever is
+            // being typed whenever the identity of value changes.
             const selected = multiple
-                ? (Array.isArray(field.value) ? field.value.map(resolve).filter(v => v !== null) : [])
-                : resolve(field.value)
+                ? (Array.isArray(field.value) ? field.value : NOTHING_SELECTED)
+                : (field.value ?? null)
 
             return <Autocomplete<T, boolean, false, boolean>
                 multiple={multiple}
@@ -79,6 +83,10 @@ export function AutocompleteFormItem<T>({
                 // Chips only: turns typed text into a chip on blur. Left off for single-select,
                 // where it would commit whichever option the mouse last passed over.
                 autoSelect={!!(freeSolo && multiple)}
+                // Highlights the closest option as the user types, so Enter picks it. Kept off
+                // under freeSolo, where it would let a blur commit an option over typed text.
+                autoHighlight={!freeSolo}
+                filterSelectedOptions={filterSelectedOptions}
                 fullWidth={fullWidth ?? true}
                 size={size}
                 // minWidth lets it shrink below its content, so chips and long labels wrap
@@ -109,13 +117,15 @@ export function AutocompleteFormItem<T>({
                             : valueOf(newValue as T | string))
                     }
                 }}
-                onInputChange={freeSolo && !multiple
-                    ? (_, newInput, reason) => {
-                        if (reason === "input") {
-                            field.onChange(newInput)
-                        }
+                onInputChange={(_, newInput, reason) => {
+                    if (reason !== "input") {
+                        return
                     }
-                    : undefined}
+                    onInputChange?.(newInput)
+                    if (freeSolo && !multiple) {
+                        field.onChange(newInput)
+                    }
+                }}
                 onBlur={field.onBlur}
                 renderInput={(params) => (
                     <TextField

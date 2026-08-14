@@ -65,10 +65,6 @@ export function AuthForm({type, onSubmit}: AuthFormProps) {
                     <FormInput name={"confPassword"}
                                rules={{
                                    required: t("required_field"),
-                                   pattern: {
-                                       value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?])[A-Za-z\d@$!%*?]{4,}$/,
-                                       message: t("form.password_validation")
-                                   },
                                    validate: (value, formValues) => {
                                        const password = formValues.password
                                        if (password === value) {

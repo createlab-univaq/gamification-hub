@@ -131,7 +131,11 @@ export function ClassificationForm({gameId, classification}: ClassificationFormP
     return <Form form={form} onSubmit={(values) => mutate(values as ClassificationFormValues)} readonly={isPending}>
         <Stack sx={{gap: 3}}>
             <FormInput name={"name"} rules={{required: t("required_field")}}>
-                <TextField label={t("leaderboards.form.name")} required={true} fullWidth={true} type={"text"}
+                <TextField label={t("leaderboards.form.name")}
+                           required={true}
+                           fullWidth={true}
+                           autoFocus={true}
+                           type={"text"}
                            disabled={!!classification}/>
             </FormInput>
 
@@ -183,11 +187,12 @@ export function ClassificationForm({gameId, classification}: ClassificationFormP
 
             <Stack direction={"row"} sx={{justifyContent: "space-between", alignItems: "center"}}>
                 <ButtonIcon icon={<ArrowBack/>} href={`/games/${gameId}/classifications`}
-                        variant={"contained"}>{t("buttons:turn_back")}</ButtonIcon>
+                            variant={"contained"}>{t("buttons:turn_back")}</ButtonIcon>
                 <Stack direction={"row"} sx={{gap: 2}}>
                     <ButtonIcon type={"submit"} icon={<Save/>} variant={"contained"}>{t("buttons:save")}</ButtonIcon>
-                    <ButtonIcon type={"button"} icon={<RestartAlt/>} onClick={() => form.reset(toFormValues(classification))}
-                            variant={"outlined"}>{t("buttons:reset")}</ButtonIcon>
+                    <ButtonIcon type={"button"} icon={<RestartAlt/>}
+                                onClick={() => form.reset(toFormValues(classification))}
+                                variant={"outlined"}>{t("buttons:reset")}</ButtonIcon>
                 </Stack>
             </Stack>
         </Stack>

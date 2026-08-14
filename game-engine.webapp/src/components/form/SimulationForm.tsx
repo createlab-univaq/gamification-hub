@@ -2,8 +2,32 @@ import {useMutation, useQuery} from "@tanstack/react-query";
 import {badgeClient, challengeClient, pointConceptClient, scenarioClient, simulationClient} from "../../api";
 import {useNotificationContext} from "../../hooks/use-notification-context";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
-import {useFieldArray, useForm} from "react-hook-form";
-import {useEffect} from "react";
+import {useFieldArray, useForm, useWatch} from "react-hook-form";
+import {useEffect, useState} from "react";
+import {Add, ArrowBack, Delete, DoneAll, Error, ExpandMore, Games, PlayArrow, Save, Science} from "@mui/icons-material";
+import type {SimulationResultDto, SimulationScenarioDto} from "../../api/types";
+import {ChallengeCard} from "./ChallengeCard.tsx";
+import {Form} from "./Form.tsx";
+import {FormInput} from "./FormInput.tsx";
+import {SimulationFlowGraph} from "../simulation/SimulationFlowGraph.tsx";
+import {PageHeader} from "../layout/PageHeader.tsx";
+import {useTranslation} from "react-i18next";
+import {useGame} from "../../hooks/use-game.ts";
+import {Loading} from "../Loading.tsx";
+import {navigateTo} from "../../utils/navigation-utils.ts";
+import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
+import {toIsoDate} from "../../utils/date-utils.ts";
+import {ExpectationStatus} from "./ExpectationStatus.tsx";
+import {
+    allExpectationsPassed,
+    buildExpectedState,
+    buildRequest,
+    emptySimulationForm,
+    evaluateExpectations,
+    type ExpectationVerdicts,
+    type SimulationFormValues,
+    toFormValues
+} from "../../utils/simulation-utils.ts";
 import {
     Accordion,
     AccordionDetails,
@@ -15,211 +39,17 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import {Add, ArrowBack, Delete, ExpandMore, Games, PlayArrow, Save, Science} from "@mui/icons-material";
-import type {
-    PlayerStateDto,
-    SimulationRequestDto,
-    SimulationResultDto,
-    SimulationScenarioDto,
-    SyntheticStateDto
-} from "../../api/types";
-import {ChallengeCard} from "./ChallengeCard.tsx";
-import {parseValue} from "../../utils/builder-utils.ts";
-import {Form} from "./Form.tsx";
-import {FormInput} from "./FormInput.tsx";
-import {SimulationFlowGraph} from "../simulation/SimulationFlowGraph.tsx";
-import {PageHeader} from "../layout/PageHeader.tsx";
-import {useTranslation} from "react-i18next";
-import {useGame} from "../../hooks/use-game.ts";
-import {Loading} from "../Loading.tsx";
-import {navigateTo} from "../../utils/navigation-utils.ts";
-import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
-import {toDateTimeInput, toIsoDate} from "../../utils/date-utils.ts";
 
 interface SimulationFormProps {
     gameId: string
     scenario?: SimulationScenarioDto
 }
 
-type PointConceptRow = { name: string; score: string }
-type BadgeCollectionRow = { name: string; badges: string[] }
-type ChallengeRow = { name: string; modelName: string; state: string; fields: KVRow[] }
-
-type KVRow = { key: string; value: string }
-
-export type SimulationFormValues = {
-    name: string
-    executionMoment: string
-    actionIds: { value: string }[]
-    pointConcepts: PointConceptRow[]
-    badgeCollections: BadgeCollectionRow[]
-    challenges: ChallengeRow[]
-    customData: KVRow[]
-    data: KVRow[]
-    expectedPointConcepts: PointConceptRow[]
-    expectedBadgeCollections: BadgeCollectionRow[]
-    expectedChallenges: ChallengeRow[]
-}
-
-function matchExpectations(values: SimulationFormValues, finalState?: PlayerStateDto): boolean | null {
-    const pcs = values.expectedPointConcepts.filter(r => r.name)
-    const bcs = values.expectedBadgeCollections.filter(r => r.name)
-    const chs = values.expectedChallenges.filter(r => r.name)
-    if ((!pcs.length && !bcs.length && !chs.length) || !finalState) {
-        return null
-    }
-    for (const pc of pcs) {
-        const actual = finalState.pointConcepts?.find(a => a.name === pc.name)
-        if (!actual || (actual.score ?? 0) !== (parseFloat(pc.score) || 0)) {
-            return false
-        }
-    }
-    for (const bc of bcs) {
-        const actual = finalState.badgeCollections?.find(a => a.name === bc.name)
-        if (!actual) {
-            return false
-        }
-        const expectedBadges = (bc.badges ?? []).map(b => b.trim()).filter(Boolean)
-        if (!expectedBadges.every(b => actual.badges?.includes(b))) {
-            return false
-        }
-    }
-    for (const ch of chs) {
-        const actual = finalState.challenges?.find(a => a.name === ch.name)
-        if (!actual) {
-            return false
-        }
-        if (ch.modelName && actual.modelName !== ch.modelName) {
-            return false
-        }
-        if (ch.state && actual.state !== ch.state) {
-            return false
-        }
-        for (const f of ch.fields.filter(r => r.key)) {
-            if (actual.fields?.[f.key] !== parseValue(f.value)) {
-                return false
-            }
-        }
-    }
-    return true
-}
-
-function buildRequest(gameId: string, values: SimulationFormValues): SimulationRequestDto {
-    return {
-        gameId,
-        syntheticState: {
-            actionIds: values.actionIds.map(a => a.value).filter(Boolean),
-            pointConcepts: values.pointConcepts
-                .filter(pc => pc.name)
-                .map(pc => ({name: pc.name, score: parseFloat(pc.score) || 0})),
-            badgeCollections: values.badgeCollections
-                .filter(bc => bc.name)
-                .map(bc => ({
-                    name: bc.name,
-                    badges: (bc.badges ?? []).map(b => b.trim()).filter(Boolean)
-                })),
-            challenges: values.challenges
-                .filter(c => c.name)
-                .map(c => ({
-                    name: c.name,
-                    modelName: c.modelName || undefined,
-                    state: c.state || undefined,
-                    fields: c.fields.length
-                        ? Object.fromEntries(c.fields.filter(r => r.key).map(r => [r.key, parseValue(r.value)]))
-                        : undefined,
-                })),
-            customData: values.customData.length
-                ? Object.fromEntries(values.customData.filter(r => r.key).map(r => [r.key, parseValue(r.value)]))
-                : undefined,
-        },
-        data: values.data.length
-            ? Object.fromEntries(values.data.filter(r => r.key).map(r => [r.key, parseValue(r.value)]))
-            : undefined,
-        executionMoment: values.executionMoment ? toIsoDate(values.executionMoment) : undefined,
-        showDetailedChanges: true,
-    };
-}
-
-function buildExpectedState(values: SimulationFormValues): SyntheticStateDto {
-    return {
-        pointConcepts: values.expectedPointConcepts
-            .filter(pc => pc.name)
-            .map(pc => ({name: pc.name, score: parseFloat(pc.score) || 0})),
-        badgeCollections: values.expectedBadgeCollections
-            .filter(bc => bc.name)
-            .map(bc => ({
-                name: bc.name,
-                badges: (bc.badges ?? []).map(b => b.trim()).filter(Boolean)
-            })),
-        challenges: values.expectedChallenges
-            .filter(c => c.name)
-            .map(c => ({
-                name: c.name,
-                modelName: c.modelName || undefined,
-                state: c.state || undefined,
-                fields: c.fields.length
-                    ? Object.fromEntries(c.fields.filter(r => r.key).map(r => [r.key, parseValue(r.value)]))
-                    : undefined,
-            })),
-    };
-}
-
-function toFormValues(scenario: SimulationScenarioDto): SimulationFormValues {
-    const state = scenario.syntheticState ?? {}
-    const expected = scenario.expectedOutput ?? {}
-    return {
-        name: scenario.name ?? "",
-        executionMoment: scenario.executionMoment ? toDateTimeInput(scenario.executionMoment) : "",
-        actionIds: (state.actionIds ?? []).map(value => ({value})),
-        pointConcepts: (state.pointConcepts ?? []).map(pc => ({name: pc.name ?? "", score: String(pc.score ?? 0)})),
-        badgeCollections: (state.badgeCollections ?? []).map(bc => ({
-            name: bc.name ?? "",
-            badges: bc.badges ?? []
-        })),
-        challenges: (state.challenges ?? []).map(c => ({
-            name: c.name ?? "",
-            modelName: c.modelName ?? "",
-            state: c.state ?? "",
-            fields: Object.entries(c.fields ?? {}).map(([key, value]) => ({key, value: String(value)}))
-        })),
-        customData: Object.entries(state.customData ?? {}).map(([key, value]) => ({key, value: String(value)})),
-        data: [],
-        expectedPointConcepts: (expected.pointConcepts ?? []).map(pc => ({
-            name: pc.name ?? "",
-            score: String(pc.score ?? 0)
-        })),
-        expectedBadgeCollections: (expected.badgeCollections ?? []).map(bc => ({
-            name: bc.name ?? "",
-            badges: bc.badges ?? []
-        })),
-        expectedChallenges: (expected.challenges ?? []).map(c => ({
-            name: c.name ?? "",
-            modelName: c.modelName ?? "",
-            state: c.state ?? "",
-            fields: Object.entries(c.fields ?? {}).map(([key, value]) => ({key, value: String(value)}))
-        })),
-    }
-}
-
 export function SimulationForm({gameId, scenario}: SimulationFormProps) {
     const {setNotification} = useNotificationContext()
     const [t] = useTranslation()
     const game = useGame()
-    const form = useForm<SimulationFormValues>({
-        defaultValues: {
-            name: "",
-            executionMoment: "",
-            actionIds: [],
-            pointConcepts: [],
-            badgeCollections: [],
-            challenges: [],
-            customData: [],
-            data: [],
-            expectedPointConcepts: [],
-            expectedBadgeCollections: [],
-            expectedChallenges: [],
-        }
-    })
+    const form = useForm<SimulationFormValues>({defaultValues: emptySimulationForm()})
 
     const actions = useFieldArray({control: form.control, name: "actionIds"})
     const pointConcepts = useFieldArray({control: form.control, name: "pointConcepts"})
@@ -266,10 +96,14 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
     const {mutate, data: result, isPending, reset} = useMutation<SimulationResultDto, object, SimulationFormValues>({
         mutationFn: (values) => simulationClient.simulate(buildRequest(gameId, values)),
         onSuccess: (data, variables) => {
-            const testResult = matchExpectations(variables, data.finalState)
-            if (testResult === null) {
+            // Captured from the values that were actually submitted, so the icons keep reporting the
+            // run that produced them even if the expectations are edited afterwards.
+            const evaluated = evaluateExpectations(variables, data.finalState)
+            setVerdicts(evaluated)
+            if (evaluated === null) {
                 return
             }
+            const testResult = allExpectationsPassed(evaluated)
             setNotification({
                 notification: {
                     type: testResult ? "success" : "error",
@@ -285,6 +119,15 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
         }
     })
 
+    const [verdicts, setVerdicts] = useState<ExpectationVerdicts | null>(null)
+    const simulationPassed = verdicts ? allExpectationsPassed(verdicts) : undefined
+
+    // The stored verdicts are keyed by the name that was tested, so these follow renames: rename a
+    // row and it simply has no verdict until the next run, rather than inheriting another row's.
+    const expectedPointConceptRows = useWatch({control: form.control, name: "expectedPointConcepts"})
+    const expectedBadgeRows = useWatch({control: form.control, name: "expectedBadgeCollections"})
+    const expectedChallengeRows = useWatch({control: form.control, name: "expectedChallenges"})
+
     const {mutate: saveScenario, isPending: isSaving} = useMutation({
         mutationFn: (values: SimulationFormValues) => {
             const payload: SimulationScenarioDto = {
@@ -298,9 +141,9 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                 : scenarioClient.createScenario(gameId, payload)
         },
         onSuccess: (data) => {
-            if(!scenario) {
+            if (!scenario) {
                 navigateTo(`/games/${gameId}/scenarios/upsert/${data.id}`, {
-                    state:{
+                    state: {
                         type: "success",
                         title: t("scenarios.form.save.title"),
                         content: t("scenarios.form.save.message", {name: data.name})
@@ -335,14 +178,17 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
         }}>
             <PageHeader
                 title={
-                    <Stack direction={"row"} sx={{gap:2}}>
-                        <FormInput name={"name"} rules={{required:t("required_field")}}>
-                            <TextField label={t("name")} placeholder={t("scenarios.form.name_placeholder")} required={true}/>
-                        </FormInput>
-                        <FormInput name={"executionMoment"}>
-                            <TextField type={"datetime-local"} label={t("scenarios.form.execution_moment")}
-                                       slotProps={{inputLabel: {shrink: true}}}/>
-                        </FormInput>
+                    <Stack>
+                        <Stack direction={"row"} sx={{gap: 2}}>
+                            <FormInput name={"name"} rules={{required: t("required_field")}}>
+                                <TextField label={t("name")} placeholder={t("scenarios.form.name_placeholder")}
+                                           required={true}/>
+                            </FormInput>
+                            <FormInput name={"executionMoment"}>
+                                <TextField type={"datetime-local"} label={t("scenarios.form.execution_moment")}
+                                           slotProps={{inputLabel: {shrink: true}}}/>
+                            </FormInput>
+                        </Stack>
                     </Stack>
                 }
                 buttons={[
@@ -406,14 +252,15 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                         flex: 1,
                         minWidth: 0,
                         maxWidth: {
-                            lg:"35%",
-                            md:"35%"
+                            lg: "35%",
+                            md: "35%"
                         }
                     }}
                 >
                     <Accordion sx={{borderRadius: 0}} defaultExpanded={true}>
                         <AccordionSummary expandIcon={<ExpandMore/>}>
-                            <Typography sx={{fontWeight: 600}}>{t("scenarios.form.inputs.title")}</Typography>
+                            <Typography sx={{fontWeight: 600}}>{t("scenarios.form.inputs.title")}
+                            </Typography>
                         </AccordionSummary>
                         <Stack sx={{flex: 1, minWidth: 0}}>
                             {/* Actions */}
@@ -609,7 +456,13 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                     </Accordion>
                     <Accordion>
                         <AccordionSummary expandIcon={<ExpandMore/>}>
-                            <Typography sx={{fontWeight: 600}}>{t("scenarios.form.outputs.title")}</Typography>
+                            <Stack direction="row" sx={{gap: 1}}>
+                                <Typography sx={{fontWeight: 600}}>{t("scenarios.form.outputs.title")}</Typography>
+                                {simulationPassed != undefined ? simulationPassed ?
+                                    <DoneAll color={"success"} titleAccess={t("scenarios.form.test.success.detail")}/> :
+                                    <Error color={"error"}
+                                           titleAccess={t("scenarios.form.test.error.detail")}/> : <></>}
+                            </Stack>
                         </AccordionSummary>
                         <Stack sx={{flex: 1, minWidth: 0}}>
                             {/* Expected Point Concepts */}
@@ -620,8 +473,10 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Stack sx={{gap: 1}}>
-                                        {expectedPointConcepts.fields.map((field, i) => (
-                                            <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
+                                        {expectedPointConcepts.fields.map((field, i) => {
+                                            const verdict = verdicts?.pointConcepts[expectedPointConceptRows?.[i]?.name]
+                                            return <Stack key={field.id} direction="row"
+                                                          sx={{gap: 1, alignItems: "center"}}>
                                                 <AutocompleteFormItem
                                                     name={`expectedPointConcepts.${i}.name`}
                                                     placeholder="Name"
@@ -633,15 +488,20 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                                     size="small"
                                                     sx={{flex: 2}}/>
                                                 <TextField size="small" placeholder="Score" type="number"
-                                                           slotProps={{htmlInput: {step: "any"}}}
+                                                           slotProps={{
+                                                               htmlInput: {
+                                                                   step: "any"
+                                                               }
+                                                           }}
                                                            sx={{flex: 1}}
                                                            {...form.register(`expectedPointConcepts.${i}.score`)}/>
+                                                <ExpectationStatus verdict={verdict}/>
                                                 <IconButton size="small" color="error"
                                                             onClick={() => expectedPointConcepts.remove(i)}>
                                                     <Delete fontSize="small"/>
                                                 </IconButton>
                                             </Stack>
-                                        ))}
+                                        })}
                                         <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                                                 onClick={() => expectedPointConcepts.append({name: "", score: "0"})}>
                                             {t("buttons:scenarios.add_point_concept")}
@@ -657,8 +517,10 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Stack sx={{gap: 1}}>
-                                        {expectedBadgeCollections.fields.map((field, i) => (
-                                            <Stack key={field.id} direction="row" sx={{gap: 1, alignItems: "center"}}>
+                                        {expectedBadgeCollections.fields.map((field, i) => {
+                                            const verdict = verdicts?.badgeCollections[expectedBadgeRows?.[i]?.name]
+                                            return <Stack key={field.id} direction="row"
+                                                          sx={{gap: 1, alignItems: "center"}}>
                                                 <AutocompleteFormItem
                                                     name={`expectedBadgeCollections.${i}.name`}
                                                     placeholder="Name"
@@ -679,12 +541,13 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                                     freeSolo={true}
                                                     size="small"
                                                     sx={{flex: 2}}/>
+                                                <ExpectationStatus verdict={verdict}/>
                                                 <IconButton size="small" color="error"
                                                             onClick={() => expectedBadgeCollections.remove(i)}>
                                                     <Delete fontSize="small"/>
                                                 </IconButton>
                                             </Stack>
-                                        ))}
+                                        })}
                                         <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                                                 onClick={() => expectedBadgeCollections.append({name: "", badges: []})}>
                                             {t("buttons:scenarios.add_badge_collection")}
@@ -700,14 +563,17 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Stack sx={{gap: 2}}>
-                                        {expectedChallenges.fields.map((field, i) => (
-                                            <ChallengeCard key={field.id} index={i} namePrefix="expectedChallenges"
-                                                           control={form.control}
-                                                           register={form.register}
-                                                           challengeModels={challengeModels}
-                                                           challengeModelsLoading={challengeModelsLoading}
-                                                           onRemove={() => expectedChallenges.remove(i)}/>
-                                        ))}
+                                        {expectedChallenges.fields.map((field, i) => {
+                                            const verdict = verdicts?.challenges[expectedChallengeRows?.[i]?.name]
+                                            return <ChallengeCard key={field.id} index={i}
+                                                                  namePrefix="expectedChallenges"
+                                                                  control={form.control}
+                                                                  register={form.register}
+                                                                  challengeModels={challengeModels}
+                                                                  challengeModelsLoading={challengeModelsLoading}
+                                                                  verdict={verdict}
+                                                                  onRemove={() => expectedChallenges.remove(i)}/>
+                                        })}
                                         <Button size="small" endIcon={<Add/>} sx={{alignSelf: "flex-start"}}
                                                 onClick={() => expectedChallenges.append({
                                                     name: "", modelName: "", state: "", fields: []
@@ -740,7 +606,10 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                         {result.firedRules?.length === 0
                             ?
                             <Typography color="text.secondary">{t("scenarios.form.outputs.no_rules_fired")}</Typography>
-                            : <SimulationFlowGraph simulationResult={result}/>
+                            :
+                            <Stack>
+                                <SimulationFlowGraph simulationResult={result} passed={simulationPassed}/>
+                            </Stack>
                         }
                     </>}
                 </Stack>

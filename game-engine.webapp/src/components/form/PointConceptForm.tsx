@@ -99,8 +99,8 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
                 identifier: row.identifier,
                 start: fromDateInput(row.start)!,
                 end: fromDateInput(row.end),
-                period: row.periodDays ? row.periodDays * DAY_MS : undefined,
-                capacity: row.capacity
+                period: Number(row.periodDays) * DAY_MS,
+                capacity: Number(row.capacity)
             }
         })
         const pc: PointConceptDto = {
@@ -129,7 +129,7 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
                         required: t("required_field")
                     }}
                 >
-                    <TextField required={true} type={"text"} fullWidth={true} label={t("name")}/>
+                    <TextField required={true} autoFocus={true} type={"text"} fullWidth={true} label={t("name")}/>
                 </FormInput>
             </Stack>
             <Stack sx={{gap: 1}}>
@@ -166,15 +166,20 @@ export function PointConceptForm({pointConcept, gameId}: PointConceptFormProps) 
                                 <Stack direction={"row"} sx={{gap: 2, width: "100%"}}>
                                     <FormInput
                                         name={`periods.${i}.periodDays`}
-                                        rules={{min: 0}}
+                                        rules={{
+                                            required: t("required_field"),
+                                            validate: (value) => Number(value) > 0
+                                                || t("points.form.period_days_positive")
+                                        }}
                                     >
                                         <TextField label={t("points.form.period_days")} type={"number"}
                                                    fullWidth={true}
-                                                   slotProps={{htmlInput: {min: 0}}}/>
+                                                   required={true}
+                                                   slotProps={{htmlInput: {min: 1}}}/>
                                     </FormInput>
                                     <FormInput
                                         name={`periods.${i}.capacity`}
-                                        rules={{min: 0}}
+                                        rules={{min: {value: 0, message: t("points.form.capacity_min")}}}
                                     >
                                         <TextField label={t("points.form.capacity")} type={"number"}
                                                    fullWidth={true}

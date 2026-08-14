@@ -31,7 +31,7 @@
   },
   "form": {
     "labels": {
-      "challenge_select":"Challenge model",
+      "challenge_select": "Challenge model",
       "instance_name": "Instance name",
       "end_before_start": "The end must come after the start",
       "initial_state": "Initial state",
@@ -116,7 +116,7 @@
       "title": "Game saved!",
       "message": "Game \"{{name}}\" has been saved successfully"
     },
-    "deleted":{
+    "deleted": {
       "title": "Game deleted!",
       "message": "The game has been deleted successfully"
     }
@@ -167,7 +167,7 @@
   "console": {
     "saving": "Saving rule...",
     "validation": {
-      "start":"Validating rule...",
+      "start": "Validating rule...",
       "title": "Rule validation complete",
       "success": "Validation completed successfully. No errors found",
       "warning": "Rule compiled with warnings"
@@ -257,6 +257,21 @@
           "end": "Final State",
           "caused_by": "Caused by {{rule}}",
           "changes": "{{count}} changes"
+        }
+      },
+      "test": {
+        "success": {
+          "title": "Simulation terminated successfully.",
+          "detail": "Every expected value matched the simulation.",
+          "hint": "Matched: {{expected}}"
+        },
+        "error": {
+          "title": "Simulation has failed. Check your expected values to see which one doesn't match.",
+          "detail": "One or more expected values did not match.",
+          "hint": "Expected {{expected}}, the simulation produced {{actual}}"
+        },
+        "missing": {
+          "hint": "Nothing by this name came back from the simulation."
         }
       }
     }
@@ -358,8 +373,8 @@
       }
     },
     "inventories": {
-      "title":"Inventory",
-      "available_choices": "Available activations: {{count}}" ,
+      "title": "Inventory",
+      "available_choices": "Available activations: {{count}}",
       "choices": {
         "empty_list": "No choice found",
         "forced": {
@@ -469,8 +484,8 @@
     },
     "details": {
       "validity": "Validity",
-      "duration": "Duration",
-      "kept_instances": "Kept instances",
+      "duration": "Window length",
+      "kept_instances": "Kept windows",
       "no_periods": "No period defined."
     },
     "periods": {
@@ -484,20 +499,22 @@
     "form": {
       "title": "Save point concept",
       "periods_title": "Periods",
-      "periods_hint": "Define the score calculation periods (e.g. weekly, monthly).",
+      "periods_hint": "A period repeats a fixed window inside a validity span. Start and End bound the span, and leaving End empty keeps it open.",
       "period_name": "Period name",
       "start": "Start",
       "end": "End",
-      "period_days": "Period (days)",
-      "capacity": "Capacity",
+      "period_days": "Window length (days)",
+      "period_days_positive": "A window must last more than zero days.",
+      "capacity": "Kept windows",
+      "capacity_min": "Kept windows cannot be negative.",
       "add_period": "Add period"
     }
   },
-  "error_page":{
+  "error_page": {
     "title": "How did we get here?",
     "message": "Seems like the page you are trying to access doesn't exist!"
   },
-  "import":{
+  "import": {
     "modal": {
       "title": "Import Games",
       "errors": "One or more files could not be parsed to JSON",

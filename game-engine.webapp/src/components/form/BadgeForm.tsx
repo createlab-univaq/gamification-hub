@@ -89,7 +89,7 @@ export function BadgeForm({gameId, badge}: BadgeFormProps) {
                 name={"name"}
                 rules={{required: t("required_field")}}
             >
-                <TextField required={true} type={"text"} fullWidth={true} label={t("badges.form.collection_name")}/>
+                <TextField required={true} autoFocus={true} type={"text"} fullWidth={true} label={t("badges.form.collection_name")}/>
             </FormInput>
 
             <FormControlLabel

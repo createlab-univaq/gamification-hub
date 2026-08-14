@@ -78,7 +78,7 @@ export function ActionForm({action, gameId}: ActionFormProps) {
                     required: t("required_field")
                 }}
             >
-                <TextField required={true} type={"text"} fullWidth={true} label={t("name")}/>
+                <TextField required={true} autoFocus={true} type={"text"} fullWidth={true} label={t("name")}/>
             </FormInput>
             <Stack direction={"row"}
                    sx={{

@@ -88,7 +88,7 @@ export function GameForm({game}: GameFormProps) {
                                required: t("required_field")
                            }}
                 >
-                    <TextField type={"text"} label={t("name")} placeholder={"Half life 3"} fullWidth={true}/>
+                    <TextField type={"text"} label={t("name")} placeholder={"Half life 3"} fullWidth={true} autoFocus={true}/>
                 </FormInput>
                 <FormInput name={"domain"}
                            rules={{
