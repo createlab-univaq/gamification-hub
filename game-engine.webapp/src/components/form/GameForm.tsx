@@ -2,7 +2,7 @@ import type {GameDto} from "../../api/types";
 import type {FieldValues} from "react-hook-form";
 import {useForm} from "react-hook-form";
 import {useMutation} from "@tanstack/react-query";
-import {gameClient} from "../../api";
+import {gameClient, queryClient} from "../../api";
 import {getApiError, translateApiErrorToNotification} from "../../utils/error-utils.ts";
 import {useEffect} from "react";
 import {Form} from "./Form.tsx";
@@ -15,6 +15,7 @@ import {useNotificationContext} from "../../hooks/use-notification-context";
 import {GAME_STORAGE_KEY} from "../../utils/storage-utils.ts";
 import {FormCheckbox} from "./FormCheckbox.tsx";
 import {useTranslation} from "react-i18next";
+import {gameQueryKey} from "../GameContext.tsx";
 
 export interface GameFormProps {
     game?: GameDto
@@ -46,6 +47,7 @@ export function GameForm({game}: GameFormProps) {
         onSuccess: (data) => {
             // Remove cached game
             localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify({}))
+            queryClient.invalidateQueries({queryKey: gameQueryKey(data.id)})
             navigateTo(game ? `/games/${data.id}` : "/dashboard", {
                 state: {
                     type: "success",
