@@ -139,7 +139,8 @@ export function ClassificationListPage() {
                     </Button>
                 </Stack>
             }}
-            onItemUpdate={() => {
+            onItemUpdate={(item) => {
+                navigateTo(`/games/${game.id}/classifications/upsert/${item.id}`)
             }}
             onItemDelete={(classification) => {
                 setDeleteClassification(classification)

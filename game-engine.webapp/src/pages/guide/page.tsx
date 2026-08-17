@@ -173,7 +173,9 @@ export function GuidePage() {
                         <ButtonIcon
                             icon={<Login/>}
                             variant={"contained"}
-                            href={user ? "/dashboard" : "/"}
+                            onClick={()=>{
+                                navigation.back()
+                            }}
                         >
                             {t("buttons:turn_back")}
                         </ButtonIcon>

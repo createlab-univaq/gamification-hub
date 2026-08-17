@@ -64,6 +64,8 @@
 
   "action_creation": "Impossibile creare l'azione. Potrebbe già esistere.",
   "action_creation_title": "Creazione fallita!",
+  "action_name_reserved": "I nomi di azione che iniziano con \"{{0}}\" sono riservati agli eventi interni del motore. Scegli un nome diverso.",
+  "action_name_reserved_title": "Nome riservato!",
 
   "point_concept_creation": "Impossibile creare il punteggio.",
   "point_concept_creation_title": "Creazione fallita!",
