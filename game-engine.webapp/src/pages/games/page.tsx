@@ -97,8 +97,8 @@ export function GamePage() {
                 <Stack direction={"row"} sx={{alignItems: "center", gap: 2}}>
                     <Typography variant={"h4"}>{game.name}</Typography>
                     <StatusDot size={"1.5rem"}
-                               title={!game.terminated ? t("game.is_expired_label") : t("game.is_not_expired_label")}
-                               type={game.terminated ? "success" : "error"}/>
+                               title={game.terminated ? t("game.is_expired_label") : t("game.is_not_expired_label")}
+                               type={!game.terminated ? "success" : "error"}/>
                 </Stack>
             }
             breadcrumbs={[
