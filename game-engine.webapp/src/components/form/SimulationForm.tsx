@@ -18,6 +18,8 @@ import {navigateTo} from "../../utils/navigation-utils.ts";
 import {AutocompleteFormItem} from "./AutocompleteFormItem.tsx";
 import {toIsoDate} from "../../utils/date-utils.ts";
 import {ExpectationStatus} from "./ExpectationStatus.tsx";
+import {useUnsavedChangesGuard} from "../../hooks/use-unsaved-changes-guard.ts";
+import {ConfirmDialog} from "../ConfirmDialog.tsx";
 import {
     allExpectationsPassed,
     buildExpectedState,
@@ -50,6 +52,9 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
     const [t] = useTranslation()
     const game = useGame()
     const form = useForm<SimulationFormValues>({defaultValues: emptySimulationForm()})
+    // react-hook-form measures this against the values the form was last reset to, which is the
+    // loaded scenario and then whatever was last saved.
+    const guard = useUnsavedChangesGuard(form.formState.isDirty)
 
     const actions = useFieldArray({control: form.control, name: "actionIds"})
     const pointConcepts = useFieldArray({control: form.control, name: "pointConcepts"})
@@ -142,6 +147,8 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
         },
         onSuccess: (data) => {
             if (!scenario) {
+                // The form still counts as dirty here, so let its own redirect through.
+                guard.allowNextNavigation()
                 navigateTo(`/games/${gameId}/scenarios/upsert/${data.id}`, {
                     state: {
                         type: "success",
@@ -151,6 +158,8 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
                 })
                 return
             }
+            // Keep the values but treat them as the saved baseline, so the guard stops firing.
+            form.reset(form.getValues())
             setNotification({
                 notification: {
                     type: "success",
@@ -176,6 +185,12 @@ export function SimulationForm({gameId, scenario}: SimulationFormProps) {
         <Form form={form} onSubmit={(v) => {
             mutate(v as SimulationFormValues)
         }}>
+            <ConfirmDialog
+                open={guard.isBlocked}
+                setOpen={(open) => !open && guard.cancelLeave()}
+                onConfirm={guard.confirmLeave}
+                message={t("scenarios.form.unsaved_changes")}
+            />
             <PageHeader
                 title={
                     <Stack>

@@ -130,7 +130,8 @@
     "reads": "Reads",
     "writes": "Writes",
     "save_title": "Rule saved",
-    "save_message": "Rule \"{{name}}\" saved succesfully"
+    "save_message": "Rule \"{{name}}\" saved succesfully",
+    "unsaved_changes": "This rule has changes that have not been saved yet. If you leave now they will be lost."
   },
   "actions": {
     "list_title": "Actions",
@@ -226,6 +227,7 @@
     },
     "form": {
       "name_placeholder": "My simulation",
+      "unsaved_changes": "This scenario has changes that have not been saved yet. If you leave now they will be lost.",
       "execution_moment": "Execution moment (defaults to now)",
       "save": {
         "title": "Scenario saved",
@@ -524,5 +526,8 @@
       "title": "Import complete!",
       "message": "{{number}} games were successfully saved."
     }
+  },
+  "navigation": {
+    "message": "If you leave now you might loose all of your progress. Make sure to save before."
   }
 }

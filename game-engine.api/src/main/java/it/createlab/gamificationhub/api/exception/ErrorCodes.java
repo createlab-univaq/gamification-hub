@@ -38,6 +38,7 @@ public final class ErrorCodes {
     // Creation / already exists
     public static final String GAME_CREATION = "game_creation";
     public static final String ACTION_CREATION = "action_creation";
+    public static final String ACTION_NAME_RESERVED = "action_name_reserved";
     public static final String POINT_CONCEPT_CREATION = "point_concept_creation";
     public static final String BADGE_CREATION = "badge_creation";
     public static final String CHALLENGE_CREATION = "challenge_creation";

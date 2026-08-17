@@ -64,6 +64,8 @@
 
   "action_creation": "The action could not be created. It may already exist.",
   "action_creation_title": "Creation failed!",
+  "action_name_reserved": "Action names starting with \"{{0}}\" are reserved for the engine's own events. Please choose a different name.",
+  "action_name_reserved_title": "Reserved name!",
 
   "point_concept_creation": "The point concept could not be created.",
   "point_concept_creation_title": "Creation failed!",

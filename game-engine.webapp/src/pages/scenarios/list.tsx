@@ -16,6 +16,7 @@ import {useDebounced} from "../../hooks/use-debounced.ts";
 import type {SimulationScenarioDto} from "../../api/types";
 import type {GetFilter} from "../../api/filters/filters.ts";
 import {useTranslation} from "react-i18next";
+import {navigateTo} from "../../utils/navigation-utils.ts";
 
 export function ScenarioListPage() {
     const game = useGame()
@@ -101,7 +102,8 @@ export function ScenarioListPage() {
                     <Typography sx={{fontWeight: "bold", fontSize: "1.2rem"}}>{scenario.name}</Typography>
                 </Stack>
             )}
-            onItemUpdate={() => {
+            onItemUpdate={(item) => {
+                navigateTo(`/games/${game.id}/scenarios/upsert/${item.id}`)
             }}
             onItemDelete={(scenario) => setDeleteScenario(scenario)}
             emptyListMessage={<Typography>{t("scenarios.empty_list")}</Typography>}

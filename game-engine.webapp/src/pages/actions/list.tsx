@@ -16,6 +16,7 @@ import type {GetFilter} from "../../api/filters/filters.ts";
 import {useTranslation} from "react-i18next";
 import {useGame} from "../../hooks/use-game";
 import {useNotificationContext} from "../../hooks/use-notification-context.ts";
+import {navigateTo} from "../../utils/navigation-utils.ts";
 
 type DeleteActionType = {
     gameId: string;
@@ -110,7 +111,10 @@ export function ActionListPage() {
             renderItem={(action) => {
                 return <Typography variant={"h5"}>{action.name}</Typography>
             }}
-            onItemUpdate={() => {
+            onItemUpdate={(item, event) => {
+                event.stopPropagation()
+                event.preventDefault()
+                navigateTo(`/games/${game.id}/actions/upsert/${item.name}`)
             }}
             onItemDelete={(action) => {
                 setDeleteAction(action.name)

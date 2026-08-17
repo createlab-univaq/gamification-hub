@@ -18,7 +18,6 @@ export function BlocklyRuleUpsertPage() {
         retry: false
     })
 
-
     if (isError) {
         const notification = translateApiErrorToNotification(getApiError(error))
         return <Navigate to={`/games/${game.id}/rules`} replace={true} state={notification}/>

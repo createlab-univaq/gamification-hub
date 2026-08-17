@@ -130,7 +130,8 @@
     "reads": "Legge",
     "writes": "Scrive",
     "save_title": "Regola salvata",
-    "save_message": "Regola \"{{name}}\" salvata con successo"
+    "save_message": "Regola \"{{name}}\" salvata con successo",
+    "unsaved_changes": "Questa regola ha modifiche non ancora salvate. Se esci ora andranno perse."
   },
   "actions": {
     "list_title": "Azioni",
@@ -226,6 +227,7 @@
     },
     "form": {
       "name_placeholder": "La mia simulazione",
+      "unsaved_changes": "Questo scenario ha modifiche non ancora salvate. Se esci ora andranno perse.",
       "execution_moment": "Momento di esecuzione (default: adesso)",
       "save": {
         "title": "Scenario salvato!",
@@ -524,5 +526,8 @@
       "title": "Importazione completata!",
       "message": "{{number}} giochi salvati correttamente"
     }
+  },
+  "navigation": {
+    "message": "Se esci dalla pagina perderai tutti i tuoi progressi. Salva prima di uscire."
   }
 }

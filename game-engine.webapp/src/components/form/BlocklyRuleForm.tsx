@@ -28,6 +28,8 @@ import {useTranslation} from "react-i18next";
 import type {Abstract} from "blockly/core/events/events_abstract";
 import {useNotificationContext} from "../../hooks/use-notification-context.ts";
 import {useGame} from "../../hooks/use-game.ts";
+import {useUnsavedChangesGuard} from "../../hooks/use-unsaved-changes-guard.ts";
+import {ConfirmDialog} from "../ConfirmDialog.tsx";
 
 interface BlocklyRuleFormProps {
     rule?: RuleDto
@@ -46,6 +48,9 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
     const [consoleActive, setConsoleActive] = useState(false)
     const [ruleName, setRuleName] = useState(rule?.name ?? "")
     const [t] = useTranslation()
+    const compact = (content?: string) => (content ?? "").replace(/\s+/g, " ").trim()
+    const isDirty = compact(drl) !== compact(rule?.content) || ruleName !== (rule?.name ?? "")
+    const guard = useUnsavedChangesGuard(isDirty)
 
     const {mutate: upsertRuleMutate, isPending: upsertRulePending} = useMutation<RuleDto, Error, RuleDto>({
         mutationFn: (request) => {
@@ -60,14 +65,25 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
             return ruleClient.addRule(request)
         },
         onSuccess: (data) => {
+            const savedNotification = {
+                type: "success" as const,
+                title: t("rules.save_title"),
+                content: t("rules.save_message", {name: data.name})
+            }
+            // A new rule has to move to its own edit route so later saves update it instead of adding
+            // another copy. The editor still looks unsaved at this point, so let that one through.
+            if (!rule?.id && data.id) {
+                guard.allowNextNavigation()
+                navigateTo(`/games/${gameId}/rules/upsert/${data.id}`, {
+                    replace: true,
+                    state: savedNotification
+                })
+                return
+            }
+            // Otherwise stay in the editor and refetch: the reloaded rule becomes what the unsaved
+            // guard compares against, so saving clears it without any extra bookkeeping.
             queryClient.invalidateQueries({queryKey: ["get-rule", rule?.id]})
-            navigateTo(`/games/${gameId}/rules`, {
-                state: {
-                    type: "success",
-                    title: t("rules.save_title"),
-                    content: t("rules.save_message", {name: data.name})
-                }
-            })
+            setNotification({notification: savedNotification, isSnack: true})
         },
         onError: handleErrors,
         mutationKey: ["save-rule", rule?.id]
@@ -208,6 +224,12 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
 
     return (
         <PageContainer>
+            <ConfirmDialog
+                open={guard.isBlocked}
+                setOpen={(open) => !open && guard.cancelLeave()}
+                onConfirm={guard.confirmLeave}
+                message={t("rules.unsaved_changes")}
+            />
             {upsertRulePending && <Loading fullScreen={true}/>}
             <PageHeader
                 title={

@@ -124,7 +124,7 @@ export function LevelForm({level, gameId}: LevelFormProps) {
                     required: t("required_field")
                 }}
             >
-                <TextField label={t("name")} required={true} fullWidth={true} type={"text"} autoFocus={true}/>
+                <TextField label={t("name")} required={true} fullWidth={true} type={"text"} autoFocus={true} disabled={!!level}/>
             </FormInput>
             <AutocompleteFormItem
                 name={"pointConceptName"}
