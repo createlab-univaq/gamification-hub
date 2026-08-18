@@ -84,6 +84,11 @@ export function BlocklyRuleForm({rule, gameId}: BlocklyRuleFormProps) {
             // guard compares against, so saving clears it without any extra bookkeeping.
             queryClient.invalidateQueries({queryKey: ["get-rule", rule?.id]})
             setNotification({notification: savedNotification, isSnack: true})
+            pushMessage([{
+                time: new Date(),
+                type: "info",
+                content: t("console.saved")
+            }])
         },
         onError: handleErrors,
         mutationKey: ["save-rule", rule?.id]

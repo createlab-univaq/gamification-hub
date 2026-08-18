@@ -38,7 +38,9 @@ export function droolsFileToBlocklyState(file: DroolsFile): object {
                         RULE_NAME: rule.name,
                         SALIENCE: rule.salience ?? 0,
                         AGENDA_GROUP: rule.agendaGroup ?? '',
+                        RULEFLOW_GROUP: rule.ruleFlowGroup ?? '',
                         NO_LOOP: rule.noLoop ? 'TRUE' : 'FALSE',
+                        ACTIVE_ON_LOCK: rule.lockOnActive ? 'TRUE' : 'FALSE',
                     },
                     inputs: {
                         ...chainInputKey('WHEN', rule.conditions, conditionToBlock),

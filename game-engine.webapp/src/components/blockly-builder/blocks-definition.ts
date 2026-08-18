@@ -114,10 +114,11 @@ const BLOCK_DEFS = [
         type: 'drool_rule',
         message0: 'rule %1',
         args0: [{type: 'field_input', name: 'RULE_NAME'}],
-        message1: '\nsalience %1 \n agenda-group %2 \n no-loop %3 \n lock-on-active %4',
+        message1: '\nsalience %1 \n agenda-group %2 \n ruleflow-group %3 \n no-loop %4 \n lock-on-active %5',
         args1: [
             {type: 'field_number', name: 'SALIENCE', value: 0, precision: 1},
             {type: 'field_input', name: 'AGENDA_GROUP', text: ''},
+            {type: 'field_input', name: 'RULEFLOW_GROUP', text: ''},
             {type: 'field_checkbox', name: 'NO_LOOP', checked: false},
             {type: 'field_checkbox', name: 'ACTIVE_ON_LOCK', checked: false}
         ],

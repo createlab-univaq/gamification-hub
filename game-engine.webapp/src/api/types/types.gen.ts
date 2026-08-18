@@ -407,8 +407,8 @@ export type LoginResponseDto = {
 };
 
 export type PagePlayerSummaryDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<PlayerSummaryDto>;
     number?: number;
@@ -503,8 +503,8 @@ export type ClassificationPositionDto = {
 };
 
 export type PageClassificationPositionDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<ClassificationPositionDto>;
     number?: number;

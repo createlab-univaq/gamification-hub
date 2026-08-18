@@ -59,9 +59,16 @@
     "guide": "Guide"
   },
   "guide": {
-    "back_to_app": "Back to app",
+    "exit": "Exit",
     "load_error": "Could not load the guide. Please try again later.",
-    "sections": "Sections"
+    "sections": "Sections",
+    "previous": "Previous",
+    "next": "Next",
+    "chapters": {
+      "console": "The Console",
+      "api": "The API",
+      "builder": "The rule builder"
+    }
   },
   "landing": {
     "hero": {
@@ -167,6 +174,7 @@
   },
   "console": {
     "saving": "Saving rule...",
+    "saved": "Rule saved successfully!",
     "validation": {
       "start": "Validating rule...",
       "title": "Rule validation complete",
@@ -526,8 +534,5 @@
       "title": "Import complete!",
       "message": "{{number}} games were successfully saved."
     }
-  },
-  "navigation": {
-    "message": "If you leave now you might loose all of your progress. Make sure to save before."
   }
 }
