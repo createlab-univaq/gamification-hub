@@ -60,6 +60,9 @@
   },
   "guide": {
     "exit": "Exit",
+    "search": "Search the guide",
+    "no_results": "Nothing found",
+    "copied": "Copied",
     "load_error": "Could not load the guide. Please try again later.",
     "sections": "Sections",
     "previous": "Previous",

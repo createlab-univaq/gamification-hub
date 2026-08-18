@@ -13,7 +13,8 @@ function languageFor(slug: string, uiLanguage: string): Language {
     return (available.includes(uiLanguage) ? uiLanguage : "en") as Language
 }
 
-function chapterQuery(slug: string, uiLanguage: string) {
+/** Shared so every reader of a chapter hits the same cache entry, whatever it does with the text. */
+export function chapterQuery(slug: string, uiLanguage: string) {
     const language = languageFor(slug, uiLanguage)
     return {
         queryKey: ["guide-chapter", slug, language],

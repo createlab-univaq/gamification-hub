@@ -1,11 +1,27 @@
 import type {Theme} from "@mui/material";
-import {Box, Collapse, Divider, Drawer, List, ListItemButton, ListItemIcon, ListItemText, Stack} from "@mui/material";
-import {Close, ExpandLess, ExpandMore} from "@mui/icons-material";
+import {
+    Box,
+    Collapse,
+    Divider,
+    Drawer,
+    IconButton,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Stack,
+    TextField,
+    Typography
+} from "@mui/material";
+import {Close, ExpandLess, ExpandMore, Search} from "@mui/icons-material";
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Link} from "react-router-dom";
 import type {GuideChapter} from "../../utils/guide-utils.ts";
-import {guideChapterPath, guideSectionPath} from "../../utils/guide-utils.ts";
+import {alpha} from "@mui/material/styles";
+import {guideChapterPath, guideSectionPath, MIN_SEARCH_LENGTH, splitHighlights} from "../../utils/guide-utils.ts";
+import {useDebounced} from "../../hooks/use-debounced.ts";
+import {useGuideSearch} from "../../hooks/use-guide-search.ts";
 import {getCurrentUser} from "../../utils/auth-utils.ts";
 import {AppIcon} from "../logo/AppIcon.tsx";
 import {AppLogo} from "../logo/AppLogo.tsx";
@@ -46,6 +62,20 @@ const CHAPTER_PART_SX = {
     flex: 1
 }
 
+// Marks the words that were searched for, so a result shows why it came up rather than only where.
+function Highlighted({text, query}: { text: string, query: string }) {
+    return <>
+        {splitHighlights(text, query).map((segment, index) => segment.match
+            ? <Box key={index} component={"mark"} sx={{
+                backgroundColor: (theme: Theme) => alpha(theme.palette.primary.dark, 0.5),
+                color: "primary.contrastText",
+                borderRadius: 0.5,
+                fontWeight:"bold"
+            }}>{segment.text}</Box>
+            : <Box key={index} component={"span"}>{segment.text}</Box>)}
+    </>
+}
+
 interface GuideSidebarProps {
     chapters: GuideChapter[]
     activeChapter: string
@@ -74,6 +104,81 @@ export function GuideSidebar({
 
     const expand = (slug: string) => setExpanded(prev =>
         prev.includes(slug) ? prev : [...prev, slug])
+
+    // What has been typed and what has been searched are kept apart: the field stays immediate while the
+    // scan waits for a pause, so a long word is looked for once instead of once per letter.
+    const [typed, setTyped] = useState("")
+    const [query, setQuery] = useState("")
+    const search = useDebounced((value: string) => setQuery(value), 250)
+    const hits = useGuideSearch(query)
+
+    const clearSearch = () => {
+        setTyped("")
+        setQuery("")
+    }
+
+    const field = <Box sx={{px: 1, py: 1, backgroundColor: (theme) => theme.palette.background.paper}}>
+        <TextField
+            fullWidth={true}
+            size={"small"}
+            value={typed}
+            placeholder={t("guide.search")}
+            onChange={(event) => {
+                setTyped(event.target.value)
+                search(event.target.value)
+            }}
+            slotProps={{
+                input: {
+                    startAdornment: <Search fontSize={"small"} sx={{mr: 1, color: "text.secondary"}}/>,
+                    endAdornment: typed
+                        ? <IconButton size={"small"} aria-label={t("buttons:clear")} onClick={clearSearch}>
+                            <Close fontSize={"small"}/>
+                        </IconButton>
+                        : undefined
+                }
+            }}
+        />
+    </Box>
+
+    const results = <List sx={{
+        flex: 1,
+        overflowY: "auto",
+        backgroundColor: (theme) => theme.palette.background.paper
+    }}>
+        {hits.length === 0 &&
+            <Typography variant={"body2"} sx={{px: 2, py: 1, color: "text.secondary"}}>
+                {t("guide.no_results")}
+            </Typography>}
+        {hits.map((hit) =>
+            <ListItemButton
+                key={`${hit.chapterSlug}-${hit.sectionId}`}
+                component={RouterLink}
+                href={hit.path}
+                replace={true}
+                onClick={()=>{
+                    clearSearch()
+                    onClose()
+                }}
+                sx={{...ITEM_SX, display: "block", py: 1}}
+            >
+                <Typography variant={"caption"} sx={{color: "text.secondary", display: "block"}}>
+                    {hit.chapterTitle}
+                </Typography>
+                <Typography variant={"body2"} sx={{fontWeight: 700, color: "text.primary"}}>
+                    <Highlighted text={hit.title} query={query}/>
+                </Typography>
+                <Typography variant={"caption"} sx={{
+                    color: "text.secondary",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden"
+                }}>
+                    <Highlighted text={hit.snippet} query={query}/>
+                </Typography>
+            </ListItemButton>
+        )}
+    </List>
 
     const tree = <List sx={{
         flex: 1,
@@ -174,7 +279,13 @@ export function GuideSidebar({
                                     event.stopPropagation()
                                     onClose()
                                 }}
-                                sx={ITEM_SX}
+                                sx={{
+                                    ...ITEM_SX,
+                                    "&:hover": {
+                                        "& .MuiListItemText-primary": {color: "primary.main"},
+                                        "& .MuiSvgIcon-root": {color: "primary.main"}
+                                    }
+                                }}
                             >
                                 <ListItemText
                                     primary={section.title}
@@ -231,6 +342,9 @@ export function GuideSidebar({
                 <Divider/>
             </>
         }
-        {tree}
+        {field}
+        {/* While something is being searched the results stand in for the tree: a heading on its own
+            cannot show why a section matched, and the snippet can. */}
+        {query.trim().length >= MIN_SEARCH_LENGTH ? results : tree}
     </Drawer>
 }

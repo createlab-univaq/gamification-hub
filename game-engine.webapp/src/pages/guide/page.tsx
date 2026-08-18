@@ -24,10 +24,12 @@ import {
     guideChapterPath,
     guideTrail,
     isGuideChapter,
+    nodeText,
     slugifyHeading,
     splitChapter
 } from "../../utils/guide-utils.ts";
 import {GuideNavigation} from "../../components/guide/GuideNavigation.tsx";
+import {CodeBlock} from "../../components/guide/CodeBlock.tsx";
 
 function omitNode<T extends { node?: unknown }>(props: T): Omit<T, "node"> {
     const rest: Record<string, unknown> = {...props}
@@ -48,16 +50,6 @@ function cellAlign(align?: string | null) {
     return align === "left" || align === "right" || align === "center" ? align : undefined
 }
 
-
-function nodeText(children: unknown): string {
-    if (children == null || children === false) return ""
-    if (typeof children === "string" || typeof children === "number") return String(children)
-    if (Array.isArray(children)) return children.map(nodeText).join("")
-    if (typeof children === "object" && "props" in children) {
-        return nodeText((children as { props: { children?: unknown } }).props.children)
-    }
-    return ""
-}
 
 const REMARK_PLUGINS = [remarkGfm]
 
@@ -129,22 +121,7 @@ const MARKDOWN_COMPONENTS: Components = {
                     {title}
                 </Typography>}
         </Box>,
-    pre: (props) => <Box component={"pre"} sx={{
-        my: 2.5,
-        p: 2,
-        borderRadius: 2,
-        border: "1px solid",
-        borderColor: "divider",
-        backgroundColor: (theme) => theme.palette.mode === "dark"
-            ? "rgba(0, 0, 0, 0.35)" : "rgba(99, 51, 148, 0.05)",
-        overflowX: "auto",
-        fontSize: "0.82rem",
-        lineHeight: 1.65,
-        "& code": {
-            fontFamily: "\"SFMono-Regular\", Menlo, Consolas, monospace",
-            whiteSpace: "pre"
-        }
-    }} {...omitNode(props)}/>,
+    pre: ({children}) => <CodeBlock>{children}</CodeBlock>,
     code: ({children, className, ...props}) => {
         const isBlock = className?.includes("language-")
             || String(children).includes("\n")

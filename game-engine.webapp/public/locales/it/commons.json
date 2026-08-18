@@ -60,6 +60,9 @@
   },
   "guide": {
     "exit": "Esci",
+    "search": "Cerca nella guida",
+    "no_results": "Nessun risultato",
+    "copied": "Copiato",
     "load_error": "Impossibile caricare la guida. Riprova più tardi.",
     "sections": "Sezioni",
     "previous": "Precedente",
