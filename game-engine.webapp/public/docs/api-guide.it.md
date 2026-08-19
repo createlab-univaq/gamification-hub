@@ -22,7 +22,7 @@ Da questa struttura escono due conseguenze che pesano su quasi ogni richiesta. L
 
 Un'ultima avvertenza, utile prima di mettersi a caccia di un id: non tutto si indirizza allo stesso modo. Giochi, regole, concetti di punteggio, medaglie, modelli di sfida, classifiche e scenari ricevono un id alla creazione, e va quello nel percorso. Azioni, livelli, giocatori, squadre e istanze di sfida si chiamano invece col nome che gli hai dato, perché per loro il nome *è* l'identità. Da qui anche il fatto che rinominarli non sia previsto, o equivalga a crearne un altro.
 
-## 2. Autenticazione
+## 2. Autenticazione e autorizzazione
 
 Il token può arrivare in due modi:
 
@@ -52,7 +52,15 @@ POST /api/v1/auth
 | `PUT` | `/auth/update-user` | Cambiare username o password |
 | `DELETE` | `/auth/deactivate` | Disattivare il proprio account |
 
-## 3. Autorizzazione
+### Chi identifica il token, e chi sono i tuoi giocatori
+
+Il token identifica **il tuo account**, non un tuo giocatore. Nel motore i giocatori non fanno login: il loro record contiene punteggi, medaglie e sfide, ma non ha credenziali proprie. Ogni richiesta relativa a un gioco viene autorizzata verificando che l'account dietro al token sia il proprietario di quel gioco: per il motore esiste quindi un solo chiamante, la tua applicazione.
+
+L'autenticazione delle persone resta perciò un compito del tuo gioco, e il punto di collegamento fra i due sistemi è **l'id del giocatore**. Lo scegli tu: `POST /games/{gameId}/players` riceve l'id nel corpo della richiesta invece di generarlo, e inviare un evento per un id inesistente crea quel giocatore proprio con l'id che hai usato. Quando un utente accede al tuo gioco, quindi, sei tu a conservare nel suo account l'id che gli corrisponde nel motore, e ogni chiamata che fai a suo nome usa quell'id. Qualunque cosa siano i tuoi utenti dalla tua parte, una riga in una tabella o un soggetto SSO, per il motore sono quell'id: del loro nome e della loro password non sa nulla.
+
+Da qui la regola su dove tenere il token. Un token che finisce in un browser o in un'app distribuita può inviare eventi a nome di **qualsiasi** giocatore, perché nella richiesta non c'è nulla che indichi chi sia la persona reale. Conservalo sul tuo server, decidi lì quale id inserire in ogni chiamata, ed effettua le chiamate dal server.
+
+### Fin dove arriva un token
 
 Un gioco appartiene a un account solo. Ogni endpoint legato a un gioco, prima di fare qualsiasi cosa, si chiede sempre la stessa cosa: l'account dietro questo token possiede questo gioco? Se la risposta è no, arriva un `403` con `errorCode: "user_not_authorized"`. Vale per il gioco e per tutto ciò che gli sta sotto: regole, giocatori, le sfide di un giocatore, la tabella di una classifica.
 
@@ -60,7 +68,7 @@ Autenticarsi, insomma, non basta. Un token valido ti porta sui tuoi giochi e si 
 
 Con l'esportazione siamo più severi ancora: un gioco che non è tuo viene rifiutato con `errorCode: "export_forbidden"`, anche dove una semplice lettura sarebbe passata.
 
-## 4. Gli endpoint disponibili
+## 3. Gli endpoint disponibili
 
 Ogni gruppo elenca i suoi endpoint e poi mostra com'è fatta la richiesta, dove ne serve una. I valori sono inventati: conta quali campi esistono e quali sono obbligatori. Gli endpoint senza corpo li descrivono già per intero il percorso e i parametri in query.
 
@@ -577,7 +585,7 @@ GET /api/v1/games/{gameId}/notifications?playerId=alice&page=0&size=20
 
 Sola lettura: crearne una non si può. Le notifiche escono dal motore mentre lavora, e sono quindi il modo in cui un client scopre che è successo qualcosa senza andare a interrogare ogni giocatore. Quali campi ci sono dipende da `type`: guarda quello per primo.
 
-## 5. Cosa accade mentre un gioco gira
+## 4. Cosa accade mentre un gioco gira
 
 Configurare un gioco e farlo girare sono due mestieri diversi. Il secondo vale la pena capirlo, perché è da lì che escono quasi tutte le sorprese.
 
@@ -598,7 +606,7 @@ POST /api/v1/executions
 
 **Le verifiche che hai salvato non le esegue nessuno.** Gli scenari si conservano, non si eseguono. Se dopo aver cambiato una regola vuoi rifarne girare uno, mandalo tu a `/executions/simulations` e confrontalo con il suo `expectedOutput`.
 
-## 6. Quando qualcosa va storto
+## 5. Quando qualcosa va storto
 
 Gli errori tornano tutti nella stessa forma, qualunque sia la causa, così di strade per gestirli ne serve una e non dodici:
 

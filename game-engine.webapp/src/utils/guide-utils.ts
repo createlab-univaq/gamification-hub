@@ -1,10 +1,11 @@
 // Slugs are part of the URL, so they stay in English and never change with the interface language.
 // Titles come from i18n. A chapter with no localised file falls back to English rather than 404ing,
 
-import {Construction, DeviceHub, ImportantDevices, type SvgIconComponent} from "@mui/icons-material"
+import {Construction, DeviceHub, Explore, ImportantDevices, type SvgIconComponent} from "@mui/icons-material"
 
 // which is what lets a chapter ship in one language ahead of the other.
 export const GUIDE_CHAPTERS = [
+    {slug: "overview", titleKey: "guide.chapters.overview", languages: ["en", "it"], icon: Explore},
     {slug: "console", titleKey: "guide.chapters.console", languages: ["en", "it"], icon: ImportantDevices},
     {slug: "builder", titleKey: "guide.chapters.builder", languages: ["en", "it"], icon: Construction},
     {slug: "api", titleKey: "guide.chapters.api", languages: ["en", "it"], icon: DeviceHub},
@@ -12,7 +13,7 @@ export const GUIDE_CHAPTERS = [
 
 export type GuideChapterSlug = typeof GUIDE_CHAPTERS[number]["slug"]
 
-export const DEFAULT_GUIDE_CHAPTER: GuideChapterSlug = "console"
+export const DEFAULT_GUIDE_CHAPTER: GuideChapterSlug = "overview"
 
 export interface GuideSection {
     // The section's place in its chapter, counting from one. This is what addresses it, because a slug

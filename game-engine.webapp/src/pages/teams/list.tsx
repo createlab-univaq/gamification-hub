@@ -15,6 +15,7 @@ import {PageList} from "../../components/PageList.tsx";
 import {useDebounced} from "../../hooks/use-debounced.ts";
 import type {TeamDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
+import {navigateTo} from "../../utils/navigation-utils.ts";
 
 export function TeamListPage() {
     const game = useGame()
@@ -105,7 +106,8 @@ export function TeamListPage() {
                     <Typography>{t("teams.members_count", {count: team.members?.length ?? 0})}</Typography>
                 </Stack>
             }}
-            onItemUpdate={() => {
+            onItemUpdate={(team) => {
+                navigateTo(`/games/${game.id}/teams/upsert/${team.id}`)
             }}
             onItemDelete={(team) => {
                 setDeleteTeam(team)

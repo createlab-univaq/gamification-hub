@@ -189,6 +189,9 @@ export function GuideSidebar({
             const unfolded = expanded.includes(chapter.slug)
             const reading = chapter.slug === activeChapter
             const Icon = chapter.icon
+            // A chapter of a single page has nothing to unfold, so it is one plain link: no caret to
+            // press, and the whole row opens it rather than half of it folding nothing.
+            const foldable = chapter.sections.length > 0
             return <Box key={chapter.slug}>
                 {/* Only the icon and the label open the chapter; the rest of the row folds it. On a
                     phone that puts the larger target on the more common action and keeps an accidental
@@ -196,9 +199,7 @@ export function GuideSidebar({
                     button never sits inside the link. */}
                 <Stack direction={"row"}
                        sx={{...CHAPTER_ROW_SX, alignItems: "center"}}
-                       onClick={() => {
-                           toggle(chapter.slug)
-                       }}>
+                       onClick={foldable ? () => toggle(chapter.slug) : undefined}>
                     <ListItemButton
                         component={RouterLink}
                         href={guideChapterPath(chapter.slug)}
@@ -214,10 +215,11 @@ export function GuideSidebar({
                             mx:0,
                             px:1,
                             gap: 1,
-                            flexGrow: 0,
+                            // With nothing to fold, the link takes the row: there is no second half.
+                            flexGrow: foldable ? 0 : 1,
                             flexShrink: 1,
                             flexBasis: "auto",
-                            maxWidth: "fit-content",
+                            maxWidth: foldable ? "fit-content" : "none",
                             flexDirection: "row",
                             // The label and the icon carry their own colours, so the hover has to
                             // reach them rather than set one on the button they sit in.
@@ -243,15 +245,16 @@ export function GuideSidebar({
                             }}
                         />
                     </ListItemButton>
-                    <ListItemButton
-                        aria-label={t("guide.sections")}
-                        aria-expanded={unfolded}
-                        sx={CHAPTER_PART_SX}
-                    >
-                        {unfolded ? <ExpandLess fontSize={"small"}/> : <ExpandMore fontSize={"small"}/>}
-                    </ListItemButton>
+                    {foldable &&
+                        <ListItemButton
+                            aria-label={t("guide.sections")}
+                            aria-expanded={unfolded}
+                            sx={CHAPTER_PART_SX}
+                        >
+                            {unfolded ? <ExpandLess fontSize={"small"}/> : <ExpandMore fontSize={"small"}/>}
+                        </ListItemButton>}
                 </Stack>
-                <Collapse in={unfolded} timeout={"auto"} unmountOnExit={true}>
+                <Collapse in={foldable && unfolded} timeout={"auto"} unmountOnExit={true}>
                     <List disablePadding={true}
                           sx={{
                               ml: 3.5,

@@ -13,7 +13,8 @@ import {Stack, TextField} from "@mui/material";
 import {ArrowBack, RestartAlt, Save} from "@mui/icons-material";
 import {ButtonIcon} from "../ButtonIcon.tsx";
 import {useTranslation} from "react-i18next";
-import cronstrue from "cronstrue/i18n";
+import {isCronValid} from "../../utils/cron-utils.ts";
+import {CronField} from "../CronField.tsx";
 
 interface ClassificationFormProps {
     gameId: string
@@ -42,7 +43,7 @@ function toFormValues(c?: ClassificationDto): ClassificationFormValues {
 
 export function ClassificationForm({gameId, classification}: ClassificationFormProps) {
 
-    const [t, i18n] = useTranslation()
+    const [t] = useTranslation()
     const {setNotification} = useNotificationContext()
     const form = useForm<ClassificationFormValues>({
         defaultValues: toFormValues(classification)
@@ -50,31 +51,6 @@ export function ClassificationForm({gameId, classification}: ClassificationFormP
 
     const type = form.watch("type")
     const selectedPointConcept = form.watch("pointConceptName")
-    const cronExpression = form.watch("cronExpression")
-
-    const cronLocale = (i18n.language ?? "en").split("-")[0]
-
-    function isCronValid(value?: string): boolean {
-        if (!value?.trim()) {
-            return true
-        }
-        try {
-            cronstrue.toString(value, {throwExceptionOnParseError: true})
-            return true
-        } catch {
-            return false
-        }
-    }
-
-    function cronHint(value?: string): string {
-        if (!value?.trim()) {
-            return t("leaderboards.form.cron_helper")
-        }
-        if (!isCronValid(value)) {
-            return t("leaderboards.form.cron_invalid")
-        }
-        return cronstrue.toString(value, {locale: cronLocale, throwExceptionOnParseError: false})
-    }
 
     const typeOptions = [
         {value: "GENERAL", label: t("leaderboards.form.type_general")},
@@ -169,8 +145,9 @@ export function ClassificationForm({gameId, classification}: ClassificationFormP
                     required: t("required_field"),
                     validate: (value) => isCronValid(value) || t("leaderboards.form.cron_invalid")
                 }}>
-                    <TextField label={t("leaderboards.form.cron")} fullWidth={true} type={"text"} required={true}
-                               helperText={cronHint(cronExpression)}/>
+                    <CronField label={t("leaderboards.form.cron")} required={true}
+                               size={"medium"}
+                               helperText={t("leaderboards.form.cron_helper")}/>
                 </FormInput>
             }
 
@@ -184,7 +161,6 @@ export function ClassificationForm({gameId, classification}: ClassificationFormP
                     rules={{required: t("leaderboards.form.period_required")}}
                 />
             }
-
             <Stack direction={"row"} sx={{justifyContent: "space-between", alignItems: "center"}}>
                 <ButtonIcon icon={<ArrowBack/>} href={`/games/${gameId}/classifications`}
                             variant={"contained"}>{t("buttons:turn_back")}</ButtonIcon>

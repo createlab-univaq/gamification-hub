@@ -14,7 +14,13 @@ What gets saved is the Drools code. Not the blocks, not their positions on the c
 
 That has a practical consequence worth taking on board early. Opening an existing rule does not restore the canvas you left behind, because the canvas was never saved. The stored code is parsed, blocks are created to match it, and they are laid out fresh from the top left. A rule you built in a careful arrangement will come back tidy but rearranged, and nothing is lost by it, because the arrangement never meant anything to the engine.
 
-It also means the two panels are not two editors competing for the same document. The blocks describe the text. The text can be edited directly, and the blocks catch up. Anything Drools can express that no block covers can still be typed, and it will survive as long as the parser understands it well enough to give it a block to live in, which is what the raw blocks in each category are for.
+So the two panels are not two editors competing for the same document. They synchronise in both directions, each on a short delay of about four tenths of a second so that neither fights your typing: change anything on the canvas and the code is regenerated from the whole workspace, and type in the code editor and the text is parsed and the canvas rebuilt from the result. Anything Drools can express that no block covers can still be typed, and it survives as long as the parser understands it well enough to give it a block to live in, which is what the raw blocks in each category are for.
+
+Regeneration is wholesale rather than incremental. The generator walks the workspace and writes the file out from scratch in a fixed order: imports first, then globals, then declared types, then functions, then rules. Where you happen to have placed things on the canvas has no effect on that order. Two rules on the same canvas are emitted in the order they sit top to bottom, the leftmost winning between two at the same height, but rules always come after functions no matter where you dragged them.
+
+When the code will not parse, the canvas is left exactly as it was and the failure is reported in the message console as an error. This is the normal state of affairs while you are halfway through typing a pattern, and it is not something to worry about: the blocks simply stop tracking until the text is coherent again. A failure in the other direction, where the workspace cannot be turned into text, is reported as a warning instead. Both are reasons to keep that console open when you are working in the text panel.
+
+One thing does not survive the round trip, and it is worth knowing before it surprises you: formatting. Comments, blank lines and your own indentation are not preserved, because what comes back is printed from the parsed structure rather than kept verbatim. What a rule *says* does make the journey in both directions, its five attributes included, so the text you get back is the same rule differently laid out rather than a lesser version of it.
 
 ## 2. The workspace
 
@@ -28,17 +34,7 @@ At the top of the page sit the rule's **name** and three buttons. The name is a 
 
 ![The rule builder workspace](/docs/images/rule-builder-area.png "The builder workspace: canvas, code editor and message console")
 
-## 3. Keeping blocks and text in step
-
-The two views synchronise in both directions, each on a short delay of about four tenths of a second so that neither fights your typing. Change anything on the canvas and the code is regenerated from the whole workspace. Type in the code editor and the text is parsed, and the canvas is rebuilt from the result.
-
-Regeneration is wholesale rather than incremental. The generator walks the workspace and writes the file out from scratch in a fixed order: imports first, then globals, then declared types, then functions, then rules. Where you happen to have placed things on the canvas has no effect on that order. Two rules on the same canvas are emitted in the order they sit top to bottom, the leftmost winning between two at the same height, but rules always come after functions no matter where you dragged them.
-
-When the code will not parse, the canvas is left exactly as it was and the failure is reported in the message console as an error. This is the normal state of affairs while you are halfway through typing a pattern, and it is not something to worry about: the blocks simply stop tracking until the text is coherent again. A failure in the other direction, where the workspace cannot be turned into text, is reported as a warning instead. Both are reasons to keep the console open when you are working in the text panel.
-
-One thing does not survive the round trip, and it is worth knowing before it surprises you: formatting. Comments, blank lines and your own indentation are not preserved, because what comes back is printed from the parsed structure rather than kept verbatim. What a rule *says* does make the journey in both directions, its five attributes included, so the text you get back is the same rule differently laid out rather than a lesser version of it.
-
-## 4. The blocks, category by category
+## 3. The blocks, category by category
 
 The toolbox has five categories holding thirty-nine distinct blocks, with forty entries in total because `return` is offered in two places. Each category is colour-coded, and a block's colour is the quickest way to tell where it belongs once your canvas has a few dozen on it.
 
@@ -138,7 +134,7 @@ Chaining an `if` straight into the `else` socket of an `if / else` is recognised
 
 ![The Consequences category](/docs/images/rule-builder-consequences.png "The Consequences blocks")
 
-## 5. What can connect to what
+## 4. What can connect to what
 
 Blocks will not join in combinations that could not compile, which is most of the validation you get for free. Each socket accepts one kind of block, and the notch shapes follow the same rule, so an attempt to drop a consequence into a `when` simply will not stick.
 
@@ -152,7 +148,7 @@ The `package` block is the one that catches people, because it is not on that li
 
 If a block seems to have no effect on the generated code, this is nearly always why: check that it is inside something, and that the something is one of the five.
 
-## 6. Bindings, suggestions and fact types
+## 5. Bindings, suggestions and fact types
 
 Bound variables in Drools start with a `$`, and on a fact pattern the builder handles that for you. Its binding field holds the bare name and the `$` is added when the code is written. Typing one in anyway is fine, because the field strips it, so `$pc` and `pc` both end up as `$pc` in the output and there is no way to produce `$$pc`.
 
@@ -162,7 +158,7 @@ Some fields suggest values as you type them. The fact type on a pattern offers t
 
 The `modify` and `retract` blocks suggest something more useful still: the bindings that actually exist on your canvas. Both read the bound patterns from the workspace and offer their variables, which means the `then` half of a rule can be assembled by picking from what the `when` half has already bound, and a typo between the two halves is much harder to make.
 
-## 7. Validating, saving and taking effect
+## 6. Validating, saving and taking effect
 
 **Validate** sends what is in the code panel to the engine and compiles it there, without storing anything. This is the same compilation the game does when it runs, so it is the real answer rather than an approximation. A clean result is confirmed with a brief notification. Anything else opens the message console and lists the results with their severity: errors mean the rule will not compile, warnings mean it will but something looks questionable. Validating costs nothing and needs no player, so there is no reason not to do it before every save.
 

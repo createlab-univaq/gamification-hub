@@ -64,7 +64,7 @@ const MARKDOWN_COMPONENTS: Components = {
             variant={"h3"} id={slugifyHeading(nodeText(children))}
             sx={{mt: 2, mb: 2, scrollMarginTop: "1rem"}}
             {...omitNode(props)}>{children}</Typography>,
-    h3: (props) => <Typography variant={"h5"} sx={{mt: 3, mb: 1.5}} {...omitNode(props)}/>,
+    h3: (props) => <Typography variant={"h5"} color={"primary"} sx={{mt: 3, mb: 1.5}} {...omitNode(props)}/>,
     p: (props) => isImageParagraph(props.node)
         ? <Box {...omitNode(props)}/>
         : <Typography variant={"body1"} sx={{mb: 2}} {...omitNode(props)}/>,

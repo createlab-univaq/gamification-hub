@@ -16,6 +16,7 @@ import {PageList} from "../../components/PageList.tsx";
 import type {GetFilter} from "../../api/filters/filters.ts";
 import {useDebounced} from "../../hooks/use-debounced.ts";
 import {useTranslation} from "react-i18next";
+import {navigateTo} from "../../utils/navigation-utils.ts";
 
 export function RuleListPage() {
 
@@ -111,7 +112,8 @@ export function RuleListPage() {
             renderItem={(rule) => {
                 return <Typography variant={"h5"}>{rule.name}</Typography>
             }}
-            onItemUpdate={() => {
+            onItemUpdate={(rule) => {
+                navigateTo(`/games/${rule.gameId}/rules/upsert/${rule.id}`)
             }}
             onItemDelete={(rule) => {
                 setDeleteRule(rule)

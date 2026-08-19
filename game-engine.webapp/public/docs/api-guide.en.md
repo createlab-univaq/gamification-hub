@@ -22,7 +22,7 @@ Two consequences of that arrangement shape almost every request you will write. 
 
 What you address a thing by varies, and it is worth knowing which is which before hunting for an id. Games, rules, point concepts, badges, challenge models, leaderboards and scenarios are given an id when created, and that id goes in the path. Actions, levels, players, teams and challenge instances are addressed by the name you gave them, because for those the name *is* the identity, which is also why renaming one is either unsupported or amounts to creating another.
 
-## 2. Authentication
+## 2. Authentication and authorization
 
 Two ways of carrying the token are accepted on every request, looked for in this order:
 
@@ -52,7 +52,15 @@ POST /api/v1/auth
 | `PUT` | `/auth/update-user` | Change username/password |
 | `DELETE` | `/auth/deactivate` | Deactivate the current account |
 
-## 3. Authorization
+### Who the token identifies, and who your players are
+
+A token identifies **your account**, not one of your players. There is no player login here: a player record holds scores, badges and challenges and carries no credentials of its own. Every game-scoped request is authorised by asking whether the account behind the token owns the game, so as far as the engine is concerned there is one caller, and that caller is your application.
+
+Authenticating people therefore stays where it already is, in your game, and the join between the two systems is the **player id**. You choose it: `POST /games/{gameId}/players` takes the id in the body rather than generating one, and sending an event for an id that does not exist yet creates that player under exactly the id you used. So when someone signs in to your game, your own account record for that person holds their engine player id, and every call you make on their behalf carries it. Whatever your users are to you, a row in a table or an SSO subject, they are that id to the engine, which never needs their name or their password.
+
+The practical consequence is where the token lives. A token that reaches a browser or a mobile binary can send events as **any** player id, because nothing in the request says which person is behind it. Keep the token on your server, let your own authentication decide whose id goes into a call, and let your server make the call.
+
+### What a token is allowed to reach
 
 A game belongs to exactly one account, and every endpoint scoped to a game asks the same question before doing anything: does the account behind this token own this game? If it does not, the request is refused with `403` and `errorCode: "user_not_authorized"`, whether you asked for the game itself or for anything underneath it — its rules, its players, one player's challenges, a leaderboard board.
 
@@ -60,7 +68,7 @@ Being logged in is therefore not enough on its own. A valid token gets you as fa
 
 Exporting is stricter still, and refuses with `errorCode: "export_forbidden"` for a game you do not own even where a read might otherwise have been allowed.
 
-## 4. Available endpoints
+## 3. Available endpoints
 
 Each group below lists its endpoints and then shows the shape of the requests that carry a body. Values are placeholders: what matters is which fields exist and which are required. Endpoints that take no body are fully described by their path and query parameters.
 
@@ -577,7 +585,7 @@ GET /api/v1/games/{gameId}/notifications?playerId=alice&page=0&size=20
 
 Read-only: there is no way to post one. Notifications are produced by the engine as a side effect of running, so they are how a client learns that something happened without polling every player. The fields present depend on `type`, so branch on it before reading the rest.
 
-## 5. What happens when a game runs
+## 4. What happens when a game runs
 
 Configuring a game and running one are different activities, and the second is worth understanding because almost every surprise comes from it.
 
@@ -598,7 +606,7 @@ POST /api/v1/executions
 
 **Nothing runs the checks you saved.** Scenarios are stored, not executed. If you want a saved scenario re-run after a rule change, send it to `/executions/simulations` yourself and compare against its `expectedOutput`.
 
-## 6. When something goes wrong
+## 5. When something goes wrong
 
 Every failure comes back in one shape, whatever caused it, so a client needs one error path rather than a dozen:
 

@@ -175,11 +175,11 @@ The value of a simulation is not just that it runs, but that it is fully **obser
 
 A simulation also becomes a **regression test**. Once you know the correct result, you fill in the **expected outcome** and save the scenario; from then on it passes only when a future run still produces that result. Re-running your saved scenarios after any rule change is how you catch a rule you accidentally broke before it reaches real players.
 
-Whether a rule *compiles* is a smaller question than whether it behaves, and it has a quicker answer. [Validating from the builder](/guide/builder/7) compiles a rule and reports its problems without a player, a scenario or a saved rule, so it is worth clearing before you spend a simulation on it.
+Whether a rule *compiles* is a smaller question than whether it behaves, and it has a quicker answer. [Validating from the builder](/guide/builder/6) compiles a rule and reports its problems without a player, a scenario or a saved rule, so it is worth clearing before you spend a simulation on it.
 
 One more tool sits alongside simulation. The **impact analysis** is a static diagram of how your rules relate to each other (which rule's output can trigger or block another), computed without running anything. As a rule set grows, it is the quickest way to spot an unintended interaction, such as one rule quietly disabling another.
 
-> **In Campus Quest.** Open **Scenarios**, add one named `lecture reaches Sophomore`, and build a synthetic player with the `attend_lecture` action, a `study_points` concept starting at `95`, and an empty `achievements` collection. Simulate. Because the score starts one lecture short of 100, the +10 crosses the threshold: the output shows `study points for lecture`, `first_lecture_badge` and `bookworm_badge` firing, `study_points` going 95 to 105, and both badges earned. Save it with that expected outcome and it guards those three rules from then on.
+> **In Campus Quest.** Open **Scenarios**, add one named `lecture reaches Sophomore`, and build a synthetic player with the `attend_lecture` action, a `study_points` concept starting at `95`, and an empty `achievements` collection. Simulate. Because the score starts one lecture short of 100, the +10 crosses the threshold: the output shows `study points for lecture`, `first lecture badge` and `bookworm badge` firing, `study_points` going 95 to 105, and both badges earned. Save it with that expected outcome and it guards those three rules from then on.
 
 ![The simulation inputs](/docs/images/simulation-inputs.png "A synthetic student one lecture away from 100 points")
 
@@ -221,7 +221,7 @@ Everything up to here has been design: you have described *what can happen* (act
 
 An **event** is how the outside world tells the engine that something happened. When a real student attends a lecture or hands in an assignment, your application (a mobile app, a website, a backend job) sends the engine a short message saying "this player just did this action". The console is where you *design and observe* the game; your application is what *feeds* it. Each event is a single call to the engine's API, and the instant it arrives the engine does exactly what you watched in the simulator, only for real: it runs your rules for that player, adds points, grants any badges, and recalculates their level.
 
-This is the one thing the console deliberately cannot do for you. There is no screen here that plays a game: no button that awards a point, no form that marks an action as done. Every real event reaches the engine through its API and no other way, which is why a game can be finished in the console and still show nothing happening until an application starts talking to it. The [API chapter](/guide/api) covers that side in full, and [what happens when a game runs](/guide/api/5) is the part that explains an execution from the call to the state it leaves behind. What follows here is enough to see the shape of it.
+This is the one thing the console deliberately cannot do for you. There is no screen here that plays a game: no button that awards a point, no form that marks an action as done. Every real event reaches the engine through its API and no other way, which is why a game can be finished in the console and still show nothing happening until an application starts talking to it. The [API chapter](/guide/api) covers that side in full, and [what happens when a game runs](/guide/api/4) is the part that explains an execution from the call to the state it leaves behind. What follows here is enough to see the shape of it.
 
 An event carries four things: **which game** it belongs to, **which player** did it, **which action** happened (an id from section 2), and any **extra data** the action needs (a `grade`, a number of `hours`). Concretely, your application logs in once to get an access token and then posts events. A plain event looks like this:
 
@@ -348,7 +348,7 @@ then
 end
 ```
 
-Swapping the single `study_points_lecture` rule for this pair makes every lecture a member attends also lift their team's `study_points`, with no team-addressed events needed. The reverse direction, a team action cascading down to each member, works the same way using an `UpdateMembers` flag and a `Team` fact on the member side. Two things are essential: put the values you need into `addData` (an empty `UpdateTeams` carries nothing, so the team rule would have nothing to read), and always guard the two rules with `team == false` and `team == true` so each fires only in the right place.
+Swapping the single `study points for lecture` rule for this pair makes every lecture a member attends also lift their team's `study_points`, with no team-addressed events needed. The reverse direction, a team action cascading down to each member, works the same way using an `UpdateMembers` flag and a `Team` fact on the member side. Two things are essential: put the values you need into `addData` (an empty `UpdateTeams` carries nothing, so the team rule would have nothing to read), and always guard the two rules with `team == false` and `team == true` so each fires only in the right place.
 
 ## 17. Blocking players
 

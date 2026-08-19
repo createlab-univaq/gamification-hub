@@ -68,10 +68,14 @@
     "previous": "Precedente",
     "next": "Successivo",
     "chapters": {
+      "overview": "Panoramica",
       "console": "La Console",
       "api": "Le API",
       "builder": "L'editor di regole"
     }
+  },
+  "cron": {
+    "help": "Per maggiori informazioni sulle espressioni cron segui questo link"
   },
   "landing": {
     "hero": {
