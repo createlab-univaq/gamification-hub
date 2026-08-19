@@ -56,13 +56,15 @@ drlGenerator.forBlock['drool_global'] = function (block: Block): string {
 drlGenerator.forBlock['drool_rule'] = function (block: Block): string {
     const name = block.getFieldValue('RULE_NAME') || 'my_rule'
     const salience = Number(block.getFieldValue('SALIENCE') ?? 0)
-    const agendaGroup = (block.getFieldValue('AGENDA_GROUP') ?? '').trim()
+    const agendaGroup = (block.getFieldValue('AGENDA_GROUP') ?? '').trim().replace(/^"|"$/g, '')
+    const ruleFlowGroup = (block.getFieldValue('RULEFLOW_GROUP') ?? '').trim().replace(/^"|"$/g, '')
     const noLoop = block.getFieldValue('NO_LOOP') === 'TRUE'
     const lockOnActive = block.getFieldValue('ACTIVE_ON_LOCK') === 'TRUE'
 
     const attrs: string[] = []
     if (salience !== 0) attrs.push(`${I}salience ${salience}`)
-    if (agendaGroup) attrs.push(`${I}agenda-group ${agendaGroup}`)
+    if (agendaGroup) attrs.push(`${I}agenda-group "${agendaGroup}"`)
+    if (ruleFlowGroup) attrs.push(`${I}ruleflow-group "${ruleFlowGroup}"`)
     attrs.push(`${I}no-loop ${noLoop}`)
     attrs.push(`${I}lock-on-active ${lockOnActive}`)
 

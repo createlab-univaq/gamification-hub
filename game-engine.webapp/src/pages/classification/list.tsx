@@ -112,7 +112,7 @@ export function ClassificationListPage() {
                         <Stack direction={"row"} sx={{
                             gap: 1,
                             alignItems: "center",
-                            justifyContent: layout === "grid" ? "space-between" : "center"
+                            justifyContent: layout === "grid" ? "space-between" : "flex-start"
                         }}>
                             <Typography sx={{fontWeight: "bold", fontSize: "1.2rem"}}>{classification.name}</Typography>
                             <Chip size={"small"}

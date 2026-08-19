@@ -59,9 +59,23 @@
     "guide": "Guide"
   },
   "guide": {
-    "back_to_app": "Back to app",
+    "exit": "Exit",
+    "search": "Search the guide",
+    "no_results": "Nothing found",
+    "copied": "Copied",
     "load_error": "Could not load the guide. Please try again later.",
-    "sections": "Sections"
+    "sections": "Sections",
+    "previous": "Previous",
+    "next": "Next",
+    "chapters": {
+      "overview": "Overview",
+      "console": "The Console",
+      "api": "The API",
+      "builder": "The rule builder"
+    }
+  },
+  "cron": {
+    "help": "For more information about cron expressions follow this link"
   },
   "landing": {
     "hero": {
@@ -167,6 +181,7 @@
   },
   "console": {
     "saving": "Saving rule...",
+    "saved": "Rule saved successfully!",
     "validation": {
       "start": "Validating rule...",
       "title": "Rule validation complete",
@@ -526,8 +541,5 @@
       "title": "Import complete!",
       "message": "{{number}} games were successfully saved."
     }
-  },
-  "navigation": {
-    "message": "If you leave now you might loose all of your progress. Make sure to save before."
   }
 }

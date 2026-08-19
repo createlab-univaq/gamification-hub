@@ -1,4 +1,5 @@
-import {createBrowserRouter} from "react-router-dom";
+import {createBrowserRouter, Navigate} from "react-router-dom";
+import {DEFAULT_GUIDE_CHAPTER} from "../utils/guide-utils.ts";
 import {lazy, Suspense} from "react";
 import {Loading} from "../components/Loading.tsx";
 import {LoginPage} from "../pages/login/page.tsx";
@@ -34,13 +35,18 @@ import {PlayerListPage} from "../pages/players/list.tsx";
 import {PlayerUpsertPage} from "../pages/players/upsert.tsx";
 import {PlayerDetailsPage} from "../pages/players/details.tsx";
 import {UserSettingsPage} from "../pages/settings/page.tsx";
-import {GuidePage} from "../pages/guide/page.tsx";
 import {LandingPage} from "../pages/landing/page.tsx";
 
 // eslint-disable-next-line react-refresh/only-export-components
 const BlocklyRuleUpsertPage = lazy(() => import("../pages/rules/upsert.tsx").then(m => ({default: m.BlocklyRuleUpsertPage})));
 // eslint-disable-next-line react-refresh/only-export-components
 const SimulationPage = lazy(() => import("../pages/scenarios/page.tsx").then(m => ({default: m.SimulationPage})));
+// The guide carries the markdown renderer, which no other page needs, so it is fetched only by readers
+// who open it rather than by everyone who loads the application.
+// eslint-disable-next-line react-refresh/only-export-components
+const GuideLayout = lazy(() => import("../components/layout/GuideLayout.tsx").then(m => ({default: m.GuideLayout})));
+// eslint-disable-next-line react-refresh/only-export-components
+const GuidePage = lazy(() => import("../pages/guide/page.tsx").then(m => ({default: m.GuidePage})));
 // eslint-disable-next-line react-refresh/only-export-components
 const ImpactAnalysisPage = lazy(() => import("../pages/rules/impact-analysis.tsx").then(m => ({default: m.ImpactAnalysisPage})));
 
@@ -68,7 +74,21 @@ export const router = createBrowserRouter([
     },
     {
         path: "/guide",
-        element: <GuidePage/>
+        element: <Suspense fallback={<Loading fullScreen={true}/>}><GuideLayout/></Suspense>,
+        children: [
+            {
+                index: true,
+                element: <Navigate to={`/guide/${DEFAULT_GUIDE_CHAPTER}`} replace={true}/>
+            },
+            {
+                path: ":chapter",
+                element: <Suspense fallback={<Loading fullScreen={false}/>}><GuidePage/></Suspense>
+            },
+            {
+                path: ":chapter/:section",
+                element: <Suspense fallback={<Loading fullScreen={false}/>}><GuidePage/></Suspense>
+            }
+        ]
     },
     {
         element: <AuthRoutes/>,

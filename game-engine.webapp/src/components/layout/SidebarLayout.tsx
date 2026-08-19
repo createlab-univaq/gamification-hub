@@ -9,6 +9,8 @@ import {useTranslation} from "react-i18next";
 import {UseSidebarContext, useSidebarContext} from "../../hooks/use-sidebar-context.ts";
 import {AppLogo} from "../logo/AppLogo.tsx";
 import {AppIcon} from "../logo/AppIcon.tsx";
+import {ButtonIcon} from "../ButtonIcon.tsx";
+import { Close } from "@mui/icons-material";
 
 
 export function SidebarContextProvider({defaultOpen, children}: PropsWithChildren<{ defaultOpen: boolean }>) {
@@ -36,7 +38,7 @@ export function SidebarLayout() {
     const sidebarWidth = useMemo(() => {
         if (width < 800) {
             if (isOpen) {
-                return "50%"
+                return "100%"
             }
             return "40%"
         }
@@ -67,8 +69,8 @@ export function SidebarLayout() {
         {width >= 800 && <Toolbar/>}
         <Box sx={{overflowX: "hidden", overflowY: "hidden"}}>
             {width < 800 &&
-                <Stack direction={"row"} sx={{p: 1}}>
-                    <Link to={"/dashboard"} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                <Stack direction={"row"} sx={{px: 1, py:0.5}}>
+                    <Link to={"/dashboard"} style={{display: "flex", alignItems: "center"}}>
                         <AppIcon
                             sx={{
                                 width: "3rem"
@@ -76,21 +78,17 @@ export function SidebarLayout() {
                         />
                         <AppLogo
                             sx={{
-                                width: {
-                                    lg: "65%",
-                                    md: "65%",
-                                    sm: "65%",
-                                    xs: "0"
-                                },
+                                width: "75%",
                                 height: {
                                     lg: "2.2rem",
                                     md: "2.2rem",
                                     sm: "2.2rem",
-                                    xs: "0"
+                                    xs: "2.2rem"
                                 }
                             }}
                         />
                     </Link>
+                    <ButtonIcon icon={<Close/>} onClick={()=>setOpen(false)}/>
                 </Stack>
             }
             <List
@@ -122,7 +120,7 @@ export function SidebarLayout() {
                                          }
                                      }}
                     >
-                        <ListItemButton href={itemHref} sx={{margin: 0, padding: 0}}>
+                        <ListItemButton href={itemHref} onClick={()=>setOpen(false)} sx={{margin: 0, padding: 0}}>
                             <ListItemIcon>
                                 <Icon color={isSelected ? "primary" : "action"} sx={{fontSize: "2rem"}}/>
                             </ListItemIcon>

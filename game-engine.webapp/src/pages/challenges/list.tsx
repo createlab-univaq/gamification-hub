@@ -15,6 +15,7 @@ import {PageList} from "../../components/PageList.tsx";
 import {useDebounced} from "../../hooks/use-debounced.ts";
 import type {ChallengeDto} from "../../api/types";
 import {useTranslation} from "react-i18next";
+import {navigateTo} from "../../utils/navigation-utils.ts";
 
 export function ChallengeListPage() {
     const game = useGame()
@@ -105,7 +106,8 @@ export function ChallengeListPage() {
                     </Stack>
                 </Stack>
             }}
-            onItemUpdate={() => {
+            onItemUpdate={(challenge) => {
+                navigateTo(`/games/${game.id}/challenges/upsert/${challenge.id}`)
             }}
             onItemDelete={(challenge) => {
                 setDeleteChallenge(challenge)

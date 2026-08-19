@@ -59,9 +59,23 @@
     "guide": "Guida"
   },
   "guide": {
-    "back_to_app": "Torna all'app",
+    "exit": "Esci",
+    "search": "Cerca nella guida",
+    "no_results": "Nessun risultato",
+    "copied": "Copiato",
     "load_error": "Impossibile caricare la guida. Riprova più tardi.",
-    "sections": "Sezioni"
+    "sections": "Sezioni",
+    "previous": "Precedente",
+    "next": "Successivo",
+    "chapters": {
+      "overview": "Panoramica",
+      "console": "La Console",
+      "api": "Le API",
+      "builder": "L'editor di regole"
+    }
+  },
+  "cron": {
+    "help": "Per maggiori informazioni sulle espressioni cron segui questo link"
   },
   "landing": {
     "hero": {
@@ -167,6 +181,7 @@
   },
   "console": {
     "saving": "Salvataggio in corso...",
+    "saved": "Regola salvata con successo!",
     "validation": {
       "start": "Validazione in corso...",
       "title": "Validazione completata",
@@ -526,8 +541,5 @@
       "title": "Importazione completata!",
       "message": "{{number}} giochi salvati correttamente"
     }
-  },
-  "navigation": {
-    "message": "Se esci dalla pagina perderai tutti i tuoi progressi. Salva prima di uscire."
   }
 }

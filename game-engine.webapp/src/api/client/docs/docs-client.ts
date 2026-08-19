@@ -7,8 +7,8 @@ export class DocsClient extends BaseApiClient {
         return super.sendRequest<T>(url, {...options, credentials: "omit"});
     }
 
-    public async getAppGuide(language: Language) {
-        return await this.get<string>(`/app-guide.${language}.md`);
+    public async getGuideChapter(chapter: string, language: Language) {
+        return await this.get<string>(`/${chapter}-guide.${language}.md`);
     }
 
 }
