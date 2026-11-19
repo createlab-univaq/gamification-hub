@@ -26,7 +26,7 @@ RUN mvn clean package -DskipTests
 # ==========================
 # Runtime stage
 # ==========================
-FROM eclipse-temurin:25-jre
+FROM eclipse-temurin:25.0.5_8-jre
 
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
