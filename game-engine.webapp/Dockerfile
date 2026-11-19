@@ -22,7 +22,7 @@ RUN npm run build
 # ==========================
 # Runtime stage
 # ==========================
-FROM nginx:1.27-alpine
+FROM nginx:1.30-alpine
 
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=builder /app/dist /usr/share/nginx/html
